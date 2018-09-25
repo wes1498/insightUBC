@@ -2,6 +2,7 @@
  * This is the primary high-level API for the project. In this folder there should be:
  * A class called InsightFacade, this should be in a file called InsightFacade.ts.
  * You should not change this interface at all or the test suite will not work.
+ * //
  */
 
 export enum InsightDatasetKind {
