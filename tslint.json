@@ -9,6 +9,7 @@
         ],
         "no-string-literal": false,
         "only-arrow-functions": false,
+        "no-console": false,
         "space-before-function-paren": [
             true,
             {
