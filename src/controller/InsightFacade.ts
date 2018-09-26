@@ -1,5 +1,5 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightCourse} from "./IInsightFacade";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -8,6 +8,9 @@ import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFaca
  */
 
 const JSZip = require("jszip");
+const COURSES = InsightDatasetKind.Courses;
+const ROOMS = InsightDatasetKind.Rooms;
+const coursesMap: Map<string, InsightCourse[]> = new Map<string, InsightCourse[]>();
 export default class InsightFacade implements IInsightFacade {
 
     public loadDatasets: Map<string, any[]>;
@@ -56,6 +59,14 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public listDatasets(): Promise<InsightDataset[]> {
-        return Promise.reject("Not implemented.");
+        return new Promise<InsightDataset[]>((fulfill, reject) => {
+            const result: InsightDataset[] = [];
+            for (const id of coursesMap.keys()) {
+                const numRows = coursesMap.get(id).length;
+                result.push({id, kind: COURSES, numRows});
+            }
+            const body: InsightDataset[] = result;
+            fulfill();
+        });
     }
 }
