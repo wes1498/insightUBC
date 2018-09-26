@@ -86,7 +86,7 @@ export default class InsightFacade implements IInsightFacade {
                         try {
                             let Jformat = JSON.parse(results);
                             Jformat.result.forEach(function (key: any) {
-                                let CourseKeys: Course = new Course(key.dept, key.id, key.number, key.instructor, key.title, key.pass, key.fail, key.audit, key.uuid, key.year);
+                                let CourseKeys: Course = new Course(key.Subject, key.Course, key.Avg, key.Professor, key.Title, key.Pass, key.Fail, key.Audit, key.id.toString(), key.Year);
                                 format.data.push(CourseKeys);
                             });
                         } catch (err) {
