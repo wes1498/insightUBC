@@ -14,6 +14,7 @@ export interface InsightDataset {
     kind: InsightDatasetKind;
     numRows: number;
 }
+
 export class InsightError extends Error {
     constructor(...args: any[]) {
         super(...args);
