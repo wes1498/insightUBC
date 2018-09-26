@@ -2,7 +2,6 @@
  * This is the primary high-level API for the project. In this folder there should be:
  * A class called InsightFacade, this should be in a file called InsightFacade.ts.
  * You should not change this interface at all or the test suite will not work.
- * ///
  */
 
 export enum InsightDatasetKind {
@@ -15,18 +14,7 @@ export interface InsightDataset {
     kind: InsightDatasetKind;
     numRows: number;
 }
-export interface InsightCourse {
-    dept: string;
-    id: string;
-    avg: number;
-    instructor: string;
-    title: string;
-    pass: number;
-    fail: number;
-    audit: number;
-    uuid: string;
-    year: number;
-}
+
 export class InsightError extends Error {
     constructor(...args: any[]) {
         super(...args);
