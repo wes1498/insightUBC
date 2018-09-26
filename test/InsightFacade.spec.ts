@@ -80,7 +80,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         }
     });
 
-    // This is an example of a pending test. Add a callback function to make the test run. rohan
+    // This is an example of a pending test. Add a callback function to make the test run.
     it("Should remove the courses dataset");
 });
 
