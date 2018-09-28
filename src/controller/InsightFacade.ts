@@ -1,5 +1,5 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind, } from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import {JSZipObject} from "jszip";
 
 /**
@@ -46,34 +46,35 @@ export interface IDataset {
 }
 export default class InsightFacade implements IInsightFacade {
 
-    public loadDatasets: Map<string, IDataset[]>;
+    private loadDatasets: Map<string, IDataset[]>;
 
-    public static insightFacade: InsightFacade = new InsightFacade();
+    // public static insightFacade: InsightFacade = new InsightFacade();
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
         this.loadDatasets = new Map<string, IDataset[]>();
     }
-    public static getInstance() {
-        return InsightFacade.insightFacade;
-    }
+    // public static getInstance() {
+    //     return InsightFacade.insightFacade;
+    // }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+        let that = this;
         return new Promise(function (resolve, reject) {
-            let isDatasetLoaded = false;
-            if (this.loadDatasets.has(id)) {
-                isDatasetLoaded = true;
-            }
+            // let isDatasetLoaded = false;
+            // if (that.loadDatasets.has(id) || fs.existsSync(id).toJson()) {
+            //     isDatasetLoaded = true;
+            // }
             let zip = new JSZip();
-            if (kind === InsightDatasetKind.Courses || this.loadedDatasets.has(id)) {
-                this.coursesHelper(id, content, zip, isDatasetLoaded);
+            if (kind === COURSES) {
+                that.coursesHelper(id, content, zip, resolve, reject);
             } else {
                 reject("error occured in handling dataset");
             }
         });
     }
 
-    public  coursesHelper(id: string, content: string, zip: any, isloaded: boolean) {
+    public  coursesHelper(id: string, content: string, zip: any, resolve: any, reject: any) {
         zip.loadAsync(content, {base64: true}).then(function (result: any) {
             let format: IDataset = {
                 id: "courses",
@@ -81,20 +82,33 @@ export default class InsightFacade implements IInsightFacade {
             };
             let promises: Promise<any>[] = [];
             result.forEach(function (relativePath: string, file: JSZipObject) {
-                if (file.dir.valueOf() === false) {
-                    file.async("text").then(function (results: any) {
-                        try {
-                            let Jformat = JSON.parse(results);
-                            Jformat.result.forEach(function (key: any) {
-                                let CourseKeys: Course = new Course(key.Subject, key.Course, key.Avg, key.Professor, key.Title, key.Pass, key.Fail, key.Audit, key.id.toString(), key.Year);
-                                format.data.push(CourseKeys);
-                            });
-                        } catch (err) {
-                            console.log("shit didnt work");
-                        }
-                    });
+                if (file.dir.valueOf()) {
+                    return;
                 }
+                let promise = file.async("text").then(function (results: any) {
+                    try {
+                        let Jformat = JSON.parse(results);
+                        Jformat.result.forEach(function (key: any) {
+                            let CourseKeys: Course = new Course(key.Subject, key.Course, key.Avg, key.Professor, key.Title, key.Pass, key.Fail, key.Audit, key.id.toString(), key.Year);
+                            format.data.push(CourseKeys);
+                        });
+                            // fulfill(result);
+                    } catch (err) {
+                        reject("shieeet");
+                    }
+                }).catch(function (err) {
+                       reject(err);
+                });
+                promises.push(promise);
             });
+            Promise.all(promises).then(function (value: any) {
+                this.loadedDataset.set("courses", format);
+                resolve(value);
+            }).catch(function (err: any) {
+                reject(err);
+            });
+        }).catch(function (error: any) {
+            reject(error);
         });
     }
 
