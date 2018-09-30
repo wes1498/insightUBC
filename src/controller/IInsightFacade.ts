@@ -16,16 +16,25 @@ export interface InsightDataset {
     numRows: number;
 }
 export interface InsightCourse {
-    dept: string;
-    id: string;
-    avg: number;
-    instructor: string;
-    title: string;
-    pass: number;
-    fail: number;
-    audit: number;
-    uuid: string;
-    year: number;
+    coursesDept: string;
+    coursesId: string;
+    coursesAvg: number;
+    coursesInstructor: string;
+    coursesTitle: string;
+    coursesPass: number;
+    coursesFail: number;
+    coursesAudit: number;
+    coursesUuid: string;
+    coursesYear: number;
+}
+export interface InsightFilter {
+    AND?: InsightFilter[];
+    OR?: InsightFilter[];
+    LT?: {[key: string]: number};
+    GT?: {[key: string]: number};
+    EQ?: {[key: string]: number};
+    IS?: {[key: string]: string};
+    NOT?: InsightFilter;
 }
 export class InsightError extends Error {
     constructor(...args: any[]) {
