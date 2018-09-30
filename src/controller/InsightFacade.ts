@@ -27,8 +27,7 @@ export default class InsightFacade implements IInsightFacade {
         Log.trace("InsightFacadeImpl::init()");
         this.coursesMap = new Map<string, object[]>();
     }
-
-    public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+    public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> { // this i did myself inspired in romans and an older repo i can take the on this one today
         // this.loadAllDatasetsSync();
         this.pathReader2("data/"); // We are readingPaths and storing in coursesMap
         return new Promise<string[]> ( (resolve, reject) => {
@@ -64,7 +63,7 @@ export default class InsightFacade implements IInsightFacade {
             });
         });
     }
-    private  addContents(unzipped: JSZip, loadingContents: any[], id: string) {
+    private  addContents(unzipped: JSZip, loadingContents: any[], id: string) {  // my own method
         unzipped.forEach( ((relativePath, fileObject: JSZipObject) => {
             // if not folder
             if (!fileObject.dir) {
@@ -76,7 +75,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         }));
     }
-    private addCourse(course: string, datasetId: string) {
+    private addCourse(course: string, datasetId: string) {// This one is needs to be re-coded
         if (datasetId.match("courses/.*?")) {
             try {
                 let parsedCourse = JSON.parse(course);
@@ -111,7 +110,7 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    private pathReader(folderName: string): void {
+    private pathReader(folderName: string): void { // deprecated
         fs.readdir(folderName, (e , files) => {
             if (e) {
                 let error1 =  "Error reading dir";
@@ -133,7 +132,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         });
     }
-    private pathReader2(folderName: string): void {
+    private pathReader2(folderName: string): void {  // this one made myself
         fs.readdir(folderName, (e , files) => {
             if (e) {
                 let error1 =  "Error reading dir";
@@ -154,7 +153,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         });
     }
-    public loadAllDatasetsSync() {
+    public loadAllDatasetsSync() {// works but covers less than the one i did
         const courseIds = fs.readdirSync("courses/");
         for (const id of courseIds) {
             const path = "courses/" + courseIds;
@@ -166,7 +165,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
-    public removeDataset(id: string): Promise<string> {
+    public removeDataset(id: string): Promise<string> {// no changes needed
         return new Promise<string>( (resolve, reject) => {
             if (id === null || id === "" || !id ) {
                 return reject(new InsightError("Invalid ID"));
@@ -180,7 +179,7 @@ export default class InsightFacade implements IInsightFacade {
             });
         });
     }
-    public performQuery(query: any): Promise <any[]> {
+    public performQuery(query: any): Promise <any[]> {// re-code
         return new Promise<any[]>((resolve, reject) => {
             if (!(query.hasOwnProperty("WHERE") && query.hasOwnProperty("OPTIONS"))) {
                 return reject(new InsightError("Syntatic check for QUERY failed"));
@@ -206,7 +205,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         });
     }
-    private filterDataset(dataset: any[], filter: InsightFilter, id: string): any[] {
+    private filterDataset(dataset: any[], filter: InsightFilter, id: string): any[] {// re code
         const filteredDataset: any[] = [];
         for (const data of dataset) {
             if (this.isFilterSatisfied(filter, data, id)) {
@@ -219,7 +218,7 @@ export default class InsightFacade implements IInsightFacade {
             return filteredDataset;
         }
     }
-    private isFilterSatisfied(filter: InsightFilter, data: any, cid: string): boolean {
+    private isFilterSatisfied(filter: InsightFilter, data: any, cid: string): boolean {// re code
         if (Object.keys(filter).length > 1) {
             throw Error("Query is malformed");
         } else if (filter.GT) {
@@ -322,7 +321,7 @@ export default class InsightFacade implements IInsightFacade {
             throw new Error("Invalid Query.");
         }
     }
-    public listDatasets(): Promise<InsightDataset[]> {
+    public listDatasets(): Promise<InsightDataset[]> { // did myself
         return new Promise<InsightDataset[]> ( (resolve, reject) => {
             let result: InsightDataset[] = [];
 
