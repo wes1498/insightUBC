@@ -27,20 +27,6 @@ export default class InsightFacade implements IInsightFacade {
         Log.trace("InsightFacadeImpl::init()");
         this.coursesMap = new Map<string, object[]>();
     }
-    public addDataset2(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-
-        this.pathReader("data/");
-
-        return new Promise<string[]>((resolve, reject) => {
-            if (this.coursesMap.get(id)) {
-                return reject(new InsightError("ID was added previously"));
-            } else if (!id) {
-                return reject(new InsightError("Not a valid ID"));
-            } else if (id.length === 0 || id === null ) {
-                return reject(new InsightError("Something wrong with the ID"));
-            }
-        });
-    }
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 
         this.pathReader("data/");
@@ -113,27 +99,22 @@ export default class InsightFacade implements IInsightFacade {
                 this.addContents(unzipped, loadingContents, id);
                 Promise.all(loadingContents).then(() => {
                     let toSaveOnDisk: object[] = this.coursesMap.get(id);
-                    if (toSaveOnDisk.length === 10000) {
-                        this.coursesMap.delete(id);
-                        return reject(new InsightError("No sections were added"));
-                    } else {
-                        fs.writeFile("data/" + id, JSON.stringify(toSaveOnDisk), (e) => {
+                    fs.writeFile("data/" + id, JSON.stringify(toSaveOnDisk), (e) => {
                             return reject(new InsightError("Error Saving Files"));
                         });
 
-                        let result: string[] = [];
-                        this.coursesMap.forEach((value, key, map) => {
+                    let result: string[] = [];
+                    this.coursesMap.forEach((value, key, map) => {
                             result.push(key);
                         });
-                        return resolve(result);
-                    }
+                    return resolve(result);
                 });
             }).catch ((e) => {
                 return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
             });
         });
     }
-    private  addContents(unzipped: JSZip, loadingContents: any[], id: string) {  // my own method
+    private addContents(unzipped: JSZip, loadingContents: any[], id: string) {  // my own method
         unzipped.forEach( ((relativePath, fileObject: JSZipObject) => {
             // if not folder
             if (!fileObject.dir) {
@@ -243,9 +224,6 @@ export default class InsightFacade implements IInsightFacade {
             // console.log("after1 " + id);
             fs.unlink("data/" + id, (err) => {
                 if (err) {
-                    // console.log("after2 " + id);
-                    let x = this.coursesMap.has(id);
-                    // console.log("is it still in? : " + x);
                     if (this.coursesMap.has(id)) {
                         this.coursesMap.delete(id);
                         return resolve(id);
