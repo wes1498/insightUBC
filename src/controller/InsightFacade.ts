@@ -236,9 +236,7 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
     public performQuery(query: any): Promise <any[]> {// re-code
-        return new Promise<any[]>((resolve, reject) => {
-            // nothing
-        });
+           return Promise.reject("Not implemented");
     }
     private filterDataset(dataset: any[], filter: InsightFilter, id: string): any[] {// re code
         const filteredDataset: any[] = [];
