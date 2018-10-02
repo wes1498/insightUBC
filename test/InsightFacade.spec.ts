@@ -131,7 +131,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const id: string = "courses";
         let response: string;
         try {
-            console.log("before: " + id);
             response = await insightFacade.removeDataset(id);
         } catch (err) {
             response = err;
