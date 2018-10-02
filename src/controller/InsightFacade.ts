@@ -237,28 +237,7 @@ export default class InsightFacade implements IInsightFacade {
     }
     public performQuery(query: any): Promise <any[]> {// re-code
         return new Promise<any[]>((resolve, reject) => {
-            if (!(query.hasOwnProperty("WHERE") && query.hasOwnProperty("OPTIONS"))) {
-                return reject(new InsightError("Syntatic check for QUERY failed"));
-            } else {
-                try {
-                    const filter: InsightFilter = query.WHERE;
-                    const options = query.OPTIONS;
-                    const columns = options.COLUMNS;
-                    let dataset;
-                    const id: string = columns[0].split("_")[0];
-                    if (this.coursesMap.get(id)) {
-                        dataset = this.coursesMap.get(id);
-                    } else {
-                        throw new Error("Can't find dataset with id: " + id);
-                    }
-                    if (Object.keys(filter).length > 0) {
-                        dataset = this.filterDataset(dataset, filter, id);
-                    }
-                } catch (err) {
-                    Log.error(err);
-                    reject(new InsightError("Invalid query"));
-                }
-            }
+            // nothing
         });
     }
     private filterDataset(dataset: any[], filter: InsightFilter, id: string): any[] {// re code
