@@ -1,0 +1,21 @@
+   { 
+  "title": "pass string",
+    "query": {
+  "WHERE": {
+    "LT": {
+      "courses_audit": -10000
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+
+  },
+
+  "isQueryValid": true,
+   "result":[{}]
+    }

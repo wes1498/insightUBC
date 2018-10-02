@@ -1,0 +1,37 @@
+    {
+  "title": "three comparators",
+    "query": {
+"WHERE": {
+            "AND": [
+                {
+                    "GT": {
+                        "courses_avg": 50
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_avg":60
+                    }
+                },{
+                    "LT": {
+                        "courses_avg": 70
+                    }
+                }
+                ]
+        },
+  "OPTIONS":{
+      "COLUMNS":[
+         "courses_dept",
+         "courses_avg"
+      ],
+      "ORDER":"courses_avg"
+   }
+   },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"dhyg","courses_avg":60},{"courses_dept":"busi","courses_avg":60},
+    {"courses_dept":"chem","courses_avg":60},{"courses_dept":"chem","courses_avg":60},{"courses_dept":"dhyg","courses_avg":60},
+    {"courses_dept":"dhyg","courses_avg":60},{"courses_dept":"busi","courses_avg":60},{"courses_dept":"dhyg","courses_avg":60},
+    {"courses_dept":"hist","courses_avg":60},{"courses_dept":"phar","courses_avg":60},{"courses_dept":"phil","courses_avg":60},
+    {"courses_dept":"test","courses_avg":60}]
+  }
+    

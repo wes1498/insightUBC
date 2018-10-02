@@ -114,10 +114,10 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             response = err;
         } finally {
-            expect(response).to.deep.equal([id]);
+            expect(response).to.be.instanceOf(InsightError);
         }
     });
-    it("Should list 2 datasets before add uno", async () => {
+    it("Should list 1 datasets before add uno courses same", async () => {
         let response: InsightDataset[];
 
         try {
@@ -125,12 +125,13 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             expect.fail("Should not fail");
         }
-        expect(response).to.have.lengthOf(2);
+        expect(response).to.have.lengthOf(1);
     });
     it("Should remove the courses dataset uno", async () => {
         const id: string = "courses";
         let response: string;
         try {
+            console.log("before: " + id);
             response = await insightFacade.removeDataset(id);
         } catch (err) {
             response = err;
@@ -138,7 +139,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(response).to.equal(id);
         }
     });
-    it("Should remove the courses dataset dos", async () => {
+    it("Should get a not found error removing twice", async () => {
         const id: string = "courses";
         let response: string;
         try {
@@ -146,10 +147,10 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             response = err;
         } finally {
-            expect(response).to.equal(id);
+            expect(response).to.be.instanceOf(NotFoundError);
         }
     });
-    it("Should list 0 datasets after remove 2 last", async () => {
+    it("Should list 0 datasets after remove 1 last", async () => {
         let response: InsightDataset[];
 
         try {
@@ -177,7 +178,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             response = err;
         } finally {
-            expect(response).to.be.instanceOf(InsightError);
+            expect(response).to.be.instanceOf(NotFoundError);
         }
     });
     // Add dataset

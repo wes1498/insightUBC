@@ -27,23 +27,94 @@ export default class InsightFacade implements IInsightFacade {
         Log.trace("InsightFacadeImpl::init()");
         this.coursesMap = new Map<string, object[]>();
     }
-    public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> { // this i did myself inspired in romans and an older repo i can take the on this one today
+    public addDataset2(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+
+        this.pathReader("data/");
+
+        return new Promise<string[]>((resolve, reject) => {
+            if (this.coursesMap.get(id)) {
+                return reject(new InsightError("ID was added previously"));
+            } else if (!id) {
+                return reject(new InsightError("Not a valid ID"));
+            } else if (id.length === 0 || id === null ) {
+                return reject(new InsightError("Something wrong with the ID"));
+            }
+        });
+    }
+    public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+
+        this.pathReader("data/");
+
+        return new Promise<string[]> ( (resolve, reject) => {
+            if (!id || id.length === 0) {
+                return reject(new InsightError("Invalid Id"));
+            }
+            if (this.coursesMap.has(id)) {
+                return reject(new InsightError("The dataset with the given id already exists"));
+            } else {
+                this.coursesMap.set(id, []);
+            }
+            JSZip.loadAsync(content, {base64: true}).then((decoded: JSZip) => {
+                let desiredFolder: string = kind === InsightDatasetKind.Courses ? "courses/" : "rooms/";
+
+                if (decoded.length === 0) {
+                    return reject(new InsightError("No valid data in the zip file"));
+                } else if (!decoded.files.hasOwnProperty(desiredFolder)) {
+                    return reject(new InsightError("Desired folder for the dataset kind does not exist"));
+                }
+                let filesToLoadPromise: any[] = [];
+                decoded.forEach( ((relativePath, fileObject: JSZipObject) => {
+                    // if not folder
+                    if (!fileObject.dir) {
+                        filesToLoadPromise.push(fileObject.async("text").then((data: string) => {
+                            this.addCourse(data, id); // save the course info
+                        }).catch((e) => {
+                            return reject(new InsightError("Error processing encoded course data " + e));
+                        }));
+                    }
+                }));
+
+                Promise.all(filesToLoadPromise).then(() => {
+                    let toSaveOnDisk: object[] = this.coursesMap.get(id);
+                    if (toSaveOnDisk.length === 10000) {
+                        this.coursesMap.delete(id);
+                        return reject(new InsightError("No sections were added"));
+                    } else {
+                        fs.writeFile("data/" + id, JSON.stringify(toSaveOnDisk), (e) => {
+                            return reject(new InsightError("Error Saving Files"));
+                        });
+
+                        let result: string[] = [];
+                        this.coursesMap.forEach((value, key, map) => {
+                            result.push(key);
+                        });
+                        return resolve(result);
+                    }
+                });
+
+            }).catch ((e) => {
+                return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
+            });
+
+        });
+    }
+    public addDataset4(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> { // this i did myself inspired in romans and an older repo i can take the on this one today
         // this.loadAllDatasetsSync();
-        this.pathReader2("data/"); // We are readingPaths and storing in coursesMap
+        this.pathReader("data/"); // We are readingPaths and storing in coursesMap
         return new Promise<string[]> ( (resolve, reject) => {
             if (this.coursesMap.has(id) || id.length === 0) {
                 return reject(new InsightError("ID cannot be added(Invalid/Already added)"));
             }
+            this.coursesMap.set(id, []);
             JSZip.loadAsync(content, {base64: true}).then((unzipped: JSZip) => { // JSzip used to Unzip and read
                 if (unzipped.length < 1) {
                     return reject(new InsightError("Unzipped file is empty"));
                 }
                 let loadingContents: any[] = [];
                 this.addContents(unzipped, loadingContents, id);
-                this.coursesMap.set(id, []);
                 Promise.all(loadingContents).then(() => {
                     let toSaveOnDisk: object[] = this.coursesMap.get(id);
-                    if (toSaveOnDisk.length === 0) {
+                    if (toSaveOnDisk.length === 10000) {
                         this.coursesMap.delete(id);
                         return reject(new InsightError("No sections were added"));
                     } else {
@@ -170,12 +241,20 @@ export default class InsightFacade implements IInsightFacade {
             if (id === null || id === "" || !id ) {
                 return reject(new InsightError("Invalid ID"));
             }
+            console.log("after1 " + id);
             fs.unlink("data/" + id, (err) => {
                 if (err) {
-                    return reject(new NotFoundError("Could not find the ID, cant delete"));
+                    console.log("after2 " + id);
+                    let x = this.coursesMap.has(id);
+                    console.log("is it still in? : " + x);
+                    if (this.coursesMap.has(id)) {
+                        this.coursesMap.delete(id);
+                        return resolve(id);
+                    } else {
+                        return reject(new NotFoundError("Dataset has not yet been loaded"));
+                    }
                 }
-                this.coursesMap.delete(id);
-                return resolve(id);
+               // return reject(new NotFoundError("Could not find the ID, cant delete"));
             });
         });
     }

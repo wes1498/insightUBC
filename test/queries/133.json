@@ -1,0 +1,33 @@
+  { 
+  "title": "not or fail",
+    "query": {
+  "WHERE": {
+    "NOT": [
+      {
+        "OR": [
+          {
+            "GT": {
+              "courses_avg": 90
+            }
+          },
+          {
+            "IS": {
+              "courses_dept": "adhe"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_id",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+  },
+"isQueryValid": false,
+   "result":[{}]
+    }

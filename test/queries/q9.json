@@ -1,0 +1,12 @@
+ {
+  "title": "Missing the option section ",
+    "query": {
+  "WHERE":{
+      "GT":{
+         "courses_avg":97
+      }
+   }
+   },
+   "isQueryValid": false,
+    "result": []
+    }

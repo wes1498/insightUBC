@@ -1,0 +1,18 @@
+{ 
+  "title": "empty COLUMNS",
+    "query": {
+  "WHERE": {
+    "GT": {
+      "courses_avg": {}
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+    ],
+    "ORDER": "courses_fail"
+  }
+  },
+     "isQueryValid": false,
+     "result":[{}]
+    }
+    

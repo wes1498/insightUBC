@@ -1,0 +1,21 @@
+   { 
+  "title": "lt dept string",
+    "query": {
+  "WHERE": {
+    "LT": {
+      "courses_dept": "introduction*"
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+
+  },
+
+  "isQueryValid": false,
+   "result":[{}]
+    }

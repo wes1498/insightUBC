@@ -1,0 +1,23 @@
+{ 
+  "title": "same colums",
+    "query": {
+  "WHERE": {
+    "GT": {
+      "courses_avg": 99
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_fail",
+      "courses_fail",
+      "courses_avg"
+    ],
+    "ORDER": "courses_fail"
+  }
+  },
+     "isQueryValid": true,
+     "result":[{"courses_dept":"cnps","courses_avg":99.19,"courses_fail":0},{"courses_dept":"math","courses_avg":99.78,"courses_fail":0},{"courses_dept":"math","courses_avg":99.78,"courses_fail":0}]
+    }
+    

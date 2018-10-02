@@ -1,0 +1,21 @@
+{ 
+  "title": "oder by pass working",
+    "query": {
+  "WHERE": {
+    "GT": {
+      "courses_avg": 99
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_pass"
+    ],
+    "ORDER": "courses_pass"
+  }
+  },
+     "isQueryValid": true,
+     "result":[{"courses_dept":"math","courses_avg":99.78,"courses_pass":9},{"courses_dept":"math","courses_avg":99.78,"courses_pass":9},{"courses_dept":"cnps","courses_avg":99.19,"courses_pass":16}]
+    }
+    

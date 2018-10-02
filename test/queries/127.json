@@ -1,0 +1,24 @@
+  { 
+  "title": "eq cpsc instructo 68 fail ",
+    "query": {
+  "WHERE": {
+    "EQ": {
+      "courses_uuid": "stirngsh"
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_fail",
+      "courses_uuid",
+      "courses_id"
+    ],
+    "ORDER": "courses_avg"
+  }
+
+  },
+
+  "isQueryValid": false,
+   "result":[{}]
+    }
