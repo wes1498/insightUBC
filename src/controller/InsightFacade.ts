@@ -98,8 +98,7 @@ export default class InsightFacade implements IInsightFacade {
 
         });
     }
-    public addDataset4(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> { // this i did myself inspired in romans and an older repo i can take the on this one today
-        // this.loadAllDatasetsSync();
+    public addDataset4(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         this.pathReader("data/"); // We are readingPaths and storing in coursesMap
         return new Promise<string[]> ( (resolve, reject) => {
             if (this.coursesMap.has(id) || id.length === 0) {
@@ -241,12 +240,12 @@ export default class InsightFacade implements IInsightFacade {
             if (id === null || id === "" || !id ) {
                 return reject(new InsightError("Invalid ID"));
             }
-            console.log("after1 " + id);
+            // console.log("after1 " + id);
             fs.unlink("data/" + id, (err) => {
                 if (err) {
-                    console.log("after2 " + id);
+                    // console.log("after2 " + id);
                     let x = this.coursesMap.has(id);
-                    console.log("is it still in? : " + x);
+                    // console.log("is it still in? : " + x);
                     if (this.coursesMap.has(id)) {
                         this.coursesMap.delete(id);
                         return resolve(id);
