@@ -151,20 +151,20 @@ export default class InsightFacade implements IInsightFacade {
             let courseData = JSON.parse(course);
             const courseInfo: object[] = courseData.result;
             courseInfo.forEach((info: any) => {  // confirm the right type with TA
-                let courseDept: string = info.Subject as string;
+                let courseDep: string = info.Subject as string;
                 let courseId: string = info.Course as string;
                 let courseAvg: number = info.Avg as number;
-                let courseInstructor: string = info.Professor as string;
+                let courseInstru: string = info.Professor as string;
                 let courseTitle: string = info.Title as string;
                 let coursePass: number = info.Pass as number;
                 let courseFail: number = info.Fail as number;
-                let courseAudit: number = info.Audit as number;
+                let courseAu: number = info.Audit as number;
                 let courseUuid: string = info.id.toString() as string;
                 let courseYear: number = Number(info.Year);
 
                 let completeCourse: InsightCourse = {
-                    coursesDept: courseDept, coursesId: courseId, coursesAvg: courseAvg, coursesInstructor: courseInstructor,
-                    coursesTitle: courseTitle, coursesPass: coursePass, coursesFail: courseFail, coursesAudit: courseAudit,
+                    coursesDept: courseDep, coursesId: courseId, coursesAvg: courseAvg, coursesInstructor: courseInstru,
+                    coursesTitle: courseTitle, coursesPass: coursePass, coursesFail: courseFail, coursesAudit: courseAu,
                     coursesUuid: courseUuid, coursesYear: courseYear
                 };
                 for (let value of Object.values(completeCourse)) {
