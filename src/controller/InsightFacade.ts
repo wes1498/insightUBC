@@ -73,7 +73,7 @@ export default class InsightFacade implements IInsightFacade {
                     // if not folder
                     if (!fileObject.dir) {
                         filesToLoadPromise.push(fileObject.async("text").then((data: string) => {
-                            this.addCourse(data, id); // save the course info
+                            this.addCourse(data, id); // save the course info a
                         }).catch((e) => {
                             return reject(new InsightError("Error processing encoded course data " + e));
                         }));
