@@ -47,16 +47,14 @@ export default class InsightFacade implements IInsightFacade {
             });
         });
     }
-    public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-
+    private something() {
         this.pathReader("data/");
-
+    }
+    public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
-            if (!id || id.length === 0) {
+            this.something();
+            if (!id || id.length === 0 || this.coursesMap.has(id)) {
                 return reject(new InsightError("Invalid Id"));
-            }
-            if (this.coursesMap.has(id)) {
-                return reject(new InsightError("The dataset with the given id already exists"));
             } else {
                 this.coursesMap.set(id, []);
             }
@@ -148,9 +146,9 @@ export default class InsightFacade implements IInsightFacade {
     }
     private addCourse(course: string, datasetId: string) {
         try {
-            let courseData = JSON.parse(course);
-            const courseInfo: object[] = courseData.result;
-            courseInfo.forEach((info: any) => {  // confirm the right type with TA
+            const courseInfo: object[] = JSON.parse(course).result;
+            let info: any;
+            for (info of courseInfo ) {
                 let courseDep: string = info.Subject as string;
                 let courseId: string = info.Course as string;
                 let courseAvg: number = info.Avg as number;
@@ -163,9 +161,16 @@ export default class InsightFacade implements IInsightFacade {
                 let courseYear: number = Number(info.Year);
 
                 let completeCourse: InsightCourse = {
-                    coursesDept: courseDep, coursesId: courseId, coursesAvg: courseAvg, coursesInstructor: courseInstru,
-                    coursesTitle: courseTitle, coursesPass: coursePass, coursesFail: courseFail, coursesAudit: courseAu,
-                    coursesUuid: courseUuid, coursesYear: courseYear
+                    coursesDept: courseDep,
+                    coursesId: courseId,
+                    coursesAvg: courseAvg,
+                    coursesInstructor: courseInstru,
+                    coursesTitle: courseTitle,
+                    coursesPass: coursePass,
+                    coursesFail: courseFail,
+                    coursesAudit: courseAu,
+                    coursesUuid: courseUuid,
+                    coursesYear: courseYear
                 };
                 for (let value of Object.values(completeCourse)) {
                     if (value === undefined || typeof value === "object" || value instanceof Array) {
@@ -173,44 +178,10 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 }
                 this.coursesMap.get(datasetId).push(completeCourse);
-            });
+            }
 
         } catch (e) {
             // not in JSON format or some fields of different type/missing-> skip this course
-        }
-    }
-    private addCourse2(course: string, datasetId: string) {// This one is needs to be re-coded
-        if (datasetId.match("courses/.*?")) {
-            try {
-                let parsedCourse = JSON.parse(course);
-                const sections: object[] = parsedCourse.result;
-                sections.forEach((section: any) => {
-                    let coursesDept: string = section.Subject as string;
-                    let coursesId: string = section.Course as string;
-                    let coursesAvg: number = section.Avg as number;
-                    let coursesInstructor: string = section.Professor as string;
-                    let coursesTitle: string = section.Title as string;
-                    let coursesPass: number = section.Pass as number;
-                    let coursesFail: number = section.Fail as number;
-                    let coursesAudit: number = section.Audit as number;
-                    let coursesUuid: string = section.id.toString() as string;
-                    let coursesYear: number = section.Year as number;
-
-                    let validCourse: InsightCourse = {
-                        coursesDept, coursesId, coursesAvg, coursesInstructor,
-                        coursesTitle, coursesPass, coursesFail, coursesAudit, coursesUuid, coursesYear
-                    };
-                    for (let value of Object.values(validCourse)) {
-                        if (value === undefined || typeof value === "object" || value instanceof Array) {
-                            throw new TypeError("Some of the fields are missing or of non-cast type");
-                        }
-                    }
-                    this.coursesMap.get(datasetId).push(validCourse);
-                });
-
-            } catch (e) {
-                // lol
-            }
         }
     }
     private pathReader(folderName: string): void { // deprecated
@@ -256,21 +227,9 @@ export default class InsightFacade implements IInsightFacade {
             }
         });
     }
-    public loadAllDatasetsSync() {// works but covers less than the one i did
-        const courseIds = fs.readdirSync("courses/");
-        for (const id of courseIds) {
-            const path = "courses/" + courseIds;
-            try {
-                const dataset = JSON.parse(fs.readFileSync(path, "utf-8"));
-                this.coursesMap.set(id, dataset);
-            } catch (err) {
-                Log.error(err);
-            }
-        }
-    }
     public removeDataset2(id: string): Promise<string> {// no changes needed
         return new Promise<string>( (resolve, reject) => {
-            if (id === null || id === "" || !id ) {
+            if (id === null || id === "") {
                 return reject(new InsightError("Invalid ID"));
             }
             // console.log("after1 " + id);
@@ -289,18 +248,19 @@ export default class InsightFacade implements IInsightFacade {
     }
     public removeDataset(id: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
-            if (!id || id === "") {
+            if ( id === null || !id || id === "") {
                 return reject(new InsightError("Invalid ID"));
             }
 
             // if(!this.courseMap.has(id)) return reject(new NotFoundError("Dataset has not yet been loaded"));
 
             fs.unlink("data/" + id, (err) => {
-                if (err) {
+                 if (err) {
                     return reject(new NotFoundError("Dataset has not yet been loaded"));
+                } else if (this.coursesMap.has(id)) {
+                    this.coursesMap.delete(id);
+                    return resolve(id);
                 }
-                this.coursesMap.delete(id);
-                return resolve(id);
             });
         });
     }
