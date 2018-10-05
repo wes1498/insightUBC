@@ -36,6 +36,14 @@ export interface InsightFilter {
     IS?: {[key: string]: string};
     NOT?: InsightFilter;
 }
+export interface InsightOrderObj {
+    dir: string;
+    keys: string[];
+}
+export interface InsightTransformations {
+    GROUP: string[];
+    APPLY: Array<{[key: string]: {[token: string]: string}}>;
+}
 export class InsightError extends Error {
     constructor(...args: any[]) {
         super(...args);

@@ -1,16 +1,19 @@
 import Log from "../Util";
 import {
-IInsightFacade,
+    IInsightFacade,
     InsightCourse,
     InsightDataset,
     InsightDatasetKind,
     InsightError,
+    InsightFilter,
     NotFoundError,
-    InsightFilter
+    InsightOrderObj,
+    InsightTransformations,
 } from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {JSZipObject} from "jszip";
 import * as fs from "fs";
+import {Decimal} from "decimal.js";
 import {fileExists} from "ts-node";
 import {isNumber, isString} from "util";
 
@@ -33,31 +36,48 @@ export default class InsightFacade implements IInsightFacade {
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
             this.something();
-            if (!id || id.length === 0 || this.coursesMap.has(id)) {
-                return reject(new InsightError("Invalid Id"));
-            } else {
-                this.coursesMap.set(id, []);
+            let filter: string = "A";
+            if (this.coursesMap.has(id)) {
+                filter = "has ID";
+            } else if (!id || id.length === 0 || id === "") {
+                filter = "Not valid";
             }
-            JSZip.loadAsync(content, {base64: true}).then((decoded: JSZip) => {
-                let desiredFolder: string = kind === InsightDatasetKind.Courses ? "courses/" : "rooms/";
-
-                if (decoded.length === 0) {
-                    return reject(new InsightError("No valid data in the zip file"));
-                } else if (!decoded.files.hasOwnProperty(desiredFolder)) {
-                    return reject(new InsightError("Desired folder for the dataset kind does not exist"));
+            switch (filter) {
+                case "Not valid": {
+                    return reject(new InsightError("Invalid Id"));
+                }
+                case "has ID": {
+                    return reject(new InsightError("Id is already added"));
+                }
+                default: {
+                    this.coursesMap.set(id, []);
+                }
+            }
+            JSZip.loadAsync(content, {base64: true}).then((unzipped: JSZip) => {
+                let dataType: string;
+                if (kind === InsightDatasetKind.Courses) {
+                    dataType = "courses/";
+                } else if (kind === InsightDatasetKind.Rooms) {
+                    dataType = "rooms/";
                 }
                 let filesToLoadPromise: any[] = [];
-                decoded.forEach(((relativePath, fileObject: JSZipObject) => {
-                    // if not folder
-                    if (!fileObject.dir) {
+                if (unzipped.length < 1) {
+                    return reject(new InsightError("Invalid Id"));
+                } else if (unzipped.files.hasOwnProperty(dataType) || unzipped.length > 0) {
+                    unzipped.forEach(((relativePath, fileObject: JSZipObject) => {
+                        // if (fileObject.dir) {
+                        // return reject(new InsightError("Is a folder "));
+                        //  } else {
                         filesToLoadPromise.push(fileObject.async("text").then((data: string) => {
                             this.addCourse(data, id); // save the course info a
                         }).catch((e) => {
                             return reject(new InsightError("Error processing encoded course data " + e));
                         }));
-                    }
-                }));
-
+                        // }
+                    }));
+                } else {
+                    return reject(new InsightError("Desired folder for the dataset kind does not exist"));
+                }
                 Promise.all(filesToLoadPromise).then(() => {
                     let toSaveOnDisk: object[] = this.coursesMap.get(id);
                     if (toSaveOnDisk.length === 0) {
@@ -75,11 +95,9 @@ export default class InsightFacade implements IInsightFacade {
                         return resolve(result);
                     }
                 });
-
             }).catch((e) => {
                 return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
             });
-
         });
     }
     private addCourse(course: string, datasetId: string) {
@@ -125,7 +143,7 @@ export default class InsightFacade implements IInsightFacade {
     private pathReader(folderName: string): void { // deprecated
         fs.readdir(folderName, (e , files) => {
             if (e) {
-                let error1 = "Error reading dir";
+                let error1 =  "Error reading dir";
                 return error1;
             } else {
                 files.forEach((filesId) => {
@@ -162,163 +180,333 @@ export default class InsightFacade implements IInsightFacade {
             });
         });
     }
-    // private validCol: any = {
-    //     "courses": {
-    //         "COLUMNS": ["dept", "id", "instructor", "title", "uuid", "avg", "pass", "fail", "audit", "year"],
-    //         "BODY": ["AND", "OR", "LT", "GT", "EQ", "IS", "NOT"],
-    //         "LOGICCOMPARISON": ["AND", "OR", "LT", "GT", "EQ", "IS", "NOT"],
-    //         "MCOMPARISON": ["avg", "pass", "fail", "audit", "year"],
-    //         "SCOMPARISON": ["dept", "id", "instructor", "title", "uuid"],
-    //         "NEGATION": ["AND", "OR", "LT", "GT", "EQ", "IS", "NOT"]
-    //     }
-    // };
-    public performQuery(query: any): Promise <any[]> {
-        return Promise.reject("Not implemented.");
+    public performQuery(query: any): Promise <any[]> {// re-code
+        return new Promise<any[]>((resolve, reject) => {
+        try {
+            let filter: InsightFilter = query.WHERE;
+            let options = query.OPTIONS;
+            let transformations = query.TRANSFORMATIONS;
+            let columns = options.COLUMNS;
+            let order = options.ORDER;
+            let id: string = columns[0].split("_")[0];
+            let dataset;
+            let result: any;
+            if (this.coursesMap.get(id)) {
+                dataset = this.coursesMap.get(id);
+            } else {
+                throw new Error("Can't find dataset with id: " + id);
+            }
+           /* if (Object.keys(filter).length > 0) {
+                dataset = this.filterDataset(dataset, filter, id);
+            }
+            if (transformations) {
+                dataset = this.transformDataset(dataset, transformations);
+            }
+            let result = this.trimDatasetByColumns(dataset, columns);
+            if (order) {
+                result = this.sortResult(result, order, columns);
+            }
+            return resolve(result);*/
+            return resolve(result);
+        } catch (err) {
+            return reject(new InsightError("DWhack"));
+        }
+    });
+}
+   /* private isFilterSatisfied(filter: InsightFilter, data: any, cid: string): boolean {
+        if (Object.keys(filter).length > 1) {
+            throw Error("Query is malformed");
+        } else if (filter.GT) {
+            const key = Object.keys(filter.GT)[0];
+            const val = filter.GT[key];
+            const col = key.split("_")[1];
+            const fid = key.split("_")[0];
+            const value = data[col];
+            if (cid !== fid) {
+                throw new Error("Query is trying to compare two datasets at the same time.");
+            }
+            if (isNumber(val) && isNumber(value)) {
+                return (value > val);
+            } else {
+                throw new Error("Invalid query: GT value should be a number.");
+            }
+        } else if (filter.EQ) {
+            const key = Object.keys(filter.EQ)[0];
+            const val = filter.EQ[key];
+            const col = key.split("_")[1];
+            const fid = key.split("_")[0];
+            const value = data[col];
+            if (cid !== fid) {
+                throw new Error("Query is trying to query tow datasets a the same time");
+            }
+            if (isNumber(val) && isNumber(value)) {
+                return (value === val);
+            } else {
+                throw new Error("Invalid query: EQ value should be a number.");
+            }
+        } else if (filter.LT) {
+            const key = Object.keys(filter.LT)[0];
+            const val = filter.LT[key];
+            const col = key.split("_")[1];
+            const fid = key.split("_")[0];
+            const value: number = data[col];
+            if (cid !== fid) {
+                throw new Error("Query is trying to query tow datasets a the same time");
+            }
+            if (isNumber(val) && isNumber(value)) {
+                return (value < val);
+            } else {
+                throw new Error("Invalid query: LT value should be a number.");
+            }
+        } else if (filter.IS) {
+            const key = Object.keys(filter.IS)[0];
+            const val: string = filter.IS[key];
+            const col = key.split("_")[1];
+            const fid = key.split("_")[0];
+            const value: string = data[col];
+            const len = val.length;
+            if (cid !== fid) {
+                throw new Error("Query is trying to query tow datasets a the same time");
+            }
+            if (isString(val) && isString(value)) {
+                if (val === "*") {
+                    return true;
+                } else if (len === 1) {
+                    return (val === value);
+                } else if (val[0] === "*" && val[len - 1] === "*") {
+                    return value.includes(val.substr(1, len - 2));
+                } else if (val[0] === "*") {
+                    return value.endsWith(val.slice(1));
+                } else if (val[len - 1] === "*") {
+                    return value.startsWith(val.substring(0, len - 1));
+                } else if (val.includes("*")) {
+                    throw new Error("Invalid query: * should not be in middle.");
+                } else {
+                    return (val === value);
+                }
+            } else {
+                throw new Error("Invalid query: IS value should be a string.");
+            }
+        } else if (filter.NOT) {
+            return (!(this.isFilterSatisfied(filter.NOT, data, cid)));
+        } else if (filter.AND) {
+            if (filter.AND.length === 0) {
+                // Log.trace(filter.AND.length.toString());
+                throw new Error("Invalid query: AND should contain at least one condition");
+            }
+            let res = true;
+            for (const r of filter.AND) {
+                if (this.isFilterSatisfied(r, data, cid) === false) {
+                    res = false;
+                }
+            }
+            return res;
+        } else if (filter.OR) {
+            if (filter.OR.length === 0) {
+                throw new Error("Invalid query: OR should contain at least one condition");
+            }
+            let res = false;
+            for (const r of filter.OR) {
+                if (this.isFilterSatisfied(r, data, cid) === true) {
+                    res = true;
+                }
+            }
+            return res;
+        } else {
+            throw new Error("Invalid Query.");
+        }
     }
-    // public performQuery(query: any): Promise <any[]> {
-    //     // let that = this;
-    //     return new Promise<any>(function (resolve, reject) {
-    //         // No Options
-    //         // No Columns
-    //         // Length === 0
-    //         if (!query["OPTIONS"] || query["OPTIONS"]["COLUMNS"].length === 0 || !query["OPTIONS"]["COLUMNS"]) {
-    //             reject("syntax error");
-    //             return;
-    //         }
-    //         // check
-    //         let id = function identifyID(Qquery: any) {
-    //             // g = global, match all instances of the pattern in a string, not just one
-    //             // i = case-insensitive (so, for example, /a/i will match the string "a" or "A".
-    //             // regex check for valid ID key_value
-    //             let idcheck = /(.*)_.*/gi.exec(Qquery["OPTIONS"]["COLUMNS"][0])[1];
-    //             if (!this.loadedDatasets.has(id)) {
-    //                 // check if path: id.json exists,
-    //                 if (fs.existsSync(id + ".json")) {
-    //                     // fs.readFileSync('cache/courses.json')
-    //                     // let thedataset: that.coursesMap = JSON.parse(fs.readFileSync(id + ".json"));
-    //                     // this.loadedDatasets.set(id, thedataset);
-    //                 } else {
-    //                     reject("could not find ID");
-    //                     return;
-    //                 }
-    //             }
-    //
-    //             let dataset = this.loadedDatasets.get(id)
-    //
-    //             return idcheck;
-    //         };
-    //     });
-    // }
-
-    // private isFilterSatisfied(filter: InsightFilter, data: any, cid: string): boolean {// re code
-    //     if (Object.keys(filter).length > 1) {
-    //         throw Error("Query is malformed");
-    //     } else if (filter.GT) {
-    //         const key = Object.keys(filter.GT)[0];
-    //         const val = filter.GT[key];
-    //         const col = key.split("_")[1];
-    //         const fid = key.split("_")[0];
-    //         const value = data[col];
-    //         if (cid !== fid) {
-    //             throw new Error("Query is trying to compare two datasets at the same time.");
-    //         }
-    //         if (isNumber(val) && isNumber(value)) {
-    //             return (value > val);
-    //         } else {
-    //             throw new Error("Invalid query: GT value should be a number.");
-    //         }
-    //     } else if (filter.EQ) {
-    //         const key = Object.keys(filter.EQ)[0];
-    //         const val = filter.EQ[key];
-    //         const col = key.split("_")[1];
-    //         const fid = key.split("_")[0];
-    //         const value = data[col];
-    //         if (cid !== fid) {
-    //             throw new Error("Query is trying to query tow datasets a the same time");
-    //         }
-    //         if (isNumber(val) && isNumber(value)) {
-    //             return (value === val);
-    //         } else {
-    //             throw new Error("Invalid query: EQ value should be a number.");
-    //         }
-    //     } else if (filter.LT) {
-    //         const key = Object.keys(filter.LT)[0];
-    //         const val = filter.LT[key];
-    //         const col = key.split("_")[1];
-    //         const fid = key.split("_")[0];
-    //         const value: number = data[col];
-    //         if (cid !== fid) {
-    //             throw new Error("Query is trying to query tow datasets a the same time");
-    //         }
-    //         if (isNumber(val) && isNumber(value)) {
-    //             return (value < val);
-    //         } else {
-    //             throw new Error("Invalid query: LT value should be a number.");
-    //         }
-    //     } else if (filter.IS) {
-    //         const key = Object.keys(filter.IS)[0];
-    //         const val: string = filter.IS[key];
-    //         const col = key.split("_")[1];
-    //         const fid = key.split("_")[0];
-    //         const value: string = data[col];
-    //         const len = val.length;
-    //         if (cid !== fid) {
-    //             throw new Error("Query is trying to query tow datasets a the same time");
-    //         }
-    //         if (isString(val) && isString(value)) {
-    //             if (val === "*") {
-    //                 return true;
-    //             } else if (len === 1) {
-    //                 return (val === value);
-    //             } else if (val[0] === "*" && val[len - 1] === "*") {
-    //                 return value.includes(val.substr(1, len - 2));
-    //             } else if (val[0] === "*") {
-    //                 return value.endsWith(val.slice(1));
-    //             } else if (val[len - 1] === "*") {
-    //                 return value.startsWith(val.substring(0, len - 1));
-    //             } else if (val.includes("*")) {
-    //                 throw new Error("Invalid query: * should not be in middle.");
-    //             } else {
-    //                 return (val === value);
-    //             }
-    //         } else {
-    //             throw new Error("Invalid query: IS value should be a string.");
-    //         }
-    //     } else if (filter.NOT) {
-    //         return (!(this.isFilterSatisfied(filter.NOT, data, cid)));
-    //     } else if (filter.AND) {
-    //         if (filter.AND.length === 0) {
-    //             // Log.trace(filter.AND.length.toString());
-    //             throw new Error("Invalid query: AND should contain at least one condition");
-    //         }
-    //         let res = true;
-    //         for (const r of filter.AND) {
-    //             if (this.isFilterSatisfied(r, data, cid) === false) {
-    //                 res = false;
-    //             }
-    //         }
-    //         return res;
-    //     } else if (filter.OR) {
-    //         if (filter.OR.length === 0) {
-    //             throw new Error("Invalid query: OR should contain at least one condition");
-    //         }
-    //         let res = false;
-    //         for (const r of filter.OR) {
-    //             if (this.isFilterSatisfied(r, data, cid) === true) {
-    //                 res = true;
-    //             }
-    //         }
-    //         return res;
-    //     } else {
-    //         throw new Error("Invalid Query.");
-    //     }
-    // }
+    private sortResultByKey(result: any[], key: string, columns: string[]): any[] {
+        if (!columns.includes(key)) {
+            throw new Error("Order key needs to be included in columns");
+        }
+        result.sort((left, right): any => {
+            if (left[key] > right[key]) {
+                return 1;
+            } else if (left[key] < right[key]) {
+                return -1;
+            }
+        });
+        return result;
+    }
+    private sortResultByOrderObj(result: any[], order: InsightOrderObj, columns: string[]): any[] {
+        const orderKeys = order.keys;
+        const maxIndex = orderKeys.length;
+        let currIndex: number;
+        function isLarger(left: any, right: any, key: string): number {
+            if (!columns.includes(key)) {
+                throw new Error("Order key needs to be included in columns");
+            }
+            if (left[key] > right[key]) {
+                return 1;
+            } else if (left[key] < right [key]) {
+                return -1;
+            } else {
+                currIndex += 1;
+                if (currIndex < maxIndex) {
+                    return isLarger(left, right, orderKeys[currIndex]);
+                } else {
+                    return 0;
+                }
+            }
+        }
+        result.sort((left, right) => {
+            currIndex = 0;
+            if (order.dir === "UP") {
+                return isLarger(left, right, orderKeys[currIndex]);
+            } else if (order.dir === "DOWN") {
+                return isLarger(right, left, orderKeys[currIndex]);
+            } else {
+                throw new Error("Invalid dir value.");
+            }
+        });
+        return result;
+    }
+    private sortResult(result: any[], order: any, columns: string[]): any[] {
+        let sortedResult;
+        if (isString(order)) {
+            sortedResult = this.sortResultByKey(result, order as string, columns);
+        } else {
+            sortedResult = this.sortResultByOrderObj(result, order as InsightOrderObj, columns);
+        }
+        return sortedResult;
+    }*/
+   /* private transformDataset(dataset: any[], transformations: InsightTransformations): any[] {
+        const transformedDataset = [];
+        const groups: Map<string, any[]> = new Map<string, any[]>();
+        for (const data of dataset) {
+            let groupName: string = "";
+            for (const ID_KEY of transformations.GROUP) {
+                const key = ID_KEY.split("_")[1];
+                const value = data[key] as string;
+                if (value === undefined) {
+                    throw new Error(ID_KEY + " is not a valid key");
+                }
+                groupName += value;
+            }
+            if (!groups.get(groupName)) {
+                groups.set(groupName, []);
+            }
+            groups.get(groupName).push(data);
+        }
+        for (const group of groups.values()) {
+            const entry: {[key: string]: any } = {};
+            for (const ID_KEY of transformations.GROUP) {
+                const key = ID_KEY.split("_")[1];
+                entry[key] = group[0][key];
+            }
+            const addedApplyKeys: string[] = [];
+            for (const applyObj of transformations.APPLY) {
+                const applyKey = Object.keys(applyObj)[0];
+                if (applyKey.includes("_")) {
+                    throw new Error("Apply keys cannot contain '_'");
+                }
+                if (addedApplyKeys.includes(applyKey)) {
+                    throw new Error("Duplicate apply key");
+                } else {
+                    addedApplyKeys.push(applyKey);
+                }
+                const token = Object.keys(applyObj[applyKey])[0];
+                const ID_KEY = applyObj[applyKey][token];
+                const key = ID_KEY.split("_")[1];
+                const valueSet = [];
+                for (const data of group) {
+                    valueSet.push(data[key]);
+                }
+                let value: number;
+                switch (token) {
+                    case "MAX":
+                        value = valueSet[0];
+                        for (const elem of valueSet) {
+                            if (!isNumber(elem)) {
+                                throw new Error("Max supports only numerical values");
+                            } else {
+                                if (elem > value) {
+                                    value = elem;
+                                }
+                            }
+                        }
+                        break;
+                    case "MIN":
+                        value = valueSet[0];
+                        for (const elem of valueSet) {
+                            if (!isNumber(elem)) {
+                                throw new Error("Min supports only numerical values");
+                            } else {
+                                if (elem < value) {
+                                    value = elem;
+                                }
+                            }
+                        }
+                        break;
+                    case "SUM":
+                        let total = new Decimal(0);
+                        for (const elem of valueSet) {
+                            total = total.add(new Decimal(elem));
+                        }
+                        value = Number(total.toFixed(2));
+                        break;
+                    case "AVG":
+                        let sum = new Decimal(0);
+                        for (const elem of valueSet) {
+                            sum = sum.add(new Decimal(elem));
+                        }
+                        value = Number((Number(sum) / valueSet.length).toFixed(2));
+                        break;
+                    case "COUNT":
+                        const valueSetUnique = valueSet.filter((elem, pos, self) => {
+                            return self.indexOf(elem) === pos;
+                        });
+                        value = valueSetUnique.length;
+                        break;
+                }
+                entry[applyKey] = value;
+            }
+            transformedDataset.push(entry);
+        }
+        return transformedDataset;
+    }
+    private filterDataset(dataset: any[], filter: InsightFilter, id: string): any[] {
+        const filteredDataset: any[] = [];
+        for (const data of dataset) {
+            if (this.isFilterSatisfied(filter, data, id)) {
+                filteredDataset.push(data);
+            }
+        }
+        if (!filteredDataset) {
+            throw  new Error("No satisfied data found.");
+        } else {
+            return filteredDataset;
+        }
+    }*/
+    /*private trimDatasetByColumns(dataset: any[], columns: string[]): any[] {
+        const trimmedDataset: any[] = [];
+        for (const data of dataset) {
+            const entry: {[key: string]: any } = {};
+            for (const ID_KEY of columns) {
+                let key;
+                if (ID_KEY.includes("_")) {
+                    key = ID_KEY.split("_")[1];
+                } else {
+                    key = ID_KEY;
+                }
+                if (data.hasOwnProperty(key)) {
+                    entry[ID_KEY] = data[key];
+                } else {
+                    throw new Error("Invalid Key.");
+                }
+            }
+            trimmedDataset.push(entry);
+        }
+        return trimmedDataset;
+    }*/
     public listDatasets(): Promise<InsightDataset[]> { // did myself
         return new Promise<InsightDataset[]> ( (resolve, reject) => {
             let result: InsightDataset[] = [];
 
             for (let id of this.coursesMap.keys()) {
                 let crows: number = this.coursesMap.get(id).length;
+                console.log(crows);
                 result.push({id, kind: InsightDatasetKind.Courses, numRows: crows});
             }
 
