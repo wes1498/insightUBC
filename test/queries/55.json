@@ -1,0 +1,39 @@
+{ 
+  "title": "with title",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "OR":[
+                        {
+                            "IS": {
+                                "courses_dept":"math"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept":"adhe"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_avg":95
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+           
+        }
+        },
+          "isQueryValid": true,
+    "result":[{"courses_dept":"math","courses_avg":95},{"courses_dept":"math","courses_avg":95}]
+    }
+    

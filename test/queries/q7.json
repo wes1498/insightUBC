@@ -1,0 +1,20 @@
+{
+    "title": "Invalid Column",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_avg":90
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "coursesdept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg",
+            "FORM": "TABLE"
+        }
+    },
+  "isQueryValid": false,
+    "result": "Not implemented."
+    }

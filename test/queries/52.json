@@ -1,0 +1,19 @@
+{ 
+  "title": "optyon",
+    "query": {
+  "WHERE": {
+    "IS": {
+      "courses_dept": "cpsc"
+    }
+  },
+  "OPTYONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+  },
+      "isQueryValid": false,
+    "result":[{}]
+    }

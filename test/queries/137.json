@@ -1,0 +1,25 @@
+  { 
+  "title": "not not NOT",
+    "query": {
+  "WHERE": {
+    "NOT": {
+      "NOT": {
+        "NOT":{
+        "GT": {
+          "courses_avg": -1000
+        }
+      }
+      }
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+},
+"isQueryValid":true,
+  "result":[{}]
+    }

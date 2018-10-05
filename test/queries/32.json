@@ -1,0 +1,18 @@
+ { 
+  "title": "invalid where params",
+    "query": {
+  "WHERE": {
+            "invalid":"notastring"
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+            
+        }
+        },
+     "isQueryValid": false,
+     "result":[{}]
+    }

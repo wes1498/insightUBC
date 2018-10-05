@@ -1,0 +1,21 @@
+{ 
+  "title": "passing object",
+    "query": {
+  "WHERE": {
+    "GT": {
+      "courses_avg": {}
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_fail"
+    ],
+    "ORDER": "courses_fail"
+  }
+  },
+     "isQueryValid": false,
+     "result":[{}]
+    }
+    

@@ -1,0 +1,32 @@
+{ 
+  "title": "asterisk instructor after ",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "GT": {
+          "courses_avg": 70
+        }
+      },
+      {
+        "IS": {
+          "courses_instructor": "gregor*"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_id",
+      "courses_avg",
+      "courses_instructor"
+    ],
+    "ORDER": "courses_avg"
+    }
+  },
+   "isQueryValid": true,
+     "result":[{"courses_dept":"geog","courses_id":"321","courses_avg":70.52,"courses_instructor":"gregory, derek john"},{"courses_dept":"geog","courses_id":"321","courses_avg":71.79,"courses_instructor":"gregory, derek john"},{"courses_dept":"geog","courses_id":"345","courses_avg":72.05,"courses_instructor":"gregory, derek john"},{"courses_dept":"geog","courses_id":"345","courses_avg":72.11,"courses_instructor":"gregory, derek john"},{"courses_dept":"geog","courses_id":"345","courses_avg":72.53,"courses_instructor":"gregory, derek john"},{"courses_dept":"geog","courses_id":"345","courses_avg":72.54,"courses_instructor":"gregory, derek john"},{"courses_dept":"geog","courses_id":"345","courses_avg":72.72,"courses_instructor":"gregory, derek john"}]
+    }
+    
+    

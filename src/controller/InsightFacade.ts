@@ -506,7 +506,7 @@ export default class InsightFacade implements IInsightFacade {
 
             for (let id of this.coursesMap.keys()) {
                 let crows: number = this.coursesMap.get(id).length;
-                console.log(crows);
+               // console.log(crows);
                 result.push({id, kind: InsightDatasetKind.Courses, numRows: crows});
             }
 
