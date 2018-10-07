@@ -1,0 +1,19 @@
+{
+    "title": "null in IS ",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": null
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Not implemented."
+}

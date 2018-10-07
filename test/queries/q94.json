@@ -1,0 +1,22 @@
+{
+    "title": "Courses audit neg num",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_audit": -1
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": [
+                "courses_dept",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Error not implemented."
+}

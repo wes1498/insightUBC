@@ -1,0 +1,19 @@
+{
+    "title": "uuid not string",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_uuid": 22
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Not implemented."
+}

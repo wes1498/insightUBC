@@ -1,0 +1,21 @@
+{
+    "title": "COLUMNS misspelled",
+    "query": {
+        "WHEREE": {
+            "EQ": {
+                "courses_avg": 90
+            }
+        },
+        "OPTIONS": {
+            "COLUMMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": [
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Error not implemented."
+}

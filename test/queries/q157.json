@@ -1,0 +1,28 @@
+{
+    "title": "reject where order not in columns",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "GT": {
+                        "courses_avg": 69
+                    }
+                },
+                {
+                    "LT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": "Not implemented."
+}

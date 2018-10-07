@@ -1,0 +1,19 @@
+{
+    "title": "EQ with dept",
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_dept": "math"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "error not implemented."
+}

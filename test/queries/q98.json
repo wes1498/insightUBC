@@ -1,0 +1,22 @@
+{
+    "title": "Courses title",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_title": null
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": [
+                "courses_dept",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Error not implemented."
+}

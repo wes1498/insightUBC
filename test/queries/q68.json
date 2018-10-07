@@ -1,0 +1,19 @@
+{
+    "title": "null in  EQ",
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_avg": null
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Not implemented."
+}

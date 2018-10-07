@@ -1,0 +1,19 @@
+{
+    "title": "fail with true",
+    "query": {
+        "WHERE": {
+            "LT": {
+                "courses_fail": true
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Error not Implemented"
+}

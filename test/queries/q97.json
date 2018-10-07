@@ -1,0 +1,22 @@
+{
+    "title": "Courses instructor null",
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_instructor": null
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": [
+                "courses_dept",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Error not implemented."
+}

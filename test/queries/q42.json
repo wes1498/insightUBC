@@ -1,0 +1,36 @@
+{
+    "title": "using ** in IS (before and after)",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "OR": [
+                        {
+                            "IS": {
+                                "courses_dept": "mat."
+                            }
+                        },
+                        {
+                            "EQ": {
+                                "courses_avg": 0
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_dept":"frst","courses_avg":0},
+        {"courses_dept":"lfs","courses_avg":0},
+        {"courses_dept":"lfs","courses_avg":0}
+    ]
+}

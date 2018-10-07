@@ -1,0 +1,19 @@
+{
+    "title": "IS with UUID",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_uuid": 20
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "error not implemented."
+}

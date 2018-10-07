@@ -1,0 +1,38 @@
+{
+    "title": "using ** in IS (before and after)",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "AND": [
+                        {
+                            "NOT": {
+                                "IS": {
+                                    "courses_dept": "*at*"
+                                }
+                            }
+                        },
+                        {
+                            "GT": {
+                                "courses_avg": 98.9
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_dept":"spph","courses_avg":98.98},
+        {"courses_dept":"spph","courses_avg":98.98},
+        {"courses_dept":"cnps","courses_avg":99.19}
+    ]
+}
