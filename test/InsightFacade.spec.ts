@@ -5,6 +5,7 @@ import {InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from ".
 import InsightFacade from "../src/controller/InsightFacade";
 import Log from "../src/Util";
 import TestUtil from "./TestUtil";
+import {log} from "util";
 
 // This should match the JSON schema described in test/query.schema.json t
 // except 'filename' which is injected when the file is read. works
@@ -578,7 +579,78 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(response).to.be.instanceOf(InsightError);
         }
     });
+    it("Trace Util", async () => {
+        const id: string = "coursesBroken";
+        let response: string;
+        try {
+            response = await insightFacade.removeDataset(id);
+        } catch (err) {
+            response = err;
+        } finally {
+            Log.trace("log trace");
+            expect(response).to.be.instanceOf(InsightError);
+        }
+    });
+    it("Info Util", async () => {
+        const id: string = "coursesBroken";
+        let response: string;
+        try {
+            response = await insightFacade.removeDataset(id);
+        } catch (err) {
+            response = err;
+        } finally {
+            Log.info("log info");
+            expect(response).to.be.instanceOf(InsightError);
+        }
+    });
+    it("Warn Util", async () => {
+        const id: string = "coursesBroken";
+        let response: string;
+        try {
+            response = await insightFacade.removeDataset(id);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.be.instanceOf(InsightError);
+        }
+    });
+    it("Error Util", async () => {
+        const id: string = "coursesBroken";
+        let response: string;
+        try {
+            response = await insightFacade.removeDataset(id);
+        } catch (err) {
+            response = err;
+        } finally {
+            Log.error("log error");
+            expect(response).to.be.instanceOf(InsightError);
+        }
+    });
+    it("Test Util", async () => {
+        const id: string = "coursesBroken";
+        let response: string;
+        try {
+            response = await insightFacade.removeDataset(id);
+        } catch (err) {
+            response = err;
+        } finally {
+            Log.test("log test");
+            expect(response).to.be.instanceOf(InsightError);
+        }
+    });
+    it("Tr Util", async () => {
+        const id: string = "coursesBroken";
+        let response: string;
+        try {
+            response = await insightFacade.removeDataset(id);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.be.instanceOf(InsightError);
+        }
+    });
 });
+
 // This test suite dynamically generates tests from the JSONe files in test/queries.
 // You should not need to modify it; instead, add additional files to the queries directory. ready
 describe("InsightFacade PerformQuery", () => {

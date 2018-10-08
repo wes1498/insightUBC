@@ -17,8 +17,9 @@ import {isNegativeNumberLiteral} from "tslint";
 import {type} from "os";
 import {Decimal} from "decimal.js";
 import {fileExists} from "ts-node";
-import {isNumber, isString} from "util";
+import {isNumber, isString, log} from "util";
 import {currentId} from "async_hooks";
+import ProcessEnv = NodeJS.ProcessEnv;
 
 /**
  * This is the main programmatic entry point for the project.
@@ -206,12 +207,35 @@ export default class InsightFacade implements IInsightFacade {
 
                 // keep only the desired columns in query
                 if (columns && columns.length !== 0) {
-                    result = this.desiredColumnsHelper(result, columns);
+                    let columnResult: object[] = [];
+                    let filteredSections: any = result;
+                    filteredSections.forEach( function (section: any) {
+                        let columnSection: InsightStrippedCourse = {};
+                        columns.forEach( function (key: any) {
+                            if (InsightFacade.validKeyHelper(key)) {
+                                columnSection[key] = section[key];
+                            }
+                        });
+                        columnResult.push(columnSection);
+                    });
+                    result = columnResult;
+                    // result = this.desiredColumnsHelper(result, columns);
                 }
                 // Sort the result if order is included
                 if (order !== undefined || order !== null) {
                     if (columns.includes(order)) {
-                        this.rowOrderHelper(result, order);
+                        result = result.sort( function (a, b) {
+                            let x = a[order];
+                            let y = b[order];
+                            if (x === y) {
+                                return 0;
+                            } else if (x > y ) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        });
+                        // this.rowOrderHelper(result, order);
                     } else {
                         throw new InsightError("ORDER not in COLUMNS");
                     }
@@ -224,23 +248,6 @@ export default class InsightFacade implements IInsightFacade {
 
         });
     }
-
-    private desiredColumnsHelper(filteredSections: any, columns: any[]): InsightStrippedCourse[] {
-        let finalResult: object[] = [];
-        filteredSections.forEach(function (section: any) {
-            let strippedSection: InsightStrippedCourse = {};
-            columns.forEach(function (key) {
-                // check if it is a key is valid
-                if (InsightFacade.validKeyHelper(key)) {
-                    // then set key to the filtered section
-                    strippedSection[key] = section[key];
-                }
-            });
-            finalResult.push(strippedSection);
-        });
-        return finalResult;
-    }
-
     private static validKeyHelper(key: string): boolean {
         // check if the key being passed is a valid one
         switch (key) {
@@ -268,16 +275,6 @@ export default class InsightFacade implements IInsightFacade {
                 return false;
         }
     }
-    // order rows by key
-    // fix for string
-    private rowOrderHelper(result: InsightStrippedCourse[], order: any): any[] {
-        return result.sort( function (a, b) {
-            let x = a[order];
-            let y = b[order];
-            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-        });
-    }
-
     // For every course section in Query, check if filter applies
     private static filterCourses(filter: InsightFilter, Query: InsightCourse[]): InsightCourse[] {
         let result: InsightCourse[] = [];
@@ -339,17 +336,16 @@ export default class InsightFacade implements IInsightFacade {
             throw new InsightError("Invalid key");
         }
         // throw error for any non-number key
-        switch (Object.keys(body)[0]) {
-            case "courses_dept":
-                throw new InsightError("Invalid key");
-            case "courses_id":
-                throw new InsightError("Invalid key");
-            case "courses_instructor":
-                throw new InsightError("Invalid key");
-            case "courses_title":
-                throw new InsightError("Invalid key");
-            case "courses_uuid":
-                throw new InsightError("Invalid key");
+        if (Object.keys(body)[0] === "courses_dept") {
+            throw new InsightError("Not valid key");
+        } else if ((Object.keys(body)[0]) === "courses_id") {
+            throw new InsightError("Not valid key");
+        } else if ((Object.keys(body)[0]) === "courses_instructor") {
+            throw new InsightError("Not valid key");
+        } else if ((Object.keys(body)[0]) === "courses_title") {
+            throw new InsightError("Not valid key");
+        } else if ((Object.keys(body)[0]) === "courses_uuid") {
+            throw new InsightError("Not valid key");
         }
     }
 
