@@ -10,7 +10,7 @@
                 },
                 {
                     "LT": {
-                        "courses_avg": 0
+                        "courses_avg": 40
                     }
                 }
             ]
@@ -24,5 +24,8 @@
         }
     },
     "isQueryValid": true,
-    "result": []
+    "result":[
+        {"courses_dept":"lfs","courses_avg":0},
+        {"courses_dept":"lfs","courses_avg":0}
+    ]
 }

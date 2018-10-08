@@ -17,12 +17,11 @@
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
+                "courses_dept"
             ],
             "ORDER": "courses_avg"
         }
     },
-    "isQueryValid": true,
+    "isQueryValid": false,
     "result": "Not implemented."
 }

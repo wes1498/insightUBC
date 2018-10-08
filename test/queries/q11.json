@@ -25,8 +25,7 @@
                 "courses_id",
                 "courses_avg"
             ],
-            "ORDER": "courses_avg",
-            "FORM": "TABLE"
+            "ORDER": "courses_avg"
         }
     },
      "isQueryValid": false,

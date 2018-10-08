@@ -189,19 +189,19 @@ export default class InsightFacade implements IInsightFacade {
                 let columns = options.COLUMNS;
                 let id: string = columns[0].split("_")[0];
 
-                let datasetId = id;
+                let dataset = id;
 
                 // perform syntax checks as you go
 
                 let result: InsightStrippedCourse[];
                 if (Object.keys(filter).length === 0) {
-                    // console.log(datasetId);
-                    result = this.coursesMap.get(datasetId);
+                    // console.log(dataset);
+                    result = this.coursesMap.get(dataset);
                     if (result.length > 5000) {
                         throw new InsightError("Too many sections in result"); }
                 } else {
-                    // console.log(datasetId);
-                    result = InsightFacade.filterCourses(filter, this.coursesMap.get(datasetId));
+                    // console.log(dataset);
+                    result = InsightFacade.filterCourses(filter, this.coursesMap.get(dataset));
                 }
 
                 // keep only the desired columns in query
@@ -416,6 +416,12 @@ export default class InsightFacade implements IInsightFacade {
             if (value.length === 1) {
                 return value === "*";
                 // *ell*, *ello, hell*
+            } else if (value.startsWith("**") || value.endsWith("**")) {
+                throw new InsightError("Asteriks cannot be in the middle");
+            } else if (value.startsWith("*") && value.endsWith("**")) {
+                throw new InsightError("Asteriks cannot be in the middle");
+            } else if (value.startsWith("**") && value.endsWith("*")) {
+                throw new InsightError("Asteriks cannot be in the middle");
             } else if (value.startsWith("*") && value.endsWith("*")) {
                 return actual.includes(value.substring(1, value.length - 1));
             } else if (value.startsWith("*")) {
@@ -502,7 +508,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
-   public listDatasets(): Promise<InsightDataset[]> { // did myself
+   public listDatasets(): Promise<InsightDataset[]> {
         return new Promise<InsightDataset[]> ( (resolve, reject) => {
             let result: InsightDataset[] = [];
 

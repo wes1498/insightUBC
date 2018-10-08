@@ -10,7 +10,7 @@
                 },
                 {
                     "LT": {
-                        "courses_avg": 0
+                        "courses_avg": 50
                     }
                 }
             ]
@@ -24,5 +24,11 @@
         }
     },
     "isQueryValid": true,
-    "result": []
+    "result":[
+        {"courses_dept":"lled","courses_avg":47.29},
+        {"courses_dept":"lled","courses_avg":47.82},
+        {"courses_dept":"lled","courses_avg":48.9},
+        {"courses_dept":"lled","courses_avg":49.73},
+        {"courses_dept":"lled","courses_avg":49.86}
+    ]
 }

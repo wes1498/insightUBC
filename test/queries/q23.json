@@ -26,6 +26,5 @@
     }
   },
    "isQueryValid": true,
-     "result":[{"courses_dept":"midw","courses_id":"310","courses_avg":89.46,"courses_instructor":"thordarson, dana"},{"courses_dept":"midw","courses_id":"310","courses_avg":89.46,"courses_instructor":""},{"courses_dept":"midw","courses_id":"310","courses_avg":87.82,"courses_instructor":"kornelsen, jude;thordarson, dana"},{"courses_dept":"midw","courses_id":"310","courses_avg":87.33,"courses_instructor":"kornelsen, jude;thordarson, dana"},{"courses_dept":"midw","courses_id":"310","courses_avg":87.65,"courses_instructor":""}]
+     "result":"Error not implemented"
     }
-    

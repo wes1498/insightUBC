@@ -1,5 +1,5 @@
 {
-    "title": "using ** in IS (before and after)",
+    "title": "nested",
     "query": {
         "WHERE": {
             "OR": [

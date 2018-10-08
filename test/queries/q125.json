@@ -1,5 +1,5 @@
 {
-    "title": "asterisk with string keys",
+    "title": "*haw, amber",
     "query": {
         "WHERE": {
             "AND": [
@@ -10,7 +10,7 @@
                 },
                 {
                     "LT": {
-                        "courses_avg": 0
+                        "courses_avg": 40
                     }
                 }
             ]
@@ -24,5 +24,12 @@
         }
     },
     "isQueryValid": true,
-    "result": []
+    "result":[
+        {"courses_dept":"lled","courses_avg":47.29},
+        {"courses_dept":"lled","courses_avg":47.82},
+        {"courses_dept":"lled","courses_avg":49.86},
+        {"courses_dept":"lled","courses_avg":52},
+        {"courses_dept":"lled","courses_avg":52.2},
+        {"courses_dept":"lled","courses_avg":59.57}
+    ]
 }
