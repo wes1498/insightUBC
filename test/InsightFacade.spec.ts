@@ -582,14 +582,14 @@ describe("InsightFacade Add/Remove Dataset", function () {
 // This test suite dynamically generates tests from the JSONe files in test/queries.
 // You should not need to modify it; instead, add additional files to the queries directory. ready
 describe("InsightFacade PerformQuery", () => {
-    const datasetsToQuery: { [id: string]: string } = {
+    const datasetsQuery: { [id: string]: string } = {
         courses: "./test/data/courses.zip",
     };
     let insightFacade: InsightFacade;
     let testQueries: ITestQuery[] = [];
 
     // Create a new instance of InsightFacade, read in the test queries from test/queries and
-    // add the datasets specified in datasetsToQuery.
+    // add the datasets specified in datasetsQuery.
     before(async function () {
         Log.test(`Before: ${this.test.parent.title}`);
 
@@ -610,15 +610,15 @@ describe("InsightFacade PerformQuery", () => {
             expect(insightFacade).to.be.instanceOf(InsightFacade);
         }
 
-        // Load the datasets specified in datasetsToQuery and add them to InsightFacade. r
+        // Load the datasets specified in datasetsQuery and add them to InsightFacade. r
         // Fail if there is a problem reading ANY dataset.
         try {
             const loadDatasetPromises: Array<Promise<Buffer>> = [];
-            for (const [id, path] of Object.entries(datasetsToQuery)) {
+            for (const [id, path] of Object.entries(datasetsQuery)) {
                 loadDatasetPromises.push(TestUtil.readFileAsync(path));
             }
             const loadedDatasets = (await Promise.all(loadDatasetPromises)).map((buf, i) => {
-                return { [Object.keys(datasetsToQuery)[i]]: buf.toString("base64") };
+                return { [Object.keys(datasetsQuery)[i]]: buf.toString("base64") };
             });
             expect(loadedDatasets).to.have.length.greaterThan(0);
 

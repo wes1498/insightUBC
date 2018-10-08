@@ -219,65 +219,66 @@ export default class InsightFacade implements IInsightFacade {
    public performQuery(query: any): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
             try {
-                let body: InsightFilter = query.WHERE;
+                let filter: InsightFilter = query.WHERE;
                 let options = query.OPTIONS;
-
-                let columns = options.COLUMNS;
                 let order = options.ORDER;
-
+                let columns = options.COLUMNS;
                 let id: string = columns[0].split("_")[0];
 
                 let datasetId = id;
 
-                // 1. Filter only desired sections and perform syntatic and semantic check as you go
-                //    Throw an error if any problems arise, error will be caught in this method and reject
+                // perform syntax checks as you go
+
                 let result: InsightStrippedCourse[];
-                if (Object.keys(body).length === 0) {
-                    console.log(datasetId);
+                if (Object.keys(filter).length === 0) {
+                    // console.log(datasetId);
                     result = this.coursesMap.get(datasetId);
                     if (result.length > 5000) {
                         throw new InsightError("Too many sections in result"); }
                 } else {
-                    console.log(datasetId);
-                    result = InsightFacade.filterCourses(body, this.coursesMap.get(datasetId));
+                    // console.log(datasetId);
+                    result = InsightFacade.filterCourses(filter, this.coursesMap.get(datasetId));
                 }
 
-                // 2. Keep only desired columns by using filteredSections and columns variables
+                // keep only the desired columns in query
                 if (columns && columns.length !== 0) {
-                    result = this.keepDesiredColumns(result, columns);
+                    result = this.desiredColumnsHelper(result, columns);
                 }
-                // 3. if there is optional order field -> sort the filtered and stripped
-                if (order !== undefined) {
+                // Sort the result if order is included
+                if (order !== undefined || order !== null) {
                     if (columns.includes(order)) {
-                        this.orderRows(result, order);
+                        this.rowOrderHelper(result, order);
                     } else {
-                        throw new InsightError("Order not in selected columns!");
+                        throw new InsightError("ORDER not in COLUMNS");
                     }
                 }
-                // Conclusion: if everything goes without problems resolve with the final dataset
+                // resolve if no problems
                 return resolve(result);
             } catch (e) {
-                return reject(new InsightError("Error" + e));
+                return reject(new InsightError("Error in reading query"));
             }
 
         });
     }
 
-    private keepDesiredColumns(filteredSections: any, columns: any[]): InsightStrippedCourse[] {
-        let strippedResult: object[] = [];
-        filteredSections.forEach((section: any) => {
+    private desiredColumnsHelper(filteredSections: any, columns: any[]): InsightStrippedCourse[] {
+        let finalResult: object[] = [];
+        filteredSections.forEach(function (section: any) {
             let strippedSection: InsightStrippedCourse = {};
-            columns.forEach((key) => {
-                if (InsightFacade.isValidKey(key)) {
+            columns.forEach(function (key) {
+                // check if it is a key is valid
+                if (InsightFacade.validKeyHelper(key)) {
+                    // then set key to the filtered section
                     strippedSection[key] = section[key];
                 }
             });
-            strippedResult.push(strippedSection);
+            finalResult.push(strippedSection);
         });
-        return strippedResult;
+        return finalResult;
     }
 
-    private static isValidKey(key: string): boolean {
+    private static validKeyHelper(key: string): boolean {
+        // check if the key being passed is a valid one
         switch (key) {
             case "courses_dept":
                 return true;
@@ -305,113 +306,152 @@ export default class InsightFacade implements IInsightFacade {
     }
     // order rows by key
     // fix for string
-    private orderRows(result: InsightStrippedCourse[], order: any): any[] {
-        return result.sort( (a, b) => {
+    private rowOrderHelper(result: InsightStrippedCourse[], order: any): any[] {
+        return result.sort( function (a, b) {
             let x = a[order];
             let y = b[order];
             return ((x < y) ? -1 : ((x > y) ? 1 : 0));
         });
     }
 
-    // For every course section in toQuery, check if filter applies
-    private static filterCourses(filter: InsightFilter, toQuery: InsightCourse[]): InsightCourse[] {
+    // For every course section in Query, check if filter applies
+    private static filterCourses(filter: InsightFilter, Query: InsightCourse[]): InsightCourse[] {
         let result: InsightCourse[] = [];
-        // console.log(toQuery)
-        for (let section of toQuery) {
+        // console.log(Query)
+        for (let section of Query) {
+            // check if you can apply filter to the key
             if (InsightFacade.isSectionValid(filter, section)) {
                 result.push(section);
             }
         }
+        // result over 5000 to add
         if (result.length > 5000) {
             throw new InsightError("Result exceeds 5000 limit");
         }
         return result;
     }
 
-    private static hasLogic(comparison: any) {
-        return comparison.hasOwnProperty("AND") || comparison.hasOwnProperty("OR");
-    }
-
-    private static hasMCOMComparison(comparison: any) {
-        return comparison.hasOwnProperty("LT") || comparison.hasOwnProperty("GT") || comparison.hasOwnProperty("EQ");
-    }
-
-    private static hasSComparison(comparison: any) {
-        return comparison.hasOwnProperty("IS");
-    }
-
-    private static hasNegation(comparison: any) {
-        return comparison.hasOwnProperty("NOT");
-    }
-
-    private static validateMCOMFilter(filter: InsightFilter) {
-        let bodyOfMComparison = Object.values(filter)[0];
-        if (typeof Object.values(bodyOfMComparison)[0] !== "number") {
-            throw new InsightError("Invalid value type for MCOMFilter");
+    private static hasLogicCompHelper(comparison: any) {
+        if (comparison.hasOwnProperty("AND") || comparison.hasOwnProperty("OR")) {
+            return true;
+        } else {
+            return false;
         }
-        if (!this.isValidKey(Object.keys(bodyOfMComparison)[0])) {
-            throw new InsightError("Invalid key: MCOM");
+    }
+
+    private static hasMComparatorHelper(comparison: any) {
+        if (comparison.hasOwnProperty("GT") || comparison.hasOwnProperty("LT") || comparison.hasOwnProperty("EQ")) {
+            return true;
+        } else {
+            return false;
         }
-        switch (Object.keys(bodyOfMComparison)[0]) {
+    }
+
+    private static hasSComparisonHelper(comparison: any) {
+        if (comparison.hasOwnProperty("IS")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static hasNegationHelper(comparison: any) {
+        if (comparison.hasOwnProperty("NOT")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static validateMComFilterHelper(filter: InsightFilter) {
+        let body = Object.values(filter)[0];
+        // MCOMPARATOR must be a number
+        // check for valid value
+        if (typeof Object.values(body)[0] !== "number") {
+            throw new InsightError("Invalid value");
+        }
+        // check for valid key
+        if (!this.validKeyHelper(Object.keys(body)[0])) {
+            throw new InsightError("Invalid key");
+        }
+        // throw error for any non-number key
+        switch (Object.keys(body)[0]) {
             case "courses_dept":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
             case "courses_id":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
             case "courses_instructor":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
             case "courses_title":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
             case "courses_uuid":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
         }
     }
 
-    private static handleLT(lt: object, section: { [key: string]: number }): boolean {
-        let keyToCheck: string = Object.keys(lt)[0];
+    private static handleLTHelper(lt: object, section: { [key: string]: number }): boolean {
+        let checkKey: string = Object.keys(lt)[0];
         let valueToCheck: number = Object.values(lt)[0];
-        let actualValue: number = section[keyToCheck];
-        return actualValue < valueToCheck;
+        let actualValue: number = section[checkKey];
+        if (actualValue < valueToCheck) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private static handleGT(gt: object, section: { [key: string]: number }): boolean {
-        let keyToCheck: string = Object.keys(gt)[0];
+    private static handleGTHelper(gt: object, section: { [key: string]: number }): boolean {
+        let checkKey: string = Object.keys(gt)[0];
         let valueToCheck: number = Object.values(gt)[0];
-        let actualValue: number = section[keyToCheck];
-        return actualValue > valueToCheck;
+        let actualValue: number = section[checkKey];
+        if (actualValue > valueToCheck) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private static handleEQ(eq: object, section: { [key: string]: number }): boolean {
-        let keyToCheck: string = Object.keys(eq)[0];
+    private static handleEQHelper(eq: object, section: { [key: string]: number }): boolean {
+        let checkKey: string = Object.keys(eq)[0];
         let valueToCheck: number = Object.values(eq)[0];
-        let actualValue: number = section[keyToCheck];
-        return actualValue === valueToCheck;
+        let actualValue: number = section[checkKey];
+        if (actualValue === valueToCheck) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private static handleSComparison(is: object, section: { [key: string]: string }): boolean {
+    private static handleSComparisonHelper(is: object, section: { [key: string]: string }): boolean {
         let value: any = Object.values(is)[0];
+        // check if value is of right type
         if (typeof value !== "string") {
-            throw new InsightError("Invalid type: IS");
+            throw new InsightError("Invalid type");
         }
         let key: any = Object.keys(is)[0];
-        if (!this.isValidKey(key)) {
-            throw new InsightError("Invalid key: IS");
+        // check if key is not invalid
+        if (!this.validKeyHelper(key)) {
+            throw new InsightError("Invalid key");
         }
+        // throw error for any non-string key
         switch (key) {
             case "courses_avg":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
             case "courses_pass":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
             case "courses_fail":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
             case "courses_audit":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
             case "courses_year":
-                throw new InsightError("Invalid key: IS");
+                throw new InsightError("Invalid key");
         }
         let actual: string = section[key];
+        // check each wildcard case
         if (value.includes("*")) {
             if (value.length === 1) {
                 return value === "*";
+                // *ell*, *ello, hell*
             } else if (value.startsWith("*") && value.endsWith("*")) {
                 return actual.includes(value.substring(1, value.length - 1));
             } else if (value.startsWith("*")) {
@@ -419,6 +459,7 @@ export default class InsightFacade implements IInsightFacade {
             } else if (value.endsWith("*")) {
                 return actual.startsWith(value.substring(0, value.length - 1));
             } else {
+                // h**lo or h*llo === error
                 throw new InsightError("Asteriks cannot be in the middle");
             }
         }
@@ -427,10 +468,11 @@ export default class InsightFacade implements IInsightFacade {
 
     // Check if filter applies to given section
     private static isSectionValid(filter: InsightFilter, section: any): boolean {
-        if (InsightFacade.hasLogic(filter)) {
-
+        if (InsightFacade.hasLogicCompHelper(filter)) {
+            // check AND COMP
             if (filter.hasOwnProperty("AND")) {
                 let toAnd: any[] = filter.AND;
+                // AND must be 1 or more
                 if (toAnd.length === 0 ) {
                     throw new InsightError("Not enough conditions for AND");
                 }
@@ -446,6 +488,7 @@ export default class InsightFacade implements IInsightFacade {
 
             } else {
                 let toOr: any[] = filter.OR;
+                // OR must be 1 or more
                 if (toOr.length === 0) {
                     throw new InsightError("Not enough conditions for OR");
                 }
@@ -458,35 +501,36 @@ export default class InsightFacade implements IInsightFacade {
                 }
                 return false;
             }
+            // check if it is an MCOMPARATOR
+        } else if (InsightFacade.hasMComparatorHelper(filter)) {
 
-        } else if (InsightFacade.hasMCOMComparison(filter)) {
-
-            this.validateMCOMFilter(filter);
+            this.validateMComFilterHelper(filter);
 
             if (filter.hasOwnProperty("LT")) {
 
-                return InsightFacade.handleLT(filter.LT, section);
+                return InsightFacade.handleLTHelper(filter.LT, section);
 
             } else if (filter.hasOwnProperty("GT")) {
 
-                return InsightFacade.handleGT(filter.GT, section);
+                return InsightFacade.handleGTHelper(filter.GT, section);
 
             } else {
 
-                return InsightFacade.handleEQ(filter.EQ, section);
+                return InsightFacade.handleEQHelper(filter.EQ, section);
 
             }
+            // Check if it is an SComparison
+        } else if (InsightFacade.hasSComparisonHelper(filter)) {
 
-        } else if (InsightFacade.hasSComparison(filter)) {
+            return InsightFacade.handleSComparisonHelper(filter.IS, section);
 
-            return InsightFacade.handleSComparison(filter.IS, section);
-
-        } else if (InsightFacade.hasNegation(filter)) {
+        } else if (InsightFacade.hasNegationHelper(filter)) {
 
             // recursively call the same function with the same inputs but negated
             return (!this.isSectionValid(filter.NOT, section));
 
         } else {
+            // if no there is no filter
             if (Object.keys(filter).length === 0 && filter.constructor === Object) {
                 return false;
             } else {
