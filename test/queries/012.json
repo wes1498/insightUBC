@@ -1,16 +1,21 @@
 {
-    "title": "*haw, amber",
+    "title": "*& and &* is ",
     "query": {
         "WHERE": {
             "AND": [
                 {
-                    "IS": {
-                        "courses_instructor": "*haw, amber"
+                    "GT": {
+                        "courses_avg": 98.8
                     }
                 },
                 {
-                    "LT": {
-                        "courses_avg": 40
+                    "IS": {
+                        "courses_instructor": "*&"
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_instructor": "&*"
                     }
                 }
             ]
@@ -18,7 +23,8 @@
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
+                "courses_avg",
+                "courses_instructor"
             ],
             "ORDER": "courses_avg"
         }

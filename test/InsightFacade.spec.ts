@@ -658,7 +658,7 @@ describe("InsightFacade PerformQuery", () => {
         courses: "./test/data/courses.zip",
         coursesOnevalid: "./test/data/courses_onevalid.zip",
         coursesOne: "./test/data/courses_one.zip",
-        coursesNoJS: "./test/data/courses_notjs.zip",
+        rooms: "./test/data/courses.zip",
     };
     let insightFacade: InsightFacade;
     let testQueries: ITestQuery[] = [];

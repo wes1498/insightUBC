@@ -236,7 +236,7 @@ export default class InsightFacade implements IInsightFacade {
                     // result = this.desiredColumnsHelper(result, columns);
                 }
                 // Sort the result if order is included
-                if (order !== undefined || order !== null) {
+                if (order !== undefined) {
                     if (columns.includes(order)) {
                         result = result.sort( function (a, b) {
                             let x = a[order];
@@ -418,6 +418,8 @@ export default class InsightFacade implements IInsightFacade {
             if (value.length === 1) {
                 return value === "*";
                 // *ell*, *ello, hell*
+            } else if (value.length === 2 && value.startsWith("**")) {
+                return value === "**";
             } else if (value.startsWith("**") || value.endsWith("**")) {
                 throw new InsightError("Asteriks cannot be in the middle");
             } else if (value.startsWith("*") && value.endsWith("**")) {
