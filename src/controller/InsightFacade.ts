@@ -60,8 +60,6 @@ export default class InsightFacade implements IInsightFacade {
                 let dataType: string;
                 if (kind === InsightDatasetKind.Courses) {
                     dataType = "courses/";
-                } else if (kind === InsightDatasetKind.Rooms) {
-                    dataType = "rooms/";
                 }
                 let filesToLoadPromise: any[] = [];
                 if (unzipped.length < 1) {
@@ -103,46 +101,6 @@ export default class InsightFacade implements IInsightFacade {
             });
         });
     }
- /*   private addCourse(course: string, datasetId: string) {
-        try {
-            const courseInfo: object[] = JSON.parse(course).result;
-            let info: any;
-            for (info of courseInfo ) {
-                let courseDep: string = info.Subject as string;
-                let courseId: string = info.Course as string;
-                let courseAvg: number = info.Avg as number;
-                let courseInstru: string = info.Professor as string;
-                let courseTitle: string = info.Title as string;
-                let coursePass: number = info.Pass as number;
-                let courseFail: number = info.Fail as number;
-                let courseAu: number = info.Audit as number;
-                let courseUuid: string = info.id.toString() as string;
-                let courseYear: number = Number(info.Year);
-
-                let completeCourse: InsightCourse = {
-                    coursesDept: courseDep,
-                    coursesId: courseId,
-                    coursesAvg: courseAvg,
-                    coursesInstructor: courseInstru,
-                    coursesTitle: courseTitle,
-                    coursesPass: coursePass,
-                    coursesFail: courseFail,
-                    coursesAudit: courseAu,
-                    coursesUuid: courseUuid,
-                    coursesYear: courseYear
-                };
-                for (let value of Object.values(completeCourse)) {
-                    if (value === undefined || typeof value === "object" || value instanceof Array) {
-                        throw new TypeError("Some of the fields are missing or of non-cast type");
-                    }
-                }
-                this.coursesMap.get(datasetId).push(completeCourse);
-            }
-
-        } catch (e) {
-            // not in JSON format or some fields of different type/missing-> skip this course
-        }
-    }*/
     private addCourse(course: string, datasetId: string) {
         try {
             let parsedCourse = JSON.parse(course);
@@ -177,42 +135,48 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
     private pathReader(folderName: string): void { // deprecated
-        fs.readdir(folderName, (e , files) => {
+        let that = this;
+        fs.readdir(folderName, function (e , files) {
             if (e) {
                 let error1 =  "Error reading dir";
                 return error1;
             } else {
-                files.forEach((filesId) => {
-                    if (this.coursesMap.has(filesId)) {
+                files.forEach(function (filesId) {
+                    // dataset already loaded
+                    if (that.coursesMap.has(filesId)) {
                         return;
                     } else {
                         let name = folderName + filesId;
-                        fs.readFile(name, "utf-8", (e2, content: string) => {
+                        fs.readFile(name, "utf-8", function (e2, content: string) {
                             if (e2) {
                                 return;
                             }
-                            this.coursesMap.set(filesId, JSON.parse(content));
+                            that.coursesMap.set(filesId, JSON.parse(content));
                         });
                     }
                 });
             }
         });
     }
-    public removeDataset(id: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            if ( id === null || !id || id === "") {
+
+    public removeDataset(id: string): Promise<string> {// no changes needed
+        let that = this;
+        return new Promise<string>( (resolve, reject) => {
+            if (id === null || id === "" || !id ) {
                 return reject(new InsightError("Invalid ID"));
             }
-
-            // if(!this.courseMap.has(id)) return reject(new NotFoundError("Dataset has not yet been loaded"));
-
-            fs.unlink("data/" + id, (err) => {
-                 if (err) {
-                    return reject(new NotFoundError("Dataset has not yet been loaded"));
-                } else if (this.coursesMap.has(id)) {
-                    this.coursesMap.delete(id);
-                    return resolve(id);
+            // console.log("after1 " + id);
+            fs.unlink("data/" + id, function (err) {
+                if (err) {
+                    // console.log("is it still in? : " + x);
+                    if (that.coursesMap.has(id)) {
+                        that.coursesMap.delete(id);
+                        return resolve(id);
+                    } else {
+                        return reject(new NotFoundError("Dataset has not yet been loaded"));
+                    }
                 }
+                // return reject(new NotFoundError("Could not find the ID, cant delete"));
             });
         });
     }
