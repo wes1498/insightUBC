@@ -16,25 +16,19 @@ export interface InsightDataset {
     numRows: number;
 }
 export interface InsightCourse {
-    coursesDept: string;
-    coursesId: string;
-    coursesAvg: number;
-    coursesInstructor: string;
-    coursesTitle: string;
-    coursesPass: number;
-    coursesFail: number;
-    coursesAudit: number;
-    coursesUuid: string;
-    coursesYear: number;
+    [key: string]: string | number;
+}
+export interface InsightStrippedCourse {
+  [key: string]: any;
 }
 export interface InsightFilter {
-    AND?: InsightFilter[];
-    OR?: InsightFilter[];
-    LT?: {[key: string]: number};
-    GT?: {[key: string]: number};
-    EQ?: {[key: string]: number};
-    IS?: {[key: string]: string};
-    NOT?: InsightFilter;
+    "AND": InsightFilter[];
+    "OR": InsightFilter[];
+    "LT": {[key: string]: number};
+    "GT": {[key: string]: number};
+    "EQ": {[key: string]: number};
+    "IS": {[key: string]: string};
+    "NOT": InsightFilter;
 }
 export interface InsightOrderObj {
     dir: string;
