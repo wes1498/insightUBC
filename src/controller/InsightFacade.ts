@@ -160,7 +160,6 @@ export default class InsightFacade implements IInsightFacade {
             } else if (id === null || !id) {
                 return reject(new InsightError("Invalid ID"));
             }// console.log("after1 " + id);
-            console.log(this.coursesMap.keys() + "woot");
             if (this.coursesMap.has(id)) {
                 this.removeFromMemory(id, InsightDatasetKind.Courses).then((succ) => {
                     return resolve(id);
@@ -178,14 +177,12 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise<boolean>((resolve, reject) => {
             fs.readdir(kind.toString(), (err, files) => {
                 if (err) {
-                    console.log(err + "1");
                     reject(false);
                 } else {
                     if (files.includes(id)) {
                         const pathy = Path.join(kind, id);
                         fs.unlink(pathy, (err2) => {
                             if (err2) {
-                                console.log(err2);
                                 reject(false);
                             } else {
                                 resolve(true);
