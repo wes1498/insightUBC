@@ -649,6 +649,30 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(response).to.be.instanceOf(InsightError);
         }
     });
+    it("Should add test smaller sets valid ", async () => {
+        const id: string = "coursesOnevalid";
+        let response: string[];
+
+        try {
+            response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.deep.equal([id]);
+        }
+    });
+    it("Should add test smaller sets ", async () => {
+        const id: string = "coursesOne";
+        let response: string[];
+
+        try {
+            response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.deep.equal([id]);
+        }
+    });
 });
 
 // This test suite dynamically generates tests from the JSONe files in test/queries.

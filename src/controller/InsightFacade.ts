@@ -110,7 +110,7 @@ export default class InsightFacade implements IInsightFacade {
                 throw new Error("0 section.");
             }
             const sections: object[] = parsedInfo.result;
-            sections.forEach((section: any) => {  // confirm the right type with TA
+            sections.forEach((section: any) => {
                 let dept: string = section.Subject as string;
                 let id: string = section.Course as string;
                 let avg: number = section.Avg as number;
@@ -125,13 +125,8 @@ export default class InsightFacade implements IInsightFacade {
                 let validCourse: InsightCourse = {
                     courses_dept: dept, courses_id: id, courses_avg: avg, courses_instructor: instructor,
                     courses_title: title, courses_pass: pass, courses_fail: fail, courses_audit: audit,
-                    courses_uuid: uuid, courses_year: year
+                    courses_uuid: uuid, courses_year: year,
                 };
-                for (let value of Object.values(validCourse)) {
-                    if (value === undefined || typeof value === "object" || value instanceof Array) {
-                        throw new TypeError("Some of the fields are missing or of non-cast type");
-                    }
-                }
                 this.coursesMap.get(datasetId).push(validCourse);
             });
 
@@ -189,12 +184,14 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise<boolean>((resolve, reject) => {
             fs.readdir(kind.toString(), (err, files) => {
                 if (err) {
+                    console.log(err + "1");
                     reject(false);
                 } else {
                     if (files.includes(id)) {
                         const pathy = Path.join(kind, id);
                         fs.unlink(pathy, (err2) => {
                             if (err2) {
+                                console.log(err2);
                                 reject(false);
                             } else {
                                 resolve(true);
@@ -222,10 +219,13 @@ export default class InsightFacade implements IInsightFacade {
 
                 let result: InsightCourseEmpty[];
                 if (Object.keys(filter).length === 0) {
+                    // console.log(dataset);
                     result = this.coursesMap.get(dataset);
+                    console.log(this.coursesMap.get(dataset));
                     if (result.length > 5000) {
                         throw new InsightError("Too many sections in result"); }
                 } else {
+                    // console.log(dataset);
                     result = InsightFacade.filterCourses(filter, this.coursesMap.get(dataset));
                 }
 
@@ -275,25 +275,25 @@ export default class InsightFacade implements IInsightFacade {
     private static validKeyHelper(key: string): boolean {
         // check if the key being passed is a valid one
         switch (key) {
-            case "courses_dept":
+            case "_dept":
                 return true;
-            case "courses_id":
+            case "_id":
                 return true;
-            case "courses_instructor":
+            case "_instructor":
                 return true;
-            case "courses_title":
+            case "_title":
                 return true;
-            case "courses_uuid":
+            case "_uuid":
                 return true;
-            case "courses_avg":
+            case "_avg":
                 return true;
-            case "courses_pass":
+            case "_pass":
                 return true;
-            case "courses_fail":
+            case "_fail":
                 return true;
-            case "courses_audit":
+            case "_audit":
                 return true;
-            case "courses_year":
+            case "_year":
                 return true;
             default:
                 return false;
@@ -302,7 +302,7 @@ export default class InsightFacade implements IInsightFacade {
     // For every course section in Query, check if filter applies
     private static filterCourses(filter: InsightFilter, Query: InsightCourse[]): InsightCourse[] {
         let result: InsightCourse[] = [];
-
+        // console.log(Query)
         for (let section of Query) {
             // check if you can apply filter to the key
             if (InsightFacade.isSectionValid(filter, section)) {
@@ -360,18 +360,19 @@ export default class InsightFacade implements IInsightFacade {
             throw new InsightError("Invalid key");
         }
         // throw error for any non-number key
-        // if (Object.keys(body)[0] === "courses_dept") {
-        //     throw new InsightError("Not valid key");
-        // } else if ((Object.keys(body)[0]) === "courses_id") {
-        //     throw new InsightError("Not valid key");
-        // } else if ((Object.keys(body)[0]) === "courses_instructor") {
-        //     throw new InsightError("Not valid key");
-        // } else if ((Object.keys(body)[0]) === "courses_title") {
-        //     throw new InsightError("Not valid key");
-        // } else if ((Object.keys(body)[0]) === "courses_uuid") {
-        //     throw new InsightError("Not valid key");
-        // }
+        if (Object.keys(body)[0] === "courses_dept") {
+            throw new InsightError("Not valid key");
+        } else if ((Object.keys(body)[0]) === "courses_id") {
+            throw new InsightError("Not valid key");
+        } else if ((Object.keys(body)[0]) === "courses_instructor") {
+            throw new InsightError("Not valid key");
+        } else if ((Object.keys(body)[0]) === "courses_title") {
+            throw new InsightError("Not valid key");
+        } else if ((Object.keys(body)[0]) === "courses_uuid") {
+            throw new InsightError("Not valid key");
+        }
     }
+
     // best move is to SPLIT into helpers for each identifiable filter
     private static handleLTHelper(lt: object, section: { [key: string]: number }): boolean {
         if (section[Object.keys(lt)[0]] < Object.values(lt)[0]) {
@@ -409,19 +410,17 @@ export default class InsightFacade implements IInsightFacade {
         if (typeof value !== "string") {
             throw new InsightError("Invalid type");
         }
-        // throw error for any non-string key
-        // switch (key) {
-        //     case "courses_audit":
-        //         throw new InsightError("Invalid key");
-        //     case "courses_year":
-        //         throw new InsightError("Invalid key");
-        //     case "courses_pass":
-        //         throw new InsightError("Invalid key");
-        //     case "courses_fail":
-        //         throw new InsightError("Invalid key");
-        //     case "courses_avg":
-        //         throw new InsightError("Invalid key");
-        // }
+        if (key === "courses_avg") {
+            throw new InsightError("Not valid key");
+        } else if (key === "courses_pass") {
+            throw new InsightError("Not valid key");
+        } else if (key === "courses_fail") {
+            throw new InsightError("Not valid key");
+        } else if (key === "courses_year") {
+            throw new InsightError("Not valid key");
+        } else if (key === "courses_audit") {
+            throw new InsightError("Not valid key");
+        }
         let actualRes: string = section[key];
         // check each wildcard case
         if (value.includes("*")) {
@@ -430,10 +429,12 @@ export default class InsightFacade implements IInsightFacade {
                 // *ell*, *ello, hell*
             } else if (value.length === 2 && value.startsWith("**")) {
                 return value === "**";
-            } else if (value.length === 3 && value.startsWith("***")) {
-                throw new InsightError("cannot have ***");
             } else if (value.startsWith("**") || value.endsWith("**")) {
-                throw new InsightError("cannot have consecutive");
+                throw new InsightError("Asteriks cannot be in the middle");
+            } else if (value.startsWith("*") && value.endsWith("**")) {
+                throw new InsightError("Asteriks cannot be in the middle");
+            } else if (value.startsWith("**") && value.endsWith("*")) {
+                throw new InsightError("Asteriks cannot be in the middle");
             } else if (value.startsWith("*") && value.endsWith("*")) {
                 return actualRes.includes(value.substring(1, value.length - 1));
             } else if (value.startsWith("*")) {
@@ -519,12 +520,13 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
-   public listDatasets(): Promise<InsightDataset[]> {
+    public listDatasets(): Promise<InsightDataset[]> {
         return new Promise<InsightDataset[]> ( (resolve, reject) => {
             let result: InsightDataset[] = [];
 
             for (let id of this.coursesMap.keys()) {
                 let crows: number = this.coursesMap.get(id).length;
+                // console.log(crows);
                 result.push({id, kind: InsightDatasetKind.Courses, numRows: crows});
             }
 
