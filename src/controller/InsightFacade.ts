@@ -219,14 +219,11 @@ export default class InsightFacade implements IInsightFacade {
 
                 let result: InsightCourseEmpty[];
                 if (Object.keys(filter).length === 0) {
-                    // console.log(dataset);
                     result = this.coursesMap.get(dataset);
-                    // console.log(this.coursesMap.get(dataset));
                     if (result.length > 5000) {
                         throw new InsightError("Too many sections in result"); }
                 } else {
-                    // console.log(dataset);
-                    result = InsightFacade.filterCourses(filter, this.coursesMap.get(dataset));
+                    result = InsightFacade.filterCourses(filter, this.coursesMap.get(dataset), id);
                 }
 
                 // keep only the desired columns in query
@@ -236,7 +233,7 @@ export default class InsightFacade implements IInsightFacade {
                     filteredSections.forEach( function (section: any) {
                         let columnSection: InsightCourseEmpty = {};
                         columns.forEach( function (key: any) {
-                            if (InsightFacade.validKeyHelper(key)) {
+                            if (InsightFacade.validKeyHelper(key, id)) {
                                 columnSection[key] = section[key];
                             }
                         });
@@ -272,40 +269,40 @@ export default class InsightFacade implements IInsightFacade {
 
         });
     }
-    private static validKeyHelper(key: string): boolean {
+    private static validKeyHelper(key: string, id: string): boolean {
         // check if the key being passed is a valid one
         switch (key) {
-            case "_dept":
+            case id + "_dept":
                 return true;
-            case "_id":
+            case id + "_id":
                 return true;
-            case "_instructor":
+            case id + "_instructor":
                 return true;
-            case "_title":
+            case id + "_title":
                 return true;
-            case "_uuid":
+            case id + "_uuid":
                 return true;
-            case "_avg":
+            case id + "_avg":
                 return true;
-            case "_pass":
+            case id + "_pass":
                 return true;
-            case "_fail":
+            case id + "_fail":
                 return true;
-            case "_audit":
+            case id + "_audit":
                 return true;
-            case "_year":
+            case id + "_year":
                 return true;
             default:
                 return false;
         }
     }
     // For every course section in Query, check if filter applies
-    private static filterCourses(filter: InsightFilter, Query: InsightCourse[]): InsightCourse[] {
+    private static filterCourses(filter: InsightFilter, Query: InsightCourse[], id: string): InsightCourse[] {
         let result: InsightCourse[] = [];
-        // console.log(Query)
+
         for (let section of Query) {
             // check if you can apply filter to the key
-            if (InsightFacade.isSectionValid(filter, section)) {
+            if (InsightFacade.isSectionValid(filter, section, id)) {
                 result.push(section);
             }
         }
@@ -348,7 +345,7 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    private static validateMComFilterHelper(filter: InsightFilter) {
+    private static validateMComFilterHelper(filter: InsightFilter, id: string) {
         let body = Object.values(filter)[0];
         // MCOMPARATOR must be a number
         // check for valid value
@@ -356,23 +353,22 @@ export default class InsightFacade implements IInsightFacade {
             throw new InsightError("Invalid value");
         }
         // check for valid key
-        if (!this.validKeyHelper(Object.keys(body)[0])) {
+        if (!this.validKeyHelper(Object.keys(body)[0], id)) {
             throw new InsightError("Invalid key");
         }
         // throw error for any non-number key
-        if (Object.keys(body)[0] === "courses_dept") {
-            throw new InsightError("Not valid key");
-        } else if ((Object.keys(body)[0]) === "courses_id") {
-            throw new InsightError("Not valid key");
-        } else if ((Object.keys(body)[0]) === "courses_instructor") {
-            throw new InsightError("Not valid key");
-        } else if ((Object.keys(body)[0]) === "courses_title") {
-            throw new InsightError("Not valid key");
-        } else if ((Object.keys(body)[0]) === "courses_uuid") {
-            throw new InsightError("Not valid key");
-        }
+        // if (Object.keys(body)[0] === "courses_dept") {
+        //     throw new InsightError("Not valid key");
+        // } else if ((Object.keys(body)[0]) === "courses_id") {
+        //     throw new InsightError("Not valid key");
+        // } else if ((Object.keys(body)[0]) === "courses_instructor") {
+        //     throw new InsightError("Not valid key");
+        // } else if ((Object.keys(body)[0]) === "courses_title") {
+        //     throw new InsightError("Not valid key");
+        // } else if ((Object.keys(body)[0]) === "courses_uuid") {
+        //     throw new InsightError("Not valid key");
+        // }
     }
-
     // best move is to SPLIT into helpers for each identifiable filter
     private static handleLTHelper(lt: object, section: { [key: string]: number }): boolean {
         if (section[Object.keys(lt)[0]] < Object.values(lt)[0]) {
@@ -398,11 +394,11 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    private static handleSComparisonHelper(is: object, section: { [key: string]: string }): boolean {
+    private static handleSComparisonHelper(is: object, section: { [key: string]: string }, id: string): boolean {
 
         let key: any = Object.keys(is)[0];
         // check if key is not invalid
-        if (!this.validKeyHelper(key)) {
+        if (!this.validKeyHelper(key, id)) {
             throw new InsightError("Invalid key");
         }
         let value: any = Object.values(is)[0];
@@ -410,32 +406,32 @@ export default class InsightFacade implements IInsightFacade {
         if (typeof value !== "string") {
             throw new InsightError("Invalid type");
         }
-        if (key === "courses_avg") {
-            throw new InsightError("Not valid key");
-        } else if (key === "courses_pass") {
-            throw new InsightError("Not valid key");
-        } else if (key === "courses_fail") {
-            throw new InsightError("Not valid key");
-        } else if (key === "courses_year") {
-            throw new InsightError("Not valid key");
-        } else if (key === "courses_audit") {
-            throw new InsightError("Not valid key");
-        }
+        // throw error for any non-string key
+        // switch (key) {
+        //     case "courses_audit":
+        //         throw new InsightError("Invalid key");
+        //     case "courses_year":
+        //         throw new InsightError("Invalid key");
+        //     case "courses_pass":
+        //         throw new InsightError("Invalid key");
+        //     case "courses_fail":
+        //         throw new InsightError("Invalid key");
+        //     case "courses_avg":
+        //         throw new InsightError("Invalid key");
+        // }
         let actualRes: string = section[key];
         // check each wildcard case
         if (value.includes("*")) {
             if (value.length === 1) {
                 return value === "*";
-                // *ell*, *ello, hell*
+                // ell, ello, hell
             } else if (value.length === 2 && value.startsWith("**")) {
                 return value === "**";
-            } else if (value.startsWith("**") || value.endsWith("**")) {
-                throw new InsightError("Asteriks cannot be in the middle");
-            } else if (value.startsWith("*") && value.endsWith("**")) {
-                throw new InsightError("Asteriks cannot be in the middle");
-            } else if (value.startsWith("**") && value.endsWith("*")) {
-                throw new InsightError("Asteriks cannot be in the middle");
-            } else if (value.startsWith("*") && value.endsWith("*")) {
+            } else if (value.length === 3 && value.startsWith("*")) {
+                throw new InsightError("cannot have *");
+            } else if (value.startsWith("*") || value.endsWith("*")) {
+                throw new InsightError("cannot have consecutive");
+            } else if (value.startsWith("") && value.endsWith("")) {
                 return actualRes.includes(value.substring(1, value.length - 1));
             } else if (value.startsWith("*")) {
                 return actualRes.endsWith(value.substring(1));
@@ -450,7 +446,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Check if filter applies to given section
-    private static isSectionValid(filter: InsightFilter, section: any): boolean {
+    private static isSectionValid(filter: InsightFilter, section: any, id: string): boolean {
         if (InsightFacade.hasLogicCompHelper(filter)) {
             // check AND COMP
             if (filter.hasOwnProperty("AND")) {
@@ -462,7 +458,7 @@ export default class InsightFacade implements IInsightFacade {
                 // for each filter section must be valid
                 // recursive call to each filter in the array on the section
                 for (let insideFilter of filter.AND) {
-                    if (!this.isSectionValid(insideFilter, section)) {
+                    if (!this.isSectionValid(insideFilter, section, id)) {
                         return false;
                     }
                 }
@@ -477,7 +473,7 @@ export default class InsightFacade implements IInsightFacade {
                 // for at least one filter section must be valid:
                 // recursive call to each filter in the array on the section
                 for (let insideFilter of filter.OR) {
-                    if (this.isSectionValid(insideFilter, section)) {
+                    if (this.isSectionValid(insideFilter, section, id)) {
                         return true;
                     }
                 }
@@ -486,7 +482,7 @@ export default class InsightFacade implements IInsightFacade {
             // check if it is an MCOMPARATOR
         } else if (InsightFacade.hasMComparatorHelper(filter)) {
 
-            this.validateMComFilterHelper(filter);
+            this.validateMComFilterHelper(filter, id);
 
             if (filter.hasOwnProperty("GT")) {
 
@@ -504,12 +500,12 @@ export default class InsightFacade implements IInsightFacade {
         } else if (InsightFacade.hasNegationHelper(filter)) {
 
             // recursively call the same function with the same inputs but negated
-            return (!this.isSectionValid(filter.NOT, section));
+            return (!this.isSectionValid(filter.NOT, section, id));
 
             // Check if it is an SComparison
         } else if (InsightFacade.hasSComparisonHelper(filter)) {
 
-            return InsightFacade.handleSComparisonHelper(filter.IS, section);
+            return InsightFacade.handleSComparisonHelper(filter.IS, section, id);
 
         } else {
             // if no there is no filter
