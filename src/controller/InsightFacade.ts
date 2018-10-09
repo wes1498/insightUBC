@@ -299,7 +299,7 @@ export default class InsightFacade implements IInsightFacade {
                 return false;
         }
     }
-    // For every course section in Query, check if filter applies
+    // For every course section in Query, check if filter applies a
     private static filterCourses(filter: InsightFilter, Query: InsightCourse[]): InsightCourse[] {
         let result: InsightCourse[] = [];
         // console.log(Query)
