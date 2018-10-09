@@ -1,0 +1,20 @@
+{
+    "title": "error GT id",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_id": "596"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Error Not Implemented"
+}

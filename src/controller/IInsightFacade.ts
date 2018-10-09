@@ -18,7 +18,7 @@ export interface InsightDataset {
 export interface InsightCourse {
     [key: string]: string | number;
 }
-export interface InsightStrippedCourse {
+export interface InsightCourseEmpty {
   [key: string]: any;
 }
 export interface InsightFilter {

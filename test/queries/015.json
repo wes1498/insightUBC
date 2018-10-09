@@ -1,0 +1,29 @@
+{
+    "title": "burrow*, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "GT": {
+                        "courses_avg": 97
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_instructor": "burrow*, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth"
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_instructor"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result":"Error not Implemented"
+}

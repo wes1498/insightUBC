@@ -1,9 +1,9 @@
 {
-    "title": " empty order string",
+    "title": "error GT dept",
     "query": {
         "WHERE": {
-            "EQ": {
-                "courses_avg": 99
+            "GT": {
+                "courses_dept": "math"
             }
         },
         "OPTIONS": {
@@ -11,9 +11,9 @@
                 "courses_dept",
                 "courses_avg"
             ],
-            "ORDER": ""
+            "ORDER": "courses_avg"
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented"
+    "result": "Error Not Implemented"
 }
