@@ -125,7 +125,7 @@ export default class InsightFacade implements IInsightFacade {
                 let validCourse: InsightCourse = {
                     courses_dept: dept, courses_id: id, courses_avg: avg, courses_instructor: instructor,
                     courses_title: title, courses_pass: pass, courses_fail: fail, courses_audit: audit,
-                    courses_uuid: uuid, courses_year: year,
+                    courses_uuid: uuid, courses_year: year
                 };
                 this.coursesMap.get(datasetId).push(validCourse);
             });
@@ -184,14 +184,14 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise<boolean>((resolve, reject) => {
             fs.readdir(kind.toString(), (err, files) => {
                 if (err) {
-                    console.log(err + "1");
+                    // console.log(err + "1");
                     reject(false);
                 } else {
                     if (files.includes(id)) {
                         const pathy = Path.join(kind, id);
                         fs.unlink(pathy, (err2) => {
                             if (err2) {
-                                console.log(err2);
+                               //  console.log(err2);
                                 reject(false);
                             } else {
                                 resolve(true);
@@ -221,7 +221,7 @@ export default class InsightFacade implements IInsightFacade {
                 if (Object.keys(filter).length === 0) {
                     // console.log(dataset);
                     result = this.coursesMap.get(dataset);
-                    console.log(this.coursesMap.get(dataset));
+                    // console.log(this.coursesMap.get(dataset));
                     if (result.length > 5000) {
                         throw new InsightError("Too many sections in result"); }
                 } else {
