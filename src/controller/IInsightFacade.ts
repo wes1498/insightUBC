@@ -1,8 +1,7 @@
 /*
  * This is the primary high-level API for the project. In this folder there should be:
  * A class called InsightFacade, this should be in a file called InsightFacade.ts.
- * You should not change this interkface at all or the test suite will not work.
- * ///
+ * You should not change this interface at all or the test suite will not work.
  */
 
 export enum InsightDatasetKind {
@@ -15,29 +14,7 @@ export interface InsightDataset {
     kind: InsightDatasetKind;
     numRows: number;
 }
-export interface InsightCourse {
-    [key: string]: string | number;
-}
-export interface InsightCourseEmpty {
-  [key: string]: any;
-}
-export interface InsightFilter {
-    AND?: InsightFilter[];
-    OR?: InsightFilter[];
-    LT?: {[key: string]: number};
-    GT?: {[key: string]: number};
-    EQ?: {[key: string]: number};
-    IS?: {[key: string]: string};
-    NOT?: InsightFilter;
-}
-export interface InsightOrderObj {
-    dir: string;
-    keys: string[];
-}
-export interface InsightTransformations {
-    GROUP: string[];
-    APPLY: Array<{[key: string]: {[token: string]: string}}>;
-}
+
 export class InsightError extends Error {
     constructor(...args: any[]) {
         super(...args);
