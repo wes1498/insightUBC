@@ -33,6 +33,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         coursesInvalid: "./test/data/courses_invalid.zip",
         coursesNoJS: "./test/data/courses_notjs.zip",
         coursesBroken: "./test/data/courses_broken.zip",
+        coursesTwo: "./test/data/courses_two.zip",
+        coursesDouble: "./test/data/courses_double.zip",
     };
     let insightFacade: InsightFacade;
     let datasets: { [id: string]: string };
@@ -74,7 +76,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     afterEach(function () {
         Log.test(`AfterTest: ${this.currentTest.title}`);
     });
-    it("Should list 0 datasets before add uno", async () => {
+  /*  it("Should list 0 datasets before add uno", async () => {
         let response: InsightDataset[];
 
         try {
@@ -83,9 +85,9 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail("Should not fail");
         }
         expect(response).to.have.lengthOf(0);
-    });
+    });*/
     it("Should add a valid dataset dos", async () => {
-        const id: string = "courses";
+        const id: string = "coursesOne";
         let response: string[];
 
         try {
@@ -96,7 +98,61 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(response).to.deep.equal([id]);
         }
     });
-    it("Should list 1 datasets before add uno", async () => {
+    it("Should list 1 datasets", async () => {
+        let response: InsightDataset[];
+
+        try {
+            response = await insightFacade.listDatasets();
+        } catch (err) {
+            expect.fail("Should not fail");
+        }
+        expect(response).to.have.lengthOf(1);
+    });
+    it("Should add a valid dataset dos tres", async () => {
+        const id: string = "coursesTwo";
+        let response: string[];
+
+        try {
+            response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.be.instanceOf(InsightError);
+        }
+    });
+    it("Should list 2 datasets", async () => {
+        let response: InsightDataset[];
+
+        try {
+            response = await insightFacade.listDatasets();
+        } catch (err) {
+            expect.fail("Should not fail");
+        }
+        expect(response).to.have.lengthOf(2);
+    });
+    it("Should add a valid dataset dos cuatro", async () => {
+        const id: string = "coursesDouble";
+        let response: string[];
+
+        try {
+            response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.be.instanceOf(InsightError);
+        }
+    });
+    it("Should list 3 datasets", async () => {
+        let response: InsightDataset[];
+
+        try {
+            response = await insightFacade.listDatasets();
+        } catch (err) {
+            expect.fail("Should not fail");
+        }
+        expect(response).to.have.lengthOf(3);
+    });
+    /*it("Should list 1 datasets before add uno", async () => {
         let response: InsightDataset[];
 
         try {
@@ -672,7 +728,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } finally {
             expect(response).to.deep.equal([id]);
         }
-    });
+    });*/
 });
 
 // This test suite dynamically generates tests from the JSONe files in test/queries.
