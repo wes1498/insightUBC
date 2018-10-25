@@ -152,6 +152,17 @@ describe("InsightFacade Add/Remove Dataset", function () {
         }
         expect(response).to.have.lengthOf(3);
     });
+    it("Should remove the courses dataset uno", async () => {
+        const id: string = "coursesOne";
+        let response: string;
+        try {
+            response = await insightFacade.removeDataset(id);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.equal(id);
+        }
+    });
     /*it("Should list 1 datasets before add uno", async () => {
         let response: InsightDataset[];
 

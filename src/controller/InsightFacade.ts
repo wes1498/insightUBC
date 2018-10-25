@@ -6,6 +6,7 @@ import {getRelativePath} from "tslint/lib/configuration";
 import {relative} from "path";
 import {JSZipObject} from "jszip";
 import * as fs from "fs";
+import * as Path from "path";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -21,36 +22,42 @@ export default class InsightFacade implements IInsightFacade {
     }
     private addPromises (zip: JSZip, id: string): Promise<string[]> {
           return new Promise<string[]>((resolve, reject) => {
+              let store: any[] = [];
               zip.forEach(((relativePath, file: JSZipObject ) => {
-                  let store: any[] = [];
+                 // let store: any[] = [];
                   store.push(file.async("text").then((data: string) => {
                       this.addCourse(data, id).then((data2: any) => {
                           // promises.push(data2);
+                           // console.log("yeeeeeeeeeee" + JSON.stringify(data2));
                            store.push(data2);
-                          // console.log(data2);
+                           // console.log(id);
                           // console.log(store);
                           // return resolve(store);
                           // return data2;
                       });
-                      // console.log(store);
-                      return resolve(store);
+                      // console.log( "from add " + store);
+                      // return resolve(store);
                       }
                   ));
                   // return resolve(store);
               }));
+              return resolve(store);
           });
     }
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
             let promises: any[] = [];
             // Unzipping returns a JSzip
+            // this.coursesMap.set(id, []);
             JSZip.loadAsync(content, {base64: true}).then((zip: JSZip) => {
                 // console.log(zip);
-               /* this.addPromises(zip, id).then((data: string[]) => {
+            /*    this.addPromises(zip, id).then((data: string[]) => {
                     // console.log(data);
-                    promises.push(data);
-                    console.log(promises);
+                    promises = data;
+                    // console.log(this.coursesMap.get(id));
                 });*/
+                // console.log(this.coursesMap.get(id));
+                // console.log(this.coursesMap.entries());
                 zip.forEach(((relativePath, file: JSZipObject) => {
                 promises.push(file.async("text").then((data: string) => {
                     this.addCourse(data, id).then((data2: any) => {
@@ -64,9 +71,10 @@ export default class InsightFacade implements IInsightFacade {
                 }));
             }));
                 Promise.all(promises).then((result) => {
-                    // console.log(promises);
+                    console.log(promises);
                     let arr: string[] = this.coursesMap.get(id);
-                   // console.log(arr);
+                    // console.log(arr);
+                    console.log(this.coursesMap.get(id));
                     let dat = Object.assign({}, arr);
                     fs.writeFile("msg" + id + ".txt", JSON.stringify(arr), (e) => {
                         if (e) {
@@ -102,6 +110,7 @@ export default class InsightFacade implements IInsightFacade {
             // console.log(data);
             // let dat = Object.assign({}, data);
             // console.log(dat);
+            try {
             let parsedData = JSON.parse(data);
             let filterPromises: any[] = [];
             if (parsedData.result.length === 0) {
@@ -112,11 +121,18 @@ export default class InsightFacade implements IInsightFacade {
             dataObj.forEach((section: any) => {
                 this.filters([section], datasetId).then((stuff3: any) => {
                     let dataObjParse: any[] = stuff3;
+                    // this.coursesMap.set(datasetId, []);
                     this.coursesMap.get(datasetId).push(dataObjParse);
+                    // console.log(this.coursesMap.get(datasetId));
+                    // console.log(datasetId);
                     return resolve(dataObjParse);
                 });
             });
-        });
+        } catch (e) {
+                console.log(e);
+                return reject("Error");
+            }
+    });
     }
     // filterPromises[section] = stuff3;
     // this.coursesMap.get(datasetId).push(stuff3);
@@ -195,8 +211,51 @@ export default class InsightFacade implements IInsightFacade {
             // return Promise.resolve(entries);
     });
     }*/
-    public removeDataset(id: string): Promise<string> {
-        return Promise.reject("Not implemented.");
+    public removeDataset(id: string): Promise<string> {// no changes needed
+        return new Promise<string>((resolve, reject) => {
+            if (id === "") {
+                return reject(new NotFoundError("Invalid ID"));
+            } else if (id === null || !id) {
+                return reject(new InsightError("Invalid ID"));
+            } else if (!this.coursesMap.has(id)) {
+                return reject(new NotFoundError("Not found"));
+            }
+       /*     if (this.coursesMap.has(id)) {
+                this.removeFromMemory(id, InsightDatasetKind.Courses).then((succ) => {
+                    return resolve(id);
+                }).catch((err) => {
+                    return reject(new NotFoundError("error :" +  err ));
+                });
+            } else if (!this.coursesMap.has(id)) {
+                return reject(new NotFoundError("Not found"));
+            }*/
+            this.coursesMap.delete(id);
+            return resolve (id);
+        });
+    }
+    private removeFromMemory(id: string, kind: InsightDatasetKind): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            fs.readdir(kind.toString(), (err, files) => {
+                if (err) {
+                    // console.log(err + "1");
+                    return reject("error in deleting: " + err);
+                } else {
+                    if (files.includes(id)) {
+                        const pathy = Path.join(kind, id);
+                        fs.unlink(pathy, (err2) => {
+                            if (err2) {
+                                //  console.log(err2);
+                                reject(false);
+                            } else {
+                                resolve(true);
+                            }
+                        });
+                    } else {
+                        reject(false);
+                    }
+                }
+            });
+        });
     }
 
     public performQuery(query: any): Promise<any[]> {
