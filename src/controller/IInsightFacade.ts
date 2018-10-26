@@ -15,9 +15,6 @@ export interface InsightDataset {
     numRows: number;
 }
 
-export interface InsightCourse {
-    [key: string]: string | number;
-}
 export class InsightError extends Error {
     constructor(...args: any[]) {
         super(...args);
