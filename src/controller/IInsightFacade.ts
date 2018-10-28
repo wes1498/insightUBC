@@ -8,6 +8,30 @@ export enum InsightDatasetKind {
     Courses = "courses",
     Rooms = "rooms",
 }
+export interface InsightCourse {
+    [key: string]: string | number;
+}
+export interface InsightFilter {
+    "AND": InsightFilter[];
+    "OR": InsightFilter[];
+    "LT": {[key: string]: number};
+    "GT": {[key: string]: number};
+    "EQ": {[key: string]: number};
+    "IS": {[key: string]: string};
+    "NOT": InsightFilter;
+}
+export interface InsightFilterString {
+    "courses_dept": string;
+    "courses_id": string;
+    "courses_instructor": string;
+    "courses_title": string;
+    "courses_uuid": string;
+    "courses_avg": string;
+    "courses_pass": string;
+    "courses_fail": string;
+    "courses_audit": string;
+    "courses_year": string;
+}
 export class CourseSaver {
     public dept: string;
     public id: string;
