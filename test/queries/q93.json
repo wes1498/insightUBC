@@ -1,0 +1,22 @@
+{
+    "title": "Courses pass neg num",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_pass": -1
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": [
+                "courses_dept",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Error not implemented."
+}

@@ -1,0 +1,19 @@
+{
+    "title": "IS with fail",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_fail": 20
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "error not implemented."
+}

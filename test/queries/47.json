@@ -1,0 +1,23 @@
+{ 
+  "title": "not not is",
+    "query": {
+  "WHERE": {
+    "NOT": {
+      "NOT" : {
+      "IS": {
+        "courses_dept": "ubc"
+      }
+    }
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+},
+    "isQueryValid": true,
+    "result":[]
+    }

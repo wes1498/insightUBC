@@ -1,0 +1,40 @@
+  { 
+  "title": "andor  2",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "OR": [
+          {
+            "GT": {
+              "courses_avg": 80
+            }
+          },
+          {
+            "IS": {
+              "courses_dept": "cpsc"
+            }
+          }
+        ]
+      },
+      {
+        "IS": {
+          "courses_dept": "adhe"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_id"
+    ],
+    "ORDER": { 
+    
+    }
+  }
+},
+"isQueryValid": false,
+   "result":[{}]
+    }

@@ -1,0 +1,28 @@
+ {
+  "title": "AND LOGIC ",
+    "query": {
+ "WHERE": {
+    "AND": [
+      {
+        "IS": {
+          "courses_dept": "math"
+        }
+      },
+      {
+        "IS": {
+          "courses_dept": "cpsc"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+  },
+  "isQueryValid": true,
+    "result": []
+    }

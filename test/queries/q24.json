@@ -1,0 +1,30 @@
+{ 
+  "title": "course title",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "GT": {
+          "courses_avg": 87
+        }
+      },
+      {
+        "IS": {
+          "courses_title": "introduction"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_id",
+      "courses_avg",
+      "courses_title"
+    ],
+    "ORDR": "courses_avg"
+    }
+  },
+   "isQueryValid": false,
+     "result":"Error not implemented"
+    }

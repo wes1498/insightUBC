@@ -1,0 +1,19 @@
+{
+    "title": "LT with uuid",
+    "query": {
+        "WHERE": {
+            "LT": {
+                "courses_uuid": "56402"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "error not implemented."
+}

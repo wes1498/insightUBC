@@ -1,0 +1,28 @@
+{
+    "title": "*haw, amber",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_instructor": "*haw, amber"
+                    }
+                },
+                {
+                    "LT": {
+                        "courses_avg": 40
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[]
+}

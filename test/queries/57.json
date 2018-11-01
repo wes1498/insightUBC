@@ -1,0 +1,38 @@
+{ 
+  "title": "with title",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "OR":[
+                        {
+                            "IS": {
+                                "courses_dept":"math"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept":"adhe"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_dept": "99"
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+           
+        }
+        },
+          "isQueryValid": false,
+    "result":[{}]
+    }

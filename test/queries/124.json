@@ -1,0 +1,22 @@
+   { 
+  "title": "eq cpsc instructo 68 fail",
+    "query": {
+  "WHERE": {
+    "EQ": {
+      "courses_fail": 68
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_fail"
+    ],
+    "ORDER": "courses_avg"
+  }
+
+  },
+
+  "isQueryValid": true,
+   "result":[{"courses_dept":"math","courses_avg":66.76,"courses_fail":68},{"courses_dept":"math","courses_avg":70.75,"courses_fail":68},{"courses_dept":"phys","courses_avg":76.15,"courses_fail":68}]
+    }

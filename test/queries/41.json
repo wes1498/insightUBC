@@ -1,0 +1,17 @@
+{ 
+  "title": "empty string in col",
+    "query": {
+  "WHERE": {
+    "GT": {
+      "courses_avg": 99
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [""],
+    "ORDER": "courses_fail"
+  }
+  },
+     "isQueryValid": false,
+     "result":[{}]
+    }
+    

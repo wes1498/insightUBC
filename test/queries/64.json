@@ -1,0 +1,38 @@
+{ 
+  "title": "double gt lt",
+    "query": {
+  "WHERE": {
+    
+      "AND":[
+                        {
+                            "GT": {
+                                "courses_avg":90
+                            }
+                        },
+                        {
+                            "LT": {
+                                "courses_avg":93
+                            }
+                        },
+                        {
+                          "IS":{
+                            "courses_dept":"adhe"
+                          }
+                        }
+                    ]
+
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_audit",
+      "courses_instructor"
+    ],
+    "ORDER": "courses_avg"
+  
+  }
+},
+  "isQueryValid": true,
+   "result":[{"courses_dept":"adhe","courses_avg":90.02,"courses_audit":0,"courses_instructor":""},{"courses_dept":"adhe","courses_avg":90.16,"courses_audit":0,"courses_instructor":"vanwynsberghe, robert"},{"courses_dept":"adhe","courses_avg":90.17,"courses_audit":0,"courses_instructor":"bishundayal, deonarine"},{"courses_dept":"adhe","courses_avg":90.18,"courses_audit":0,"courses_instructor":"falk, clifford"},{"courses_dept":"adhe","courses_avg":90.5,"courses_audit":0,"courses_instructor":"bishundayal, deonarine"},{"courses_dept":"adhe","courses_avg":90.72,"courses_audit":0,"courses_instructor":"bishundayal, deonarine"},{"courses_dept":"adhe","courses_avg":90.82,"courses_audit":0,"courses_instructor":"bishundayal, deonarine"},{"courses_dept":"adhe","courses_avg":90.85,"courses_audit":0,"courses_instructor":""},{"courses_dept":"adhe","courses_avg":91.29,"courses_audit":0,"courses_instructor":"bishundayal, deonarine"},{"courses_dept":"adhe","courses_avg":91.33,"courses_audit":0,"courses_instructor":"bishundayal, deonarine"},{"courses_dept":"adhe","courses_avg":91.33,"courses_audit":0,"courses_instructor":""},{"courses_dept":"adhe","courses_avg":91.48,"courses_audit":0,"courses_instructor":"bishundayal, deonarine"},{"courses_dept":"adhe","courses_avg":92.54,"courses_audit":0,"courses_instructor":"bishundayal, deonarine"}]
+ }

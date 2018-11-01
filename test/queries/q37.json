@@ -1,0 +1,20 @@
+{
+
+    "title": "reject where EQ is not a number",
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_avg":"97"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "students_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_invalid"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Not implemented."
+}

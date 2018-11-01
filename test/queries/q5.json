@@ -1,0 +1,31 @@
+{
+    "title": "Invalid querie, expect a key but passed a string",
+    "query": {
+        "WHERE": {
+            "AND":[
+                {
+                    "GT": {
+                        "courses_avg":"no dealz"
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_dept":"cpsc"
+                    }
+                }
+            ]
+        },
+
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg",
+            "FORM": "TABLE"
+        }
+    },
+    "isQueryValid": false,
+    "result": []
+    }

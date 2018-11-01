@@ -1,0 +1,34 @@
+{
+    "title": "wildcard on both sides",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "*at*"
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_pass": 150
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_dept":"math","courses_avg":61.52},
+        {"courses_dept":"math","courses_avg":66.44},
+        {"courses_dept":"math","courses_avg":70.76},
+        {"courses_dept":"math","courses_avg":78.65},
+        {"courses_dept":"math","courses_avg":78.93}
+    ]
+}

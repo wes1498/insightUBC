@@ -1,0 +1,22 @@
+   { 
+  "title": "lt fail",
+    "query": {
+  "WHERE": {
+    "LT": {
+      "courses_fail": -100
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_fail"
+    ],
+    "ORDER": "courses_avg"
+  }
+
+  },
+
+  "isQueryValid": true,
+   "result":[]
+    }

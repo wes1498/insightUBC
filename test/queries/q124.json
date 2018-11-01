@@ -1,0 +1,31 @@
+{
+    "title": "asterisk with string keys",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_id": "*00"
+                    }
+                },
+                {
+                    "LT": {
+                        "courses_avg": 40
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"lfs","courses_avg":0},
+        {"courses_dept":"lfs","courses_avg":0}
+    ]
+}

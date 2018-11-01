@@ -1,0 +1,28 @@
+{ 
+  "title": "weird symbol gets 0 ",
+    "query": {
+"WHERE": {
+        "AND": [
+          {
+            "IS": {
+              "courses_dept": "cp^c"
+            }
+          },
+          {
+            "IS": {
+              "courses_dept":"cp^c"         
+            }
+          }
+        ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+    }
+  },
+   "isQueryValid": true,
+    "result": []
+    }

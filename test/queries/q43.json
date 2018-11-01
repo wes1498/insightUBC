@@ -1,0 +1,37 @@
+{
+    "title": "complex",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "AND": [
+                        {
+                            "IS": {
+                                "courses_dept": "math"
+                            }
+                        },
+                        {
+                            "EQ": {
+                                "courses_avg": 80
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {"courses_dept":"math","courses_avg":80},
+        {"courses_dept":"math","courses_avg":80},
+        {"courses_dept":"math","courses_avg":80},
+        {"courses_dept":"math","courses_avg":80}
+    ]
+}

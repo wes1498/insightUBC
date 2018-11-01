@@ -1,0 +1,19 @@
+{
+    "title": "wild card at beginning",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": "**th"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Error not implemented."
+}

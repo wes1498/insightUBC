@@ -1,0 +1,34 @@
+{
+    "title": "*& and &* is ",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "GT": {
+                        "courses_avg": 98.8
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_instructor": "*&"
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_instructor": "&*"
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_instructor"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[]
+}

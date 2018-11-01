@@ -1,0 +1,21 @@
+   { 
+  "title": "pass string",
+    "query": {
+  "WHERE": {
+    "LT": {
+      "courses_instructor": "introduction*"
+    }
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+
+  },
+
+  "isQueryValid": false,
+   "result":[{}]
+    }

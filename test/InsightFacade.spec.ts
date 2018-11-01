@@ -76,7 +76,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     afterEach(function () {
         Log.test(`AfterTest: ${this.currentTest.title}`);
     });
-  /*  it("Should list 0 datasets before add uno", async () => {
+    it("Should list 0 datasets before add uno", async () => {
         let response: InsightDataset[];
 
         try {
@@ -85,7 +85,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail("Should not fail");
         }
         expect(response).to.have.lengthOf(0);
-    });*/
+    });
     it("Should add a valid dataset", async () => {
         const id: string = "courses";
         let response: string[];
@@ -172,7 +172,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             expect.fail("Should not fail");
         }
-        expect(response).to.have.lengthOf(1);
+        expect(response).to.have.lengthOf(2);
     });
     it("Should add a valid dataset dos tres", async () => {
         const id: string = "courses";
