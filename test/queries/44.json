@@ -17,6 +17,9 @@
         }
         },
          "isQueryValid": true,
-     "result":[{"courses_dept":"cnps","courses_avg":99.19},{"courses_dept":"math","courses_avg":99.78},{"courses_dept":"math","courses_avg":99.78}]
+     "result":[
+         {"courses_dept":"cnps","courses_avg":99.19},
+         {"courses_dept":"math","courses_avg":99.78},
+         {"courses_dept":"math","courses_avg":99.78}
+     ]
     }
-    

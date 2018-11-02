@@ -1,19 +1,32 @@
 {
-    "title": "invalid key avg",
+    "title": "burrows, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth*",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_avg": 97
-            }
+            "AND": [
+                {
+                    "GT": {
+                        "courses_avg": 97
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_instructor": "burrows, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth*"
+                    }
+                }
+            ]
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
+                "courses_avg",
+                "courses_instructor"
             ],
             "ORDER": "courses_avg"
         }
     },
-    "isQueryValid": false,
-    "result": "Invalid key"
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"nurs","courses_avg":97.53,"courses_instructor":"burrows, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth"},
+        {"courses_dept":"nurs","courses_avg":98.5,"courses_instructor":"burrows, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth"}
+    ]
 }

@@ -3,15 +3,13 @@ import {
     IInsightFacade,
     InsightDataset,
     InsightDatasetKind,
-    InsightFilter
+    InsightError,
+    InsightFilter,
+    NotFoundError
 } from "./IInsightFacade";
-import {InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
-import {getRelativePath} from "tslint/lib/configuration";
-import {relative} from "path";
 import {JSZipObject} from "jszip";
 import * as fs from "fs";
-import * as Path from "path";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -29,6 +27,9 @@ export default class InsightFacade implements IInsightFacade {
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         let that = this;
         return new Promise<string[]>(function (resolve, reject) {
+            if (typeof id !== "string" || typeof content !== "string" || kind === undefined || kind === null) {
+                reject(new InsightError("Invalid params"));
+            }
             if (that.coursesMap.has(id)) {
                 return reject(new InsightError("Id is already added"));
             }
@@ -63,12 +64,27 @@ export default class InsightFacade implements IInsightFacade {
                                     // let validCourse: CourseSaver = new CourseSaver(dept, id,
                                     //     avg, instructor, title, pass, fail, audit, uuid, year);
                                     let validCourse: any = {
-                                        courses_dept: dept, courses_id: iid, courses_avg: avg,
-                                        courses_instructor: instructor,
-                                        courses_title: title, courses_pass: pass,
-                                        courses_fail: fail, courses_audit: audit,
-                                        courses_uuid: uuid, courses_year: year
+                                        dept: String,
+                                        id: String,
+                                        avg: Number,
+                                        instructor: String,
+                                        title: String,
+                                        pass: Number,
+                                        fail: Number,
+                                        audit: Number,
+                                        uuid: String,
+                                        year: Number
                                     };
+                                    validCourse.dept = dept;
+                                    validCourse.id = iid;
+                                    validCourse.avg = avg;
+                                    validCourse.instructor = instructor;
+                                    validCourse.title = title;
+                                    validCourse.pass = pass;
+                                    validCourse.fail = fail;
+                                    validCourse.audit = audit;
+                                    validCourse.uuid = uuid;
+                                    validCourse.year = year;
                                     that.coursesMap.get(id).push(validCourse);
                                 });
 
@@ -88,7 +104,7 @@ export default class InsightFacade implements IInsightFacade {
                     //     that.coursesMap.delete(id);
                     //     return reject(new InsightError("No sections were added"));
                     // } else {
-                    fs.writeFile("data/" + id, JSON.stringify(toSaveOnDisk), function (e) {
+                    fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
                             return reject(new InsightError("Error Saving Files " + e));
                         });
 
@@ -120,23 +136,9 @@ export default class InsightFacade implements IInsightFacade {
                     if (e) {
                         return reject(new InsightError("Dataset not added yet " + e));
                     }
-                    // else {
-                    //     if (files.includes(id)) {
-                    //         const pathy = Path.join(InsightDatasetKind.Courses, id);
-                    //         fs.unlink(pathy, function (e1) {
-                    //             if (e1) {
-                    //                 return reject(new InsightError("Dataset no unlink " + e1));
-                    //             }
-                    //         });
-                    //     } else {
-                    //         return reject(new NotFoundError("File does not include Id"));
-                    //     }
-                    // }
                 });
             }
-            // else if (!that.coursesMap.has(id)) {
-            //     return reject(new NotFoundError("Not found"));
-            // }
+
             that.coursesMap.delete(id);
             return resolve (id);
         });
@@ -150,38 +152,33 @@ export default class InsightFacade implements IInsightFacade {
                 let order = options.ORDER;
                 let columns = options.COLUMNS;
                 let id: string = columns[0].split("_")[0];
-
-                // perform syntax checks as you go
+                if (that.coursesMap.get(id) === undefined) {
+                        reject(new InsightError("noot"));
+                }
+                // let sections = fs.readFileSync("./data/" + id + ".json", "UTF8");
+                // if (!sections) {
+                //     reject(new InsightError("id does not exist"));
+                // }
+                // let parsedInfo = JSON.parse(sections);
                 let result: any[];
                 if (Object.keys(filter).length === 0) {
-                    // console.log(dataset);
                     result = that.coursesMap.get(id);
-                    // console.log(this.coursesMap.get(dataset));
                     if (result.length > 5000) {
-                        throw new InsightError("Too many sections in result"); }
+                        throw new InsightError("Too many sections in result");
+                    }
                 } else {
-                    let theResult: any[] = [];
-                    for (let section of that.coursesMap.get(id)) {
-                        // check if you can apply filter to the key
-                        if (InsightFacade.isSectionValid(filter, section)) {
-                            theResult.push(section);
-                        }
-                    }
-
-                    if (theResult.length > 5000) {
-                        throw new InsightError("Result exceeds 5000 limit");
-                    }
-                    result = theResult;
+                    result = InsightFacade.filterCourses(filter, that.coursesMap.get(id), id);
                 }
-
                 // keep only the desired columns in query
                 if (columns && columns.length !== 0) {
                     let columnResult: object[] = [];
                     result.forEach( function (section: any) {
                         let columnSection: any = {};
                         columns.forEach( function (key: any) {
-                            if (InsightFacade.validKeyHelper(key)) {
-                                columnSection[key] = section[key];
+                            if (InsightFacade.validKeyHelper(key, id)) {
+                                let res = key.substring(0, key.indexOf("_"));
+                                key = key.substring(key.indexOf("_") + 1);
+                                columnSection[res + "_" + key] = section[key];
                             }
                         });
                         columnResult.push(columnSection);
@@ -215,28 +212,43 @@ export default class InsightFacade implements IInsightFacade {
 
         });
     }
-    private static validKeyHelper(key: string): boolean {
+    private static filterCourses(filter: InsightFilter, Query: any[], id: string): any[] {
+        let result: any[] = [];
+
+        for (let section of Query) {
+            // check if you can apply filter to the key
+            if (InsightFacade.isSectionValid(filter, section, id)) {
+                result.push(section);
+            }
+        }
+        // result over 5000 to add
+        if (result.length > 5000) {
+            throw new InsightError("Result exceeds 5000 limit");
+        }
+        return result;
+    }
+    private static validKeyHelper(key: string, id: string): boolean {
         // check if the key being passed is a valid one
         switch (key) {
-            case "courses_dept":
+            case id + "_dept":
                 return true;
-            case "courses_id":
+            case id + "_id":
                 return true;
-            case "courses_instructor":
+            case id + "_instructor":
                 return true;
-            case "courses_title":
+            case id + "_title":
                 return true;
-            case "courses_uuid":
+            case id + "_uuid":
                 return true;
-            case "courses_avg":
+            case id + "_avg":
                 return true;
-            case "courses_pass":
+            case id + "_pass":
                 return true;
-            case "courses_fail":
+            case id + "_fail":
                 return true;
-            case "courses_audit":
+            case id + "_audit":
                 return true;
-            case "courses_year":
+            case id + "_year":
                 return true;
             default:
                 return false;
@@ -244,15 +256,15 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Check if filter applies to given section
-    private static isSectionValid(filter: InsightFilter, section: any): boolean {
+    private static isSectionValid(filter: InsightFilter, section: any, id: string): boolean {
         if (filter.hasOwnProperty("AND")) {
-            if (filter.AND.length === 0 ) {
+            if (filter.AND.length < 1 ) {
                 throw new InsightError("Not enough conditions for AND");
             }
                 // for each filter section must be valid
                 // recursive call to each filter in the array on the section
             for (let insideFilter of filter.AND) {
-                if (!this.isSectionValid(insideFilter, section)) {
+                if (!this.isSectionValid(insideFilter, section, id)) {
                     return false;
                 }
             }
@@ -268,7 +280,7 @@ export default class InsightFacade implements IInsightFacade {
                 // for at least one filter section must be valid:
                 // recursive call to each filter in the array on the section
             for (let insideFilter of filter.OR) {
-                if (this.isSectionValid(insideFilter, section)) {
+                if (this.isSectionValid(insideFilter, section, id)) {
                     return true;
                 }
             }
@@ -284,21 +296,9 @@ export default class InsightFacade implements IInsightFacade {
                 throw new InsightError("Invalid value");
             }
             // check for valid key
-            if (!this.validKeyHelper(Object.keys(body)[0])) {
+            if (!this.validKeyHelper(Object.keys(body)[0], id)) {
                 throw new InsightError("Invalid key");
             }
-            // throw error for any non-number key
-            // if (Object.keys(body)[0] === "courses_dept") {
-            //     throw new InsightError("Not valid key");
-            // } else if ((Object.keys(body)[0]) === "courses_id") {
-            //     throw new InsightError("Not valid key");
-            // } else if ((Object.keys(body)[0]) === "courses_instructor") {
-            //     throw new InsightError("Not valid key");
-            // } else if ((Object.keys(body)[0]) === "courses_title") {
-            //     throw new InsightError("Not valid key");
-            // } else if ((Object.keys(body)[0]) === "courses_uuid") {
-            //     throw new InsightError("Not valid key");
-            // }
 
             if (filter.hasOwnProperty("GT")) {
 
@@ -328,7 +328,7 @@ export default class InsightFacade implements IInsightFacade {
         } else if (filter.hasOwnProperty("NOT")) {
 
             // recursively call the same function with the same inputs but negated
-            return (!this.isSectionValid(filter.NOT, section));
+            return (!this.isSectionValid(filter.NOT, section, id));
 
             // Check if it is an SComparison
         } else if (filter.hasOwnProperty("IS")) {
@@ -337,7 +337,7 @@ export default class InsightFacade implements IInsightFacade {
 
             let key: any = Object.keys(filter.IS)[0];
             // check if key is not invalid
-            if (!this.validKeyHelper(key)) {
+            if (!this.validKeyHelper(key, id)) {
                 throw new InsightError("Invalid key");
             }
             let value: any = Object.values(filter.IS)[0];
@@ -345,18 +345,7 @@ export default class InsightFacade implements IInsightFacade {
             if (typeof value !== "string") {
                 throw new InsightError("Invalid type");
             }
-            // if (key === "courses_avg") {
-            //     throw new InsightError("Not valid key");
-            // } else if (key === "courses_pass") {
-            //     throw new InsightError("Not valid key");
-            // } else if (key === "courses_fail") {
-            //     throw new InsightError("Not valid key");
-            // } else if (key === "courses_year") {
-            //     throw new InsightError("Not valid key");
-            // } else if (key === "courses_audit") {
-            //     throw new InsightError("Not valid key");
-            // }
-            let actualRes: string = section[key];
+            let actualRes: string = section[key.substring(key.indexOf("_") + 1)];
             // check each wildcard case
             if (value.includes("*")) {
                 if (value.length === 1) {
@@ -392,11 +381,12 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
     public listDatasets(): Promise<InsightDataset[]> {
-        return new Promise<InsightDataset[]> ( (resolve, reject) => {
+        let that = this;
+        return new Promise<InsightDataset[]> ( function (resolve, reject) {
             let result: InsightDataset[] = [];
 
-            for (let id of this.coursesMap.keys()) {
-                let crows: number = this.coursesMap.get(id).length;
+            for (let id of that.coursesMap.keys()) {
+                let crows: number = that.coursesMap.get(id).length;
                 result.push({id, kind: InsightDatasetKind.Courses, numRows: crows});
             }
 
