@@ -167,7 +167,19 @@ export default class InsightFacade implements IInsightFacade {
                         throw new InsightError("Too many sections in result");
                     }
                 } else {
-                    result = InsightFacade.filterCourses(filter, that.coursesMap.get(id), id);
+                    let thisResult: any[] = [];
+
+                    for (let section of that.coursesMap.get(id)) {
+                        // check if you can apply filter to the key
+                        if (InsightFacade.isSectionValid(filter, section, id)) {
+                            thisResult.push(section);
+                        }
+                    }
+                    // result over 5000 to add
+                    if (thisResult.length > 5000) {
+                        throw new InsightError("Result exceeds 5000 limit");
+                    }
+                    result = thisResult;
                 }
                 // keep only the desired columns in query
                 if (columns && columns.length !== 0) {
@@ -212,21 +224,7 @@ export default class InsightFacade implements IInsightFacade {
 
         });
     }
-    private static filterCourses(filter: InsightFilter, Query: any[], id: string): any[] {
-        let result: any[] = [];
 
-        for (let section of Query) {
-            // check if you can apply filter to the key
-            if (InsightFacade.isSectionValid(filter, section, id)) {
-                result.push(section);
-            }
-        }
-        // result over 5000 to add
-        if (result.length > 5000) {
-            throw new InsightError("Result exceeds 5000 limit");
-        }
-        return result;
-    }
     private static validKeyHelper(key: string, id: string): boolean {
         // check if the key being passed is a valid one
         switch (key) {
@@ -301,24 +299,31 @@ export default class InsightFacade implements IInsightFacade {
             }
 
             if (filter.hasOwnProperty("GT")) {
+                let yup = Object.keys(filter.GT)[0]; // courses_avg
+                yup = yup.substring(yup.indexOf("_") + 1); // avg
 
-                if (section[Object.keys(filter.GT)[0]] > Object.values(filter.GT)[0]) {
+                if (section[yup] > Object.values(filter.GT)[0]) { // section[avg]
                     return true;
                 } else {
                     return false;
                 }
 
             } else if (filter.hasOwnProperty("LT")) {
+                let yup = Object.keys(filter.LT)[0];
+                yup = yup.substring(yup.indexOf("_") + 1);
 
-                if (section[Object.keys(filter.LT)[0]] < Object.values(filter.LT)[0]) {
+                if (section[yup] < Object.values(filter.LT)[0]) {
                     return true;
                 } else {
                     return false;
                 }
 
             } else {
+                let yup = Object.keys(filter.EQ)[0];
+                yup = yup.substring(yup.indexOf("_") + 1);
 
-                if (section[ Object.keys(filter.EQ)[0]] === Object.values(filter.EQ)[0]) {
+                if (section[ yup] === Object.values(filter.EQ)[0]) {
+
                     return true;
                 } else {
                     return false;
@@ -335,17 +340,17 @@ export default class InsightFacade implements IInsightFacade {
 
             // return InsightFacade.handleSComparisonHelper(filter.IS, section);
 
-            let key: any = Object.keys(filter.IS)[0];
+            let key: any = Object.keys(filter.IS)[0]; // courses_id
             // check if key is not invalid
             if (!this.validKeyHelper(key, id)) {
                 throw new InsightError("Invalid key");
             }
-            let value: any = Object.values(filter.IS)[0];
+            let value: any = Object.values(filter.IS)[0]; // courses_avg: VALUE
             // check if value is of right type
             if (typeof value !== "string") {
                 throw new InsightError("Invalid type");
             }
-            let actualRes: string = section[key.substring(key.indexOf("_") + 1)];
+            let actualRes: string = section[key.substring(key.indexOf("_") + 1)]; // section[id]
             // check each wildcard case
             if (value.includes("*")) {
                 if (value.length === 1) {
