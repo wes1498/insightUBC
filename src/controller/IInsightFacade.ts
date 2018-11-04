@@ -19,6 +19,14 @@ export interface InsightFilter {
     "NOT": InsightFilter;
 }
 
+export interface InsightOrderObj {
+    dir: string;
+    keys: string[];
+}
+export interface InsightTransformations {
+    GROUP: string[];
+    APPLY: Array<{[key: string]: {[token: string]: string}}>;
+}
 export interface InsightDataset {
     id: string;
     kind: InsightDatasetKind;

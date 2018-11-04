@@ -5,7 +5,9 @@ import {
     InsightDatasetKind,
     InsightError,
     InsightFilter,
-    NotFoundError
+    NotFoundError,
+    InsightOrderObj,
+    InsightTransformations
 } from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {JSZipObject} from "jszip";
@@ -151,15 +153,11 @@ export default class InsightFacade implements IInsightFacade {
                 let options = query.OPTIONS;
                 let order = options.ORDER;
                 let columns = options.COLUMNS;
+                // let transformations = query.TRANSFORMATIONS;
                 let id: string = columns[0].split("_")[0];
                 if (that.coursesMap.get(id) === undefined) {
                         reject(new InsightError("noot"));
                 }
-                // let sections = fs.readFileSync("./data/" + id + ".json", "UTF8");
-                // if (!sections) {
-                //     reject(new InsightError("id does not exist"));
-                // }
-                // let parsedInfo = JSON.parse(sections);
                 let result: any[];
                 if (Object.keys(filter).length === 0) {
                     result = that.coursesMap.get(id);
@@ -217,6 +215,13 @@ export default class InsightFacade implements IInsightFacade {
                         throw new InsightError("ORDER not in COLUMNS");
                     }
                 }
+                // if (transformations) {
+                //     dataset = this.transformDataset(dataset, transformations);
+                // }
+                // let result = this.trimDatasetByColumns(dataset, columns);
+                // if (order) {
+                //     result = this.sortResult(result, order, columns);
+                // }
                 // resolve if no problems
                 return resolve(result);
             } catch (e) {
@@ -340,8 +345,6 @@ export default class InsightFacade implements IInsightFacade {
             // Check if it is an SComparison
         } else if (filter.hasOwnProperty("IS")) {
 
-            // return InsightFacade.handleSComparisonHelper(filter.IS, section);
-
             let key: any = Object.keys(filter.IS)[0]; // courses_id
             // check if key is not invalid
             if (!this.validKeyHelper(key, id)) {
@@ -355,23 +358,31 @@ export default class InsightFacade implements IInsightFacade {
             let actualRes: string = section[key.substring(key.indexOf("_") + 1)]; // section[id]
             // check each wildcard case
             if (value.includes("*")) {
-                if (value.length === 1) {
-                    return value === "*";
-                    // *ell*, *ello, hell*
-                } else if (value.length === 2 && value.startsWith("**")) {
-                    return value === "**";
-                } else if (value.startsWith("**") || value.endsWith("**")) {
-                    throw new InsightError("Asteriks cannot be in the middle");
-                } else if (value.startsWith("*") && value.endsWith("**")) {
-                    throw new InsightError("Asteriks cannot be in the middle");
-                } else if (value.startsWith("**") && value.endsWith("*")) {
-                    throw new InsightError("Asteriks cannot be in the middle");
-                } else if (value.startsWith("*") && value.endsWith("*")) {
-                    return actualRes.includes(value.substring(1, value.length - 1));
-                } else if (value.startsWith("*")) {
-                    return actualRes.endsWith(value.substring(1));
-                } else if (value.endsWith("*")) {
-                    return actualRes.startsWith(value.substring(0, value.length - 1));
+                let valueArray: string[] = value.split("*");
+                if (valueArray.length === 2) {
+                    if (valueArray[0] === "") {
+                        if (valueArray.length > 2) {
+                            throw new InsightError("Asterisks cannot be in the middle");
+                        }
+                        if (value.startsWith("*")) {
+                            return actualRes.endsWith(value.substring(1));
+                        }
+                    }
+                    if (valueArray[1] === "") {
+                        if (valueArray.length > 2) {
+                            throw new InsightError("Asterisks cannot be ");
+                        }
+                        if (value.endsWith("*")) {
+                            return actualRes.startsWith(value.substring(0, value.length - 1));
+                        }
+                    } else {
+                        throw new InsightError ("Asterisk Error Occured");
+                    }
+                }
+                if (valueArray.length === 3 && valueArray[0] === "" && valueArray[2] === "") {
+                    if (value.startsWith("*") && value.endsWith("*")) {
+                        return actualRes.includes(value.substring(1, value.length - 1));
+                    }
                 } else {
                     // h**lo or h*llo === error
                     throw new InsightError("Asteriks cannot be in the middle");
@@ -387,6 +398,25 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
+    // if (value.length === 1) {
+    //     return value === "*";
+    //     // *ell*, *ello, hell*
+    // } else if (value.length === 2 && value.startsWith("**")) {
+    //     return value === "**";
+    // } else if (value.startsWith("**") || value.endsWith("**")) {
+    //     throw new InsightError("Asteriks cannot be in the middle");
+    // } else if (value.startsWith("*") && value.endsWith("**")) {
+    //     throw new InsightError("Asteriks cannot be in the middle");
+    // } else if (value.startsWith("**") && value.endsWith("*")) {
+    //     throw new InsightError("Asteriks cannot be in the middle");
+    // } else if (value.startsWith("*") && value.endsWith("*")) {
+    //     return actualRes.includes(value.substring(1, value.length - 1));
+    // } else if (value.startsWith("*")) {
+    //     return actualRes.endsWith(value.substring(1));
+    // } else if (value.endsWith("*")) {
+    //     return actualRes.startsWith(value.substring(0, value.length - 1));
+    // }
+
     public listDatasets(): Promise<InsightDataset[]> {
         let that = this;
         return new Promise<InsightDataset[]> ( function (resolve, reject) {
