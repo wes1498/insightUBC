@@ -18,14 +18,13 @@ export interface InsightFilter {
     "IS": {[key: string]: string};
     "NOT": InsightFilter;
 }
-
-export interface InsightOrderObj {
-    dir: string;
-    keys: string[];
+export interface InsightRoom {
+    [key: string]: string | number;
 }
-export interface InsightTransformations {
-    GROUP: string[];
-    APPLY: Array<{[key: string]: {[token: string]: string}}>;
+export interface IGeoResponse {
+    lat?: number;
+    lon?: number;
+    error?: string;
 }
 export interface InsightDataset {
     id: string;

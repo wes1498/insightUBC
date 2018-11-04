@@ -35,6 +35,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         coursesBroken: "./test/data/courses_broken.zip",
         coursesTwo: "./test/data/courses_two.zip",
         coursesDouble: "./test/data/courses_double.zip",
+        rooms: "./test/data/rooms.zip"
     };
     let insightFacade: InsightFacade;
     let datasets: { [id: string]: string };
@@ -75,6 +76,18 @@ describe("InsightFacade Add/Remove Dataset", function () {
 
     afterEach(function () {
         Log.test(`AfterTest: ${this.currentTest.title}`);
+    });
+    it("add rooms", async () => {
+        const id: string = "rooms";
+        let response: string[];
+
+        try {
+            response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.deep.equal([id]);
+        }
     });
     it("Should list 0 datasets before add uno", async () => {
         let response: InsightDataset[];

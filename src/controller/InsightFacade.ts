@@ -6,12 +6,14 @@ import {
     InsightError,
     InsightFilter,
     NotFoundError,
-    InsightOrderObj,
-    InsightTransformations
+    IGeoResponse,
+    InsightRoom,
 } from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {JSZipObject} from "jszip";
 import * as fs from "fs";
+import * as parse5 from "parse5/lib";
+import * as http from "http";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -21,14 +23,1064 @@ import * as fs from "fs";
 
 export default class InsightFacade implements IInsightFacade {
     private coursesMap: Map<string, any>;
+    private roomsMap: Map<string, any[]>;
+    private linksMap: Map<string, any>;
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
         this.coursesMap = new Map<string, any>();
+        this.roomsMap = new Map<string, any[]>();
+        this.linksMap = new Map<string, any>();
+    }
+// ADD ROOMS METHODS
+    private getGeoInfo(url: string): Promise<IGeoResponse> {
+        return new Promise<IGeoResponse>((resolve, reject) => {
+            http.get(url, (res) => {
+                res.setEncoding("utf8");
+                let body = "";
+                res.on("data", (stream) => {
+                    body += stream;
+                }).on("error", (err) => {
+                    reject(err);
+                });
+                res.on("end", () => {
+                    let result: IGeoResponse = JSON.parse(body);
+                    resolve(result);
+                });
+            });
+        });
+    }
+    private storeData(data2: any, data3: any,  id: string, code: any): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            let arrnum: any[] = [];
+            let arrtype: any[] = [];
+            let arrfurn: any[] = [];
+            let arrsize: any[] = [];
+            let arrhref: any[] = [];
+            let res: any[] = [];
+            let res2: any[] = [];
+            let resultsaver: any[] = [];
+            data3[0].forEach((numElem: any) => {
+                arrnum.push(numElem);
+            });
+            data3[1].forEach((typeElem: any) => {
+                arrtype.push(typeElem);
+            });
+            data3[2].forEach((furnElem: any) => {
+                arrfurn.push(furnElem);
+            });
+            data3[3].forEach((sizeElem: any) => {
+                arrsize.push(sizeElem);
+            });
+            data3[4].forEach((sizeElem: any) => {
+                arrhref.push(sizeElem);
+            });
+            data3[0].forEach((elem: any, i: any) => {
+                let str1 = arrtype[i].replace(code + ": ", "type:");
+                let str2 = arrfurn[i].replace(code + ": ", "furniture:");
+                let str3 = arrsize[i].replace(code + ": ", "seats:");
+                let str4 = arrhref[i].replace(code + ": ", "href:");
+                res.push(elem + str1 + str2 + str3 + str4);
+            });
+            data2.forEach((item: any) => {
+                res2.push(item);
+                // console.log(item);
+            });
+            let addr = res2[1].replace(/ /g, "%20");
+            let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
+
+            this.getGeoInfo(url).then((data4: any) => {
+                let latlon = JSON.parse(JSON.stringify(data4));
+                let lat = latlon.lat;
+                let lon = latlon.lon;
+                res.forEach( (item: any) => {
+                    let num = item.replace("number:", "");
+                    let num2 = num.replace(/type:.*/, "");
+                    let seat = item.replace(/.*seats:/, "");
+                    let seat2 = seat.replace(/href:.*/, "");
+                    let seat3 = Number(seat2);
+                    let type = item.replace(/.*type:/, "");
+                    let type2 = type.replace(/furniture.*/, "");
+                    // Obtained regex online
+                    let type3 = type2.replace(/([A-Z])/g, " $1").trim();
+                    let furn = item.replace(/.*furniture:/, "");
+                    let furn2 = furn.replace(/seats:.*/, "");
+                    let href = item.replace(/.*href:/, "");
+                    let roomsname = code + "_" + num2;
+                    let obj = {
+                        rooms_fullname: res2[0], rooms_shortname: code, rooms_number: num2,
+                        rooms_name: roomsname, rooms_address: res2[1],
+                        rooms_lat: lat, rooms_lon: lon, rooms_seats: seat3,
+                        rooms_type: type3, rooms_furniture: furn2, rooms_href: href
+                    };
+                    let roomsobj = JSON.stringify(obj);
+                    // console.log(roomsobj);
+                    resultsaver.push(roomsobj);
+                });
+                return resolve(resultsaver);
+            });
+        });
+    }
+    // ADDS ROOM DATA FURNITURE ADDRESS FULL NAME ETC
+    private roomData(content: any, id: string) {
+        return new Promise<any>((resolve, reject) => {
+            let resultsaver: any[] = [];
+            let roomCodes = Array.from(this.linksMap.keys());
+            JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
+                roomCodes.forEach((code: any) => {
+                    let value = this.linksMap.get(code);
+                    let subs = value[0].slice(2, 47);
+                    zipRooms.file(subs).async("text").then((data: any) => {
+                        Promise.all([this.getData(data, code),
+                            this.getDataRoomNum(data, code)]).then((abc: any) => {
+                            this.storeData(abc[0], abc[1], id, code).then((lon: any) => {
+                                // console.log(resolve1);
+                                // console.log(lon);
+                                // resultsaver.push(lon);
+                                // console.log(resultsaver);
+                                // console.log(lon);
+                                // console.log(lon);
+                               // this.roomsMap.get(id).push(lon);
+                                // console.log(lon);
+                                // console.log("newwww iteration---------------------------------------------------");
+                                // console.log(lon);
+                                // this.roomsMap.get(id).push(lon);
+                                // console.log(this.roomsMap);
+                                // return resolve(this.roomsMap);
+                            });
+                            // return resolve(resultsaver);
+                        });
+                    });
+                });
+            });
+        });
+    }
+    // GETS LINKS FROM INDEX.HTM IT ALSO GETS SHORT NAME
+    private addRoom(data: any, code: string) {
+        // let doc: any = parse5.parse(data);
+        // let data2 = data.async("text");
+        // console.log(data2);
+        let document: any = parse5.parse(data);
+        let dataNodes: any[] = document.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === "html") {
+                // this.addRoom2(childnode);
+                this.getDataLinks(childnode);
+            }
+        });
+        // console.log(this.roomsMap);
+        // console.log(dataNodes);
+    }
+    private getDataLinks(data: any) {
+        let dataNodes: any[] = data.childNodes;
+        let classVal = "building-info";
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === null || childnode.tagName === undefined) {
+                // console.log("undef");
+            } else if (childnode.nodeName !== "tbody") {
+                this.getDataLinks(childnode);
+            } else {
+                this.getDataLinks2(childnode);
+            }
+        });
+    }
+    private getDataLinks2(data: any) {
+        let dataNodes: any[] = data.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === null || childnode.tagName === undefined) {
+                // console.log("undef");
+            } else if (childnode.nodeName !== "a") {
+                this.getDataLinks2(childnode);
+            } else {
+                this.getLinks(childnode.attrs);
+            }
+        });
+    }
+    private getLinks(data: any) {
+        let res: any[] = [];
+        let regex = /.\/campus\/discover\/buildings-and-classrooms\/.*/;
+        data.forEach((obj: any) => {
+            if (obj.value.match(regex)) {
+                res.push(obj.value);
+            }
+        });
+        this.removeDuplicates(res);
+    }
+    private removeDuplicates(data: any[]) {
+        // console.log(data);
+        let sub = data[0].substring(43, 47);
+        // console.log(sub);
+        let elem = data[0];
+        // console.log(data);
+        this.linksMap.set(sub, data);
+        let merged = [].concat.apply([], data);
+        // console.log(merged);
+        // this.check();
+    }
+    // GET DATA FROM THE ROOMS FROM THE LINKS
+    private getData(data: any, code: string): Promise<any> {
+        return new Promise<any[]>((resolve, reject) => {
+            let promises: any[] = [];
+            let document: any = parse5.parse(data);
+            let dataNodes: any[] = document.childNodes;
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === "html") {
+                    // this.getDatar(childnode, code);
+                    // this.getDatar2(childnode, code);
+                    // this.getDataMix(childnode, code);
+                    this.getDataName(childnode, code).then((data2: any) => {
+                        this.getDataAddress(childnode, code).then((data3: any) => {
+                            return resolve([data2, data3]);
+                        });
+                        // console.log(data2);
+                        // promises.push(data2);
+                        // return resolve(data2);
+                    });
+                    // this.getDataAddress(childnode, code);
+                    // this.vie();
+                }
+            });
+        });
+        // console.log(this.nameMap);
+        // console.log(promises);
+    }
+    // GET DATA FROM ROOM NUMBER
+    private getDataRoomNum(data: any, code: string): Promise<any> {
+        return new Promise<any[]>((resolve, reject) => {
+            let document: any = parse5.parse(data);
+            let dataNodes: any[] = document.childNodes;
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === "html") {
+                    this.getRoomNumber(childnode, code).then((data2: any) => {
+                        this.getRoomType(childnode, code).then((data3: any) => {
+                            this.getRoomFurn(childnode, code).then((data4: any) => {
+                                this.getRoomSize(childnode, code).then((data5: any) => {
+                                    this.getRoomHref(childnode, code).then((data6: any) => {
+                                        // console.log(data3);
+                                        return resolve([data2, data3, data4, data5, data6]);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                }
+            });
+        });
+    }
+    // GET DATA NAME
+    private getDataName(data: any, code: string): Promise<any> {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            let classVal = "building-info";
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === null || childnode.tagName === undefined) {
+                    // console.log("undef");
+                } else if (childnode.tagName !== "h2") {
+                    this.getDataName(childnode, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                } else {
+                    // console.log(this.getDataName2(childnode, code));
+                    this.getDataName2(childnode, code).then((data2: any) => {
+                        // console.log(data2);
+                        return resolve(data2);
+                    });
+                }
+            });
+        });
+    }
+    // GET DATA NAME
+    private getDataName2(data: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === "span") {
+                    // console.log(childnode);
+                    this.getDataName3(childnode, code).then((data2: any) => {
+                        // console.log(data2);
+                        return resolve(data2);
+                    });
+                }
+            });
+        });
+    }
+    // GET DATA NAME
+    private getDataName3(data: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.nodeName === "#text") {
+                    // this.nameMap.set(code, childnode.value);
+                    // console.log(code + ": " + childnode.value);
+                    return resolve(childnode.value);
+                }
+            });
+        });
+    }
+    // GET DATA ADDRESS
+    private getDataAddress(data: any, code: string) {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            let classVal = "building-info";
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === null || childnode.tagName === undefined) {
+                    // console.log("undef");
+                } else if (childnode.tagName !== "div") {
+                    this.getDataAddress(childnode, code).then((data2: any) => {
+                        // console.log(data2);
+                        return resolve(data2);
+                    });
+                } else {
+                    if (typeof childnode.attrs !== "undefined") {
+                        childnode.attrs.forEach((at: any) => {
+                            if (childnode.attrs.length >= 1) {
+                                if (at.value === classVal) {
+                                    // console.log(childnode);
+                                    this.getDataAddress5(childnode, code).then((data2: any) => {
+                                        return resolve(data2);
+                                    });
+                                } else {
+                                    this.getDataAddress(childnode, code).then((data2: any) => {
+                                        return resolve(data2);
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    }
+    // GET DATA ADDRESS
+    private getDataAddress5(data: any, code: string) {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === "div") {
+                    this.getDataAddress6(childnode, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            });
+        });
+    }
+    // GET DATA ADDRESS
+    private getDataAddress6(data: any, code: string) {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === "div") {
+                    // console.log(childnode);
+                    this.getDataAddress7(childnode, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            });
+        });
+    }
+    // GET DATA ADDRESS
+    private getDataAddress7(data: any, code: string) {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.nodeName === "#text") {
+                    if (childnode.value.substring(0, 8) === "Building") {
+                        // nda
+                    } else {
+                        return resolve(childnode.value);
+                    }
+                }
+            });
+        });
+    }
+    private getRoomNumber(data: any, code: string): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            let res: any[] = [];
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
+                    // console.log("undef");
+                } else if (childnode.tagName !== "tr") {
+                    // Promise.all()
+                    this.getRoomNumber(childnode, code).then((data2: any) => {
+                        // Promise.all(promises).then((data3) => {
+                        // this.numArray.push(code + ": " + data2);
+                        // console.log(code + ": " + data2);
+                        // promises.push(data2);
+                        // });
+                        return resolve(data2);
+                    });
+                } else {
+                    promises.push(childnode);
+                    // console.log(childnode);
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    this.getRoomNumber2(promises, code).then((data2: any) => {
+                        res = data2;
+                        return resolve(data2);
+                    });
+                }
+            }
+            /*Promise.all(promises).then((data3) => {
+                 console.log(promises);
+                 return resolve(data3);
+            });*/
+        });
+    }
+    private getRoomNumber2(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            //  let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            prom.forEach((datatr: any) => {
+                if (typeof datatr.attrs !== "undefined") {
+                    datatr.attrs.forEach((at: any) => {
+                        if (datatr.attrs.length >= 1) {
+                            let x = at.value;
+                            // console.log(x);
+                            if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 ) {
+                                // console.log(childnode);
+                                // console.log(x);
+                                promises.push(datatr);
+                            }
+                        }
+                    });
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomNumber3(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomNumber3(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            // let dataNodes: any[] = data.childNodes;
+            let classVal = "views-field views-field-field-room-number";
+            let classVal2 = "views-field views-field-field-room-type";
+            let promises: any[] = [];
+            prom.forEach((datar: any) => {
+                let x = datar.childNodes;
+                //  console.log(x);
+                x.forEach((dats: any) => {
+                    if (dats.tagName === "td") {
+                        // console.log("made it");
+                        if (typeof dats.attrs !== "undefined") {
+                            dats.attrs.forEach((atr: any) => {
+                                // console.log(atr);
+                                if (atr.value === classVal) {
+                                    // console.log("eyyyyyyyyyy");
+                                    // console.log(x);
+                                    promises.push(dats);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomNumber4(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomNumber4(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            let classVal = "views-field views-field-field-room-number";
+            let classVal2 = "views-field views-field-field-room-type";
+            let promises: any[] = [];
+            // let dataNodes: any[] = data.childNodes;
+            // this.numArray.push(code);
+            // foreach prom, data attrs
+            // prom.forEach((data4: any) => {
+            // console.log(data4);
+            // console.log("new arrayyyyyyyyyyyyyyyyyyy");
+            // console.log(prom);
+            prom.forEach((data2: any) => {
+                let x = data2.childNodes;
+                x.forEach((cnodes: any) => {
+                    if (cnodes.tagName === "a") {
+                        let y = cnodes.childNodes;
+                        y.forEach((tex: any) => {
+                            if (tex.nodeName === "#text") {
+                                // console.log("newwwwwwwwwwww val");
+                                // console.log(tex.value);
+                                promises.push("number:" + tex.value);
+                            }
+                        });
+                    }
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    return resolve(promises);
+                }
+            }
+        });
+    }
+    private getRoomType(data: any, code: string): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            let res: any[] = [];
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
+                    // console.log("undef");
+                } else if (childnode.tagName !== "tr") {
+                    // Promise.all()
+                    this.getRoomType(childnode, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                } else {
+                    promises.push(childnode);
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomType2(promises, code).then((data2: any) => {
+                        res = data2;
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomType2(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            //  let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            prom.forEach((datatr: any) => {
+                if (typeof datatr.attrs !== "undefined") {
+                    datatr.attrs.forEach((at: any) => {
+                        if (datatr.attrs.length >= 1) {
+                            let x = at.value;
+                            // console.log(x);
+                            if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 ) {
+                                // console.log(childnode);
+                                // console.log(x);
+                                promises.push(datatr);
+                            }
+                        }
+                    });
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomType3(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomType3(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            // let dataNodes: any[] = data.childNodes;
+            // let classVal = "views-field views-field-field-room-number";
+            let classVal2 = "views-field views-field-field-room-type";
+            let promises: any[] = [];
+            prom.forEach((datar: any) => {
+                let x = datar.childNodes;
+                //  console.log(x);
+                x.forEach((dats: any) => {
+                    if (dats.tagName === "td") {
+                        // console.log("made it");
+                        if (typeof dats.attrs !== "undefined") {
+                            dats.attrs.forEach((atr: any) => {
+                                // console.log(atr);
+                                if (atr.value === classVal2) {
+                                    // console.log("eyyyyyyyyyy");
+                                    // console.log(x);
+                                    promises.push(dats);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomType4(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomType4(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            let promises: any[] = [];
+            prom.forEach((data2: any) => {
+                let x = data2.childNodes;
+                x.forEach((cnodes: any) => {
+                    let str = cnodes.value.replace(/\s/g, "");
+                    promises.push(code + ": " + str);
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    return resolve(promises);
+                }
+            }
+        });
     }
 
+    private getRoomFurn(data: any, code: string): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            let res: any[] = [];
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
+                    // console.log("undef");
+                } else if (childnode.tagName !== "tr") {
+                    // Promise.all()
+                    this.getRoomFurn(childnode, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                } else {
+                    promises.push(childnode);
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomFurn2(promises, code).then((data2: any) => {
+                        res = data2;
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomFurn2(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            //  let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            prom.forEach((datatr: any) => {
+                if (typeof datatr.attrs !== "undefined") {
+                    datatr.attrs.forEach((at: any) => {
+                        if (datatr.attrs.length >= 1) {
+                            let x = at.value;
+                            // console.log(x);
+                            if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 ) {
+                                // console.log(childnode);
+                                // console.log(x);
+                                promises.push(datatr);
+                            }
+                        }
+                    });
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomFurn3(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomFurn3(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            // let dataNodes: any[] = data.childNodes;
+            // let classVal = "views-field views-field-field-room-number";
+            let classVal2 = "views-field views-field-field-room-furniture";
+            let promises: any[] = [];
+            prom.forEach((datar: any) => {
+                let x = datar.childNodes;
+                //  console.log(x);
+                x.forEach((dats: any) => {
+                    if (dats.tagName === "td") {
+                        // console.log("made it");
+                        if (typeof dats.attrs !== "undefined") {
+                            dats.attrs.forEach((atr: any) => {
+                                // console.log(atr);
+                                if (atr.value === classVal2) {
+                                    // console.log("eyyyyyyyyyy");
+                                    // console.log(x);
+                                    promises.push(dats);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomFurn4(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomFurn4(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            let promises: any[] = [];
+            prom.forEach((data2: any) => {
+                let x = data2.childNodes;
+                x.forEach((cnodes: any) => {
+                    let str = cnodes.value.replace(/\s/g, "");
+                    promises.push(code + ": " + str);
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    return resolve(promises);
+                }
+            }
+        });
+    }
+    private getRoomSize(data: any, code: string): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            let res: any[] = [];
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
+                    // console.log("undef");
+                } else if (childnode.tagName !== "tr") {
+                    // Promise.all()
+                    this.getRoomSize(childnode, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                } else {
+                    promises.push(childnode);
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomSize2(promises, code).then((data2: any) => {
+                        res = data2;
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomSize2(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            //  let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            prom.forEach((datatr: any) => {
+                if (typeof datatr.attrs !== "undefined") {
+                    datatr.attrs.forEach((at: any) => {
+                        if (datatr.attrs.length >= 1) {
+                            let x = at.value;
+                            // console.log(x);
+                            if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 ) {
+                                // console.log(childnode);
+                                // console.log(x);
+                                promises.push(datatr);
+                            }
+                        }
+                    });
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomSize3(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomSize3(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            // let dataNodes: any[] = data.childNodes;
+            // let classVal = "views-field views-field-field-room-number";
+            let classVal2 = "views-field views-field-field-room-capacity";
+            let promises: any[] = [];
+            prom.forEach((datar: any) => {
+                let x = datar.childNodes;
+                //  console.log(x);
+                x.forEach((dats: any) => {
+                    if (dats.tagName === "td") {
+                        // console.log("made it");
+                        if (typeof dats.attrs !== "undefined") {
+                            dats.attrs.forEach((atr: any) => {
+                                // console.log(atr);
+                                if (atr.value === classVal2) {
+                                    // console.log("eyyyyyyyyyy");
+                                    // console.log(x);
+                                    promises.push(dats);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomSize4(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomSize4(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            let promises: any[] = [];
+            prom.forEach((data2: any) => {
+                let x = data2.childNodes;
+                x.forEach((cnodes: any) => {
+                    let str = cnodes.value.replace(/\s/g, "");
+                    promises.push(code + ": " + str);
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    return resolve(promises);
+                }
+            }
+        });
+    }
+    private getRoomHref(data: any, code: string): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            let res: any[] = [];
+            dataNodes.forEach((childnode: any) => {
+                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
+                    // console.log("undef");
+                } else if (childnode.tagName !== "tr") {
+                    // Promise.all()
+                    this.getRoomHref(childnode, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                } else {
+                    promises.push(childnode);
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomHref2(promises, code).then((data2: any) => {
+                        res = data2;
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomHref2(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            //  let dataNodes: any[] = data.childNodes;
+            let c1 = "odd";
+            let c2 = "even";
+            let c3 = "even views-row-last";
+            let c4 = "odd views-row-last";
+            let c5 = "even views-row-first";
+            let c6 = "odd views-row-first";
+            let promises: any[] = [];
+            prom.forEach((datatr: any) => {
+                if (typeof datatr.attrs !== "undefined") {
+                    datatr.attrs.forEach((at: any) => {
+                        if (datatr.attrs.length >= 1) {
+                            let x = at.value;
+                            // console.log(x);
+                            if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 ) {
+                                // console.log(childnode);
+                                // console.log(x);
+                                promises.push(datatr);
+                            }
+                        }
+                    });
+                }
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomHref3(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomHref3(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            // let dataNodes: any[] = data.childNodes;
+            let classVal = "views-field views-field-field-room-number";
+            let classVal2 = "views-field views-field-field-room-capacity";
+            let promises: any[] = [];
+            prom.forEach((datar: any) => {
+                let x = datar.childNodes;
+                //  console.log(x);
+                x.forEach((dats: any) => {
+                    if (dats.tagName === "td") {
+                        // console.log("made it");
+                        if (typeof dats.attrs !== "undefined") {
+                            dats.attrs.forEach((atr: any) => {
+                                // console.log(atr);
+                                if (atr.value === classVal) {
+                                    // console.log("eyyyyyyyyyy");
+                                    // console.log(x);
+                                    promises.push(dats);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    // console.log(promises);
+                    this.getRoomHref4(promises, code).then((data2: any) => {
+                        return resolve(data2);
+                    });
+                }
+            }
+        });
+    }
+    private getRoomHref4(prom: any, code: string): any {
+        return new Promise<any[]>((resolve, reject) => {
+            let classVal = "views-field views-field-field-room-number";
+            let classVal2 = "views-field views-field-field-room-type";
+            let promises: any[] = [];
+            prom.forEach((data2: any) => {
+                let x = data2.childNodes;
+                x.forEach((cnodes: any) => {
+                    if (cnodes.tagName === "a") {
+                        let y = cnodes.attrs;
+                        y.forEach((tex: any) => {
+                            if (tex.name === "href") {
+                                // console.log("newwwwwwwwwwww val");
+                                // console.log(tex.value);
+                                promises.push(code + ": " + tex.value);
+                            }
+                        });
+                    }
+                });
+            });
+            if (promises.length !== 0) {
+                if (promises === undefined) {
+                    // c
+                } else {
+                    return resolve(promises);
+                }
+            }
+        });
+    }
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         let that = this;
         return new Promise<string[]>(function (resolve, reject) {
+            let promises: any[] = [];
             if (typeof id !== "string" || typeof content !== "string" || kind === undefined || kind === null) {
                 reject(new InsightError("Invalid params"));
             }
@@ -37,6 +1089,25 @@ export default class InsightFacade implements IInsightFacade {
             }
             if (!id || id.length === 0 || id === "") {
                 return reject(new InsightError("Invalid Id"));
+            }
+            if (kind === InsightDatasetKind.Rooms) {
+                JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
+                    // console.log(zipRooms.file("index.htm"));
+                    // console.log(zipRooms);
+                    // console.log(zipRooms.file("index.htm").async("text"));
+                    promises.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
+                        // this.roomsMap.set(id, []);
+                        that.addRoom(data, id);
+                        that.roomData(content, id).then((x: any) => {
+                            // console.log(this.roomsMap);
+                        });
+                        // console.log(savearr);
+                        // console.log(this.roomsMap);
+                    }));
+                });
+                Promise.all(promises).then((result) => {
+                    // co
+                });
             }
             that.coursesMap.set(id, []);
             JSZip.loadAsync(content, {base64: true}).then((unzipped: JSZip) => {
@@ -153,15 +1224,20 @@ export default class InsightFacade implements IInsightFacade {
                 let options = query.OPTIONS;
                 let order = options.ORDER;
                 let columns = options.COLUMNS;
-                // let transformations = query.TRANSFORMATIONS;
                 let id: string = columns[0].split("_")[0];
+                // console.log(columns[0]);
+                // console.log(columns);
                 if (that.coursesMap.get(id) === undefined) {
                         reject(new InsightError("noot"));
                 }
+                // let sections = fs.readFileSync("./data/" + id + ".json", "UTF8");
+                // if (!sections) {
+                //     reject(new InsightError("id does not exist"));
+                // }
+                // let parsedInfo = JSON.parse(sections);
                 let result: any[];
                 if (Object.keys(filter).length === 0) {
                     result = that.coursesMap.get(id);
-
                     if (result.length > 5000) {
                         throw new InsightError("Too many sections in result");
                     }
@@ -215,13 +1291,6 @@ export default class InsightFacade implements IInsightFacade {
                         throw new InsightError("ORDER not in COLUMNS");
                     }
                 }
-                // if (transformations) {
-                //     dataset = this.transformDataset(dataset, transformations);
-                // }
-                // let result = this.trimDatasetByColumns(dataset, columns);
-                // if (order) {
-                //     result = this.sortResult(result, order, columns);
-                // }
                 // resolve if no problems
                 return resolve(result);
             } catch (e) {
@@ -262,8 +1331,7 @@ export default class InsightFacade implements IInsightFacade {
     // Check if filter applies to given section
     private static isSectionValid(filter: InsightFilter, section: any, id: string): boolean {
         if (filter.hasOwnProperty("AND")) {
-            if (filter.AND.length === 0 ) {
-
+            if (filter.AND.length < 1 ) {
                 throw new InsightError("Not enough conditions for AND");
             }
                 // for each filter section must be valid
@@ -345,6 +1413,8 @@ export default class InsightFacade implements IInsightFacade {
             // Check if it is an SComparison
         } else if (filter.hasOwnProperty("IS")) {
 
+            // return InsightFacade.handleSComparisonHelper(filter.IS, section);
+
             let key: any = Object.keys(filter.IS)[0]; // courses_id
             // check if key is not invalid
             if (!this.validKeyHelper(key, id)) {
@@ -358,31 +1428,23 @@ export default class InsightFacade implements IInsightFacade {
             let actualRes: string = section[key.substring(key.indexOf("_") + 1)]; // section[id]
             // check each wildcard case
             if (value.includes("*")) {
-                let valueArray: string[] = value.split("*");
-                if (valueArray.length === 2) {
-                    if (valueArray[0] === "") {
-                        if (valueArray.length > 2) {
-                            throw new InsightError("Asterisks cannot be in the middle");
-                        }
-                        if (value.startsWith("*")) {
-                            return actualRes.endsWith(value.substring(1));
-                        }
-                    }
-                    if (valueArray[1] === "") {
-                        if (valueArray.length > 2) {
-                            throw new InsightError("Asterisks cannot be ");
-                        }
-                        if (value.endsWith("*")) {
-                            return actualRes.startsWith(value.substring(0, value.length - 1));
-                        }
-                    } else {
-                        throw new InsightError ("Asterisk Error Occured");
-                    }
-                }
-                if (valueArray.length === 3 && valueArray[0] === "" && valueArray[2] === "") {
-                    if (value.startsWith("*") && value.endsWith("*")) {
-                        return actualRes.includes(value.substring(1, value.length - 1));
-                    }
+                if (value.length === 1) {
+                    return value === "*";
+                    // *ell*, *ello, hell*
+                } else if (value.length === 2 && value.startsWith("**")) {
+                    return value === "**";
+                } else if (value.startsWith("**") || value.endsWith("**")) {
+                    throw new InsightError("Asteriks cannot be in the middle");
+                } else if (value.startsWith("*") && value.endsWith("**")) {
+                    throw new InsightError("Asteriks cannot be in the middle");
+                } else if (value.startsWith("**") && value.endsWith("*")) {
+                    throw new InsightError("Asteriks cannot be in the middle");
+                } else if (value.startsWith("*") && value.endsWith("*")) {
+                    return actualRes.includes(value.substring(1, value.length - 1));
+                } else if (value.startsWith("*")) {
+                    return actualRes.endsWith(value.substring(1));
+                } else if (value.endsWith("*")) {
+                    return actualRes.startsWith(value.substring(0, value.length - 1));
                 } else {
                     // h**lo or h*llo === error
                     throw new InsightError("Asteriks cannot be in the middle");
@@ -398,25 +1460,6 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
-    // if (value.length === 1) {
-    //     return value === "*";
-    //     // *ell*, *ello, hell*
-    // } else if (value.length === 2 && value.startsWith("**")) {
-    //     return value === "**";
-    // } else if (value.startsWith("**") || value.endsWith("**")) {
-    //     throw new InsightError("Asteriks cannot be in the middle");
-    // } else if (value.startsWith("*") && value.endsWith("**")) {
-    //     throw new InsightError("Asteriks cannot be in the middle");
-    // } else if (value.startsWith("**") && value.endsWith("*")) {
-    //     throw new InsightError("Asteriks cannot be in the middle");
-    // } else if (value.startsWith("*") && value.endsWith("*")) {
-    //     return actualRes.includes(value.substring(1, value.length - 1));
-    // } else if (value.startsWith("*")) {
-    //     return actualRes.endsWith(value.substring(1));
-    // } else if (value.endsWith("*")) {
-    //     return actualRes.startsWith(value.substring(0, value.length - 1));
-    // }
-
     public listDatasets(): Promise<InsightDataset[]> {
         let that = this;
         return new Promise<InsightDataset[]> ( function (resolve, reject) {
