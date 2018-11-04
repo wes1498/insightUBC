@@ -163,6 +163,7 @@ export default class InsightFacade implements IInsightFacade {
                 let result: any[];
                 if (Object.keys(filter).length === 0) {
                     result = that.coursesMap.get(id);
+
                     if (result.length > 5000) {
                         throw new InsightError("Too many sections in result");
                     }
