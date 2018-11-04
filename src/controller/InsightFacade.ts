@@ -113,7 +113,6 @@ export default class InsightFacade implements IInsightFacade {
                         rooms_type: type3, rooms_furniture: furn2, rooms_href: href
                     };
                     let roomsobj = JSON.stringify(obj);
-                    // console.log(roomsobj);
                     resultsaver.push(roomsobj);
                 });
                 return resolve(resultsaver);
@@ -139,8 +138,8 @@ export default class InsightFacade implements IInsightFacade {
                                 // console.log(resultsaver);
                                 // console.log(lon);
                                 // console.log(lon);
-                               // this.roomsMap.get(id).push(lon);
-                                // console.log(lon);
+                                this.roomsMap.get(id).push(lon);
+                                console.log(lon);
                                 // console.log("newwww iteration---------------------------------------------------");
                                 // console.log(lon);
                                 // this.roomsMap.get(id).push(lon);
@@ -210,7 +209,6 @@ export default class InsightFacade implements IInsightFacade {
         let sub = data[0].substring(43, 47);
         // console.log(sub);
         let elem = data[0];
-        // console.log(data);
         this.linksMap.set(sub, data);
         let merged = [].concat.apply([], data);
         // console.log(merged);
@@ -1080,7 +1078,6 @@ export default class InsightFacade implements IInsightFacade {
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         let that = this;
         return new Promise<string[]>(function (resolve, reject) {
-            let promises: any[] = [];
             if (typeof id !== "string" || typeof content !== "string" || kind === undefined || kind === null) {
                 reject(new InsightError("Invalid params"));
             }
@@ -1089,25 +1086,6 @@ export default class InsightFacade implements IInsightFacade {
             }
             if (!id || id.length === 0 || id === "") {
                 return reject(new InsightError("Invalid Id"));
-            }
-            if (kind === InsightDatasetKind.Rooms) {
-                JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
-                    // console.log(zipRooms.file("index.htm"));
-                    // console.log(zipRooms);
-                    // console.log(zipRooms.file("index.htm").async("text"));
-                    promises.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
-                        // this.roomsMap.set(id, []);
-                        that.addRoom(data, id);
-                        that.roomData(content, id).then((x: any) => {
-                            // console.log(this.roomsMap);
-                        });
-                        // console.log(savearr);
-                        // console.log(this.roomsMap);
-                    }));
-                });
-                Promise.all(promises).then((result) => {
-                    // co
-                });
             }
             that.coursesMap.set(id, []);
             JSZip.loadAsync(content, {base64: true}).then((unzipped: JSZip) => {
@@ -1168,6 +1146,24 @@ export default class InsightFacade implements IInsightFacade {
                             return reject(new InsightError("Error in adding dataset " + e));
                         }));
                     }));
+                } else if (kind === InsightDatasetKind.Rooms) {
+                        JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
+                            // console.log(zipRooms.file("index.htm"));
+                            // console.log(zipRooms);
+                            // console.log(zipRooms.file("index.htm").async("text"));
+                            filesPromise.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
+                                // this.roomsMap.set(id, []);
+                                this.addRoom(data, id);
+                                this.roomData(content, id).then((x: any) => {
+                                    // console.log(this.roomsMap);
+                                });
+                                // console.log(savearr);
+                                // console.log(this.roomsMap);
+                            }));
+                        });
+                        Promise.all(filesPromise).then((result) => {
+                            // co
+                        });
                 } else {
                     return reject(new InsightError("Desired folder for the dataset kind does not exist"));
                 }
