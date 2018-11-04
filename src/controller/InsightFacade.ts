@@ -257,7 +257,7 @@ export default class InsightFacade implements IInsightFacade {
     // Check if filter applies to given section
     private static isSectionValid(filter: InsightFilter, section: any, id: string): boolean {
         if (filter.hasOwnProperty("AND")) {
-            if (filter.AND.length < 1 ) {
+            if (filter.AND.length === 0 ) {
                 throw new InsightError("Not enough conditions for AND");
             }
                 // for each filter section must be valid
