@@ -67,7 +67,7 @@ export default class InsightFacade implements IInsightFacade {
     private addRoom(data: any, code: string) {
         // let doc: any = parse5.parse(data);
         // let data2 = data.async("text");
-        // console.log(data2);
+
         let document: any = parse5.parse(data);
         let dataNodes: any[] = document.childNodes;
         dataNodes.forEach((childnode: any) => {
@@ -76,15 +76,13 @@ export default class InsightFacade implements IInsightFacade {
                 this.getDataLinks(childnode);
             }
         });
-        // console.log(this.roomsMap);
-        // console.log(dataNodes);
     }
     private getDataLinks(data: any) {
         let dataNodes: any[] = data.childNodes;
         let classVal = "building-info";
         dataNodes.forEach((childnode: any) => {
             if (childnode.tagName === null || childnode.tagName === undefined) {
-                // console.log("undef");
+                // whatevs
             } else if (childnode.nodeName !== "tbody") {
                 this.getDataLinks(childnode);
             } else {
@@ -96,7 +94,7 @@ export default class InsightFacade implements IInsightFacade {
         let dataNodes: any[] = data.childNodes;
         dataNodes.forEach((childnode: any) => {
             if (childnode.tagName === null || childnode.tagName === undefined) {
-                // console.log("undef");
+                // shit
             } else if (childnode.nodeName !== "a") {
                 this.getDataLinks2(childnode);
             } else {
@@ -115,13 +113,13 @@ export default class InsightFacade implements IInsightFacade {
         this.removeDuplicates(res);
     }
     private removeDuplicates(data: any[]) {
-        // console.log(data);
+
         let sub = data[0].substring(43, 47);
-        // console.log(sub);
+
         let elem = data[0];
         this.linksMap.set(sub, data);
         let merged = [].concat.apply([], data);
-        // console.log(merged);
+
         // this.check();
     }
 
@@ -135,7 +133,6 @@ export default class InsightFacade implements IInsightFacade {
             JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
                 roomCodes.forEach((code: any) => {
                     codearr.push(code);
-                    // console.log(code);
                     let value = this.linksMap.get(code);
                     let subs = value[0].slice(2, 47);
                     resultsaver.push(zipRooms.file(subs).async("text").then((data: any) => {
@@ -181,8 +178,6 @@ export default class InsightFacade implements IInsightFacade {
             let mixarr3: any[] = [];
             let resul: any[] = [];
             this.nameArray1.forEach((data1: any) => {
-                // console.log(codearr[i]);
-                // console.log(this.nameArray1[i]);
                 arr.push(data1);
             });
             this.numberArray1.forEach((data1: any) => {
@@ -215,7 +210,6 @@ export default class InsightFacade implements IInsightFacade {
                     adr.push(x);
                 }
             });
-            // console.log(adr);
             this.mixArray1.forEach((data1: any) => {
                 data1.forEach((x: any, i: any) => {
                     if (x.includes("http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/")) {
@@ -236,7 +230,6 @@ export default class InsightFacade implements IInsightFacade {
                 let adrarr: any[] = [];
                 uniq.forEach((x: any) => {
                     let sub = x.substring(0, 4);
-                    // console.log(sub);
                     if (short.includes(sub)) {
                         mixarr3.push(data1 + " -- " + x);
                     }
@@ -246,29 +239,22 @@ export default class InsightFacade implements IInsightFacade {
                 // let full = data1.replace(/.*:/, "");
                 let short = data1.replace(/:.*/, "");
                 let adrarr: any[] = [];
-                // console.log(short);
                 let full = data1.replace(/.*:/, "");
                 let full2 = full.replace(/ --.*/, "");
 
                 let addrs = data1.replace(/.* --/, "");
                 let addrs2 = addrs.replace(/.*--/, "");
-                // console.log(addrs2);
-                // console.log(data1);
-                // console.log(full2);
-                // console.log(adrarr);
-                // console.log(link2);
+
                 let addr = addrs2.replace(/ /g, "%20");
                 let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
                 // this.getGeoInfo(url).then((data4: any) => {
                   //  let latlon = JSON.parse(JSON.stringify(data4));
                    // let lati = latlon.lat;
                    // let longi = latlon.lon;
-                    // console.log(data4);
-                    // console.log(latlon);
+
                 chunks.forEach((data2: any) => {
-                        // console.log(data2);
+
                         if (data2[0].indexOf(short) === 0) {
-                            // console.log(data2[1]);
                             let regex = /.*\//;
                             let roomname = data2[0].replace(regex, "");
                             let roomname2 = roomname.replace(/.*-/, "");
@@ -292,16 +278,12 @@ export default class InsightFacade implements IInsightFacade {
                                 rooms_furniture: furn,
                                 rooms_href: href
                             };
-                            // console.log(obj);
                             let roomsobj = JSON.parse(JSON.stringify(obj));
                             resul.push(roomsobj);
                             that.roomsMap.get(id).push(roomsobj);
                         }
                     });
-               // });
-                // console.log(resul);
-                // });
-                // console.log(this.roomsMap);
+
             });
       //  });
     }
@@ -325,11 +307,11 @@ export default class InsightFacade implements IInsightFacade {
         let dataNodes: any[] = data.childNodes;
         dataNodes.forEach((childnode: any) => {
             if (childnode.tagName === null || childnode.tagName === undefined) {
-                // console.log("undef");
+                // fuck
             } else if (childnode.tagName !== "h2") {
                 this.getDataName(childnode, code);
             } else {
-                // console.log(this.getDataName2(childnode, code));
+
                 this.getDataName2(childnode, code);
             }
         });
@@ -341,7 +323,6 @@ export default class InsightFacade implements IInsightFacade {
         let dataNodes: any[] = data.childNodes;
         dataNodes.forEach((childnode: any) => {
             if (childnode.tagName === "span") {
-                // console.log(childnode);
                 this.getDataName3(childnode, code);
             }
         });
@@ -353,10 +334,7 @@ export default class InsightFacade implements IInsightFacade {
         let dataNodes: any[] = data.childNodes;
         dataNodes.forEach((childnode: any) => {
             if (childnode.nodeName === "#text") {
-                // this.nameMap.set(code, childnode.value);
-                // console.log(code + ": " + childnode.value);
-                // console.log("line");
-                // console.log(childnode.value);
+
                 this.nameArray1.push(code + ":" + childnode.value);
             }
         });
@@ -368,7 +346,7 @@ export default class InsightFacade implements IInsightFacade {
         let classVal = "building-info";
         dataNodes.forEach((childnode: any) => {
             if (childnode.tagName === null || childnode.tagName === undefined) {
-                // console.log("undef");
+                // fuck
             } else if (childnode.tagName !== "div") {
                 this.getDataAddress(childnode, code);
             } else {
@@ -376,7 +354,6 @@ export default class InsightFacade implements IInsightFacade {
                     childnode.attrs.forEach((at: any) => {
                         if (childnode.attrs.length >= 1) {
                             if (at.value === classVal) {
-                                // console.log(childnode);
                                 this.getDataAddress5(childnode, code);
                             } else {
                                 this.getDataAddress(childnode, code);
@@ -401,7 +378,6 @@ export default class InsightFacade implements IInsightFacade {
         let dataNodes: any[] = data.childNodes;
         dataNodes.forEach((childnode: any) => {
             if (childnode.tagName === "div") {
-                // console.log(childnode);
                 this.getDataAddress7(childnode, code);
             }
         });
@@ -439,7 +415,7 @@ export default class InsightFacade implements IInsightFacade {
         let res: any[] = [];
         dataNodes.forEach((childnode: any) => {
             if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
-                // console.log("undef");
+                // fuck
             } else if (childnode.tagName !== "tr") {
                 this.getAll(childnode, code);
             } else {
@@ -467,10 +443,9 @@ export default class InsightFacade implements IInsightFacade {
                 datatr.attrs.forEach((at: any) => {
                     if (datatr.attrs.length >= 1) {
                         let x = at.value;
-                        // console.log(x);
+
                         if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6) {
-                            // console.log(childnode);
-                            // console.log(x);
+
                             res.push(datatr);
                         }
                     }
@@ -481,7 +456,7 @@ export default class InsightFacade implements IInsightFacade {
             if (res === undefined) {
                 // c
             } else {
-                // console.log(res);
+
                 this.getAll3(res, code);
             }
         }
@@ -495,17 +470,14 @@ export default class InsightFacade implements IInsightFacade {
         let promises2: any[] = [];
         prom.forEach((datar: any) => {
             let x = datar.childNodes;
-            //  console.log(x);
+
             x.forEach((dats: any) => {
                 if (dats.tagName === "td") {
-                    // console.log("made it");
+
                     if (typeof dats.attrs !== "undefined") {
                         dats.attrs.forEach((atr: any) => {
                             if (atr.value === l1 || atr.value  === l2 || atr.value  === l3 || atr.value  === l4) {
-                                // console.log(code);
-                                // console.log(atr);
-                                // console.log("eyyyyyyyyyy");
-                                // console.log(x);
+
                                 promises.push(dats);
                                 // promises.push(dats);
                             }
@@ -533,15 +505,13 @@ export default class InsightFacade implements IInsightFacade {
                     let z = cnodes.childNodes;
                     z.forEach((tex2: any) => {
                         if (tex2.nodeName === "#text") {
-                            // console.log("newwwwwwwwwwww val");
-                            // console.log(tex.value);
+
                             res.push(code + "-" + tex2.value);
                         }
                     });
                     y.forEach((tex: any) => {
                         if (tex.name === "href") {
-                            // console.log("newwwwwwwwwwww val");
-                            // console.log(tex.value);
+
                             res.push(code + ":" + tex.value);
                         }
                     });
@@ -559,12 +529,12 @@ export default class InsightFacade implements IInsightFacade {
                 res.forEach((x: any) => {
                     let regex = /.*:/;
                     if (x === regex) {
-                        // console.log("pedo");
+                        // delete later
                     } else {
-                        // console.log(x);
+                        // delete after
                     }
                 });
-                // console.log(res);
+
                 this.mixArray1.push(res);
             }
         }
@@ -585,9 +555,6 @@ export default class InsightFacade implements IInsightFacade {
             // add room -----------------------
             if (kind === InsightDatasetKind.Rooms) {
                 JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
-                    // console.log(zipRooms.file("index.htm"));
-                    // console.log(zipRooms);
-                    // console.log(zipRooms.file("index.htm").async("text"));
                     promises.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
                         that.roomsMap.set(id, []);
                         that.addRoom(data, id);
@@ -596,7 +563,7 @@ export default class InsightFacade implements IInsightFacade {
                         let roomCodes = Array.from(that.linksMap.keys());
                         roomCodes.forEach((code: any) => {
                             codearr.push(code);
-                            // console.log(code);
+
                             let value = that.linksMap.get(code);
                             let subs = value[0].slice(2, 47);
                             resultsaver.push(zipRooms.file(subs).async("text").then((datax: any) => {
@@ -625,7 +592,7 @@ export default class InsightFacade implements IInsightFacade {
                         }).catch((e) => {
                             return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
                         });
-                        // console.log(this.roomsMap);
+
                     }));
                 });
             } else if (kind === InsightDatasetKind.Courses) {
@@ -751,7 +718,7 @@ export default class InsightFacade implements IInsightFacade {
                 if (that.coursesMap.get(id) === undefined) {
                     reject(new InsightError("noot"));
                 }
-                console.log(that.roomsMap.size);
+
                 let dataset = id === "courses" ? that.coursesMap.get(id) : that.roomsMap.get(id);
 
                 let result: any[];
@@ -811,7 +778,6 @@ export default class InsightFacade implements IInsightFacade {
                 }
 
                 if (transformations !== undefined && transformations !== null) {
-                    console.log(Object.keys(query));
                     let keys: any[] = Object.keys(query);
 
                     if (!Object.keys(transformations).includes("GROUP", 0)) {
@@ -847,7 +813,6 @@ export default class InsightFacade implements IInsightFacade {
                             groups.set(groupingVal, []); // each grouptitle has its array of grouped items
                         }
                         groups.get(groupingVal).push(values); // push sections that group to Career Planning
-                        // console.log(groups.get(groupingVal));
                     }
                     for (let group of groups.values()) { // group {title(1): ___} of title(n)
                         let entry: {[key: string]: any } = {}; // initialize {[key: stirng]: any}
@@ -872,7 +837,6 @@ export default class InsightFacade implements IInsightFacade {
                             let key = pair.split("_")[1]; // avg
                             let setVal: any[] = [];
                             for (let element of group) {
-                                // console.log(group);
                                 setVal.push(element[key]); // setVal has courses_avg for each section { 90, 80, 70, etc}
                             }
                             let value: number;
