@@ -11,10 +11,9 @@ import {
 import * as JSZip from "jszip";
 import {JSZipObject} from "jszip";
 import * as fs from "fs";
-import * as parse5 from "parse5/lib";
 import * as http from "http";
 import {Decimal} from "decimal.js";
-
+const parse5 = require("parse5");
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
