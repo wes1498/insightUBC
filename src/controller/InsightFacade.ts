@@ -1,22 +1,18 @@
 import Log from "../Util";
 import {
+    IGeoResponse,
     IInsightFacade,
-    InsightCourse,
     InsightDataset,
     InsightDatasetKind,
     InsightError,
-    NotFoundError,
-    InsightRoom,
-    IGeoResponse,
+    InsightFilter,
+    NotFoundError
 } from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {JSZipObject} from "jszip";
-import * as Path from "path";
 import * as fs from "fs";
 import * as parse5 from "parse5/lib";
-import {fdatasyncSync} from "fs";
 import * as http from "http";
-import {cpus} from "os";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -24,22 +20,10 @@ import {cpus} from "os";
  *
  */
 
-const indexLinkedBuildings: string[] = [];
 export default class InsightFacade implements IInsightFacade {
     private coursesMap: Map<string, any>;
     private roomsMap: Map<string, any[]>;
     private linksMap: Map<string, any>;
-    private realroomsMap: Map<string, any>;
-    private linkArray: string[] = [];
-    private  roomsMap2: Map<string, any>;
-    private numberArray: string[] = [];
-    private typeArray: string[] = [];
-    private numArray: any[] = [];
-    private  numStr: string = "";
-    private addressArray: string[] = [];
-    private addressMap: Map<string, any>;
-    private nameMap: Map<any, any>;
-    private numberMap: Map<any, any>;
     private nameArray1: string[] = [];
     private addressArray1: string[] = [];
     private numberArray1: string[][] = [];
@@ -48,23 +32,11 @@ export default class InsightFacade implements IInsightFacade {
     private sizeArray1: string[][] = [];
     private hrefArray1: string[][] = [];
     private mixArray1: string[][] = [];
-
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
         this.coursesMap = new Map<string, any>();
         this.roomsMap = new Map<string, any[]>();
         this.linksMap = new Map<string, any>();
-        this.roomsMap2 = new Map<string, any>();
-        this.linkArray = [];
-        this.numberArray = [];
-        this.numArray = [];
-        this.typeArray = [];
-        this.numStr = "";
-        this.addressArray = [];
-        this.addressMap = new Map<string, any>();
-        this.nameMap = new Map<any, any>();
-        this.numberMap = new Map<any, any>();
-        this.realroomsMap = new Map<string, any>();
         this.nameArray1 = [];
         this.addressArray1 = [];
         this.numberArray1 = [];
@@ -74,243 +46,23 @@ export default class InsightFacade implements IInsightFacade {
         this.hrefArray1 = [];
         this.mixArray1 = [];
     }
-    private getGeoInfo(url: string): Promise<IGeoResponse> {
+   /* private getGeoInfo(url: string): Promise<IGeoResponse> {
         return new Promise<IGeoResponse>((resolve, reject) => {
-            http.get(url, (res) => {
-                res.setEncoding("utf8");
+            http.get(url, (result) => {
+                result.setEncoding("utf8");
                 let body = "";
-                res.on("data", (stream) => {
+                result.on("data", (stream) => {
                     body += stream;
                 }).on("error", (err) => {
                     reject(err);
                 });
-                res.on("end", () => {
-                    let result: IGeoResponse = JSON.parse(body);
-                    resolve(result);
+                result.on("end", () => {
+                    let result1: IGeoResponse = JSON.parse(body);
+                    resolve(result1);
                 });
             });
         });
-    }
-    private placeData(id: any, codearr: any) {
-        let arr: any[] = [];
-        let numarr: any[] = [];
-        let hrefarr: any[] = [];
-        let mixarr: any[] = [];
-        let mixarr2: any[][] = [];
-        let chunks: any[] = [];
-        let adr: any [] = [];
-        this.nameArray1.forEach((data1: any) => {
-            // console.log(codearr[i]);
-            // console.log(this.nameArray1[i]);
-            arr.push(data1);
-        });
-        this.numberArray1.forEach((data1: any) => {
-            numarr.push(data1);
-        });
-        arr.forEach((data1: any, i) => {
-            let full = data1.replace(/.*:/, "");
-            let short = data1.replace(/:.*/, "");
-            this.hrefArray1.forEach((data2: any) => {
-                data2.forEach((x: any) => {
-                    let shortref = x.replace(/.*room/, "");
-                    let shortref2 = short.replace("/", "");
-                    if (x.indexOf(short) === 0) {
-                        mixarr.push([data1, x, shortref2]);
-                    }
-
-                });
-            });
-        });
-        let uniq = this.addressArray1.reduce(( a , b ) => {
-            if (a.indexOf(b) < 0 ) {
-                a.push(b);
-            }
-            return a;
-        }, [] );
-        uniq.forEach((x: any) => {
-            let y = x;
-            let h = y.replace(/[0-9]*.*/, x);
-            adr.push(h);
-        });
-        console.log(adr);
-        this.mixArray1.forEach((data1: any) => {
-            data1.forEach((x: any, i: any) => {
-                if (x.includes("http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/")) {
-                     mixarr2.push([x]);
-                }
-            });
-            mixarr2.forEach((y: any) => {
-               data1.forEach((t: any, c: any) => {
-                  if (y[0] === data1[c]) {
-                     chunks.push([data1[c], data1[c + 2], data1[c + 3], data1[c + 4]]);
-                  }
-               });
-            });
-        });
-        arr.forEach((data1: any, i) => {
-            let full = data1.replace(/.*:/, "");
-            let short = data1.replace(/:.*/, "");
-            let addr = data1[0].replace(/.*-h/, "" );
-            let addr2 = "h" + addr;
-            let addr3 = addr2.replace(/ /g, "%20");
-            let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr3;
-            let link = this.linksMap.get(short);
-            let link2 = link[0].replace(/ /g, "%20");
-            // console.log(link2);
-        /*    this.getGeoInfo(url).then((data4: any) => {
-                let latlon = JSON.parse(JSON.stringify(data4));
-                let lat = latlon.lat;
-                let lon = latlon.lon;
-                // console.log(latlon);
-            });*/
-            chunks.forEach((data2: any) => {
-                if (data2[0].indexOf(short) === 0) {
-                    // console.log(data2[1]);
-                    let regex = /.*\//;
-                    let roomname = data2[0].replace(regex, "");
-                    let obj = {
-                        rooms_fullname: full,
-                        rooms_shortname: short,
-                        rooms_name: roomname,
-                        rooms_seats: data2[1],
-                        rooms_type: data2[3],
-                        rooms_furniture: data2[2]};
-                    // console.log(obj);
-                }
-            });
-        });
-   /*     while (this.mixArray1.length) {
-            mixarr2.push([this.mixArray1.splice(0, 7)]);
-        }*/
-       // console.log(this.mixArray1);
-        // console.log(mixarr2);
-        // console.log(hrefarr);
-                    // numarr.forEach((data2: any, i) => {
-                    /*    data2.forEach((x: any) => {
-                            // console.log(arr[]);
-                            let obj = {
-                                    rooms_fullname: full,
-                                    rooms_shortname: short,
-                                    rooms_name: x };
-                            let roomsobj = JSON.stringify(obj);
-                            this.roomsMap.get(id).push(roomsobj);
-                        });*/
-                    // });
-        // console.log(this.roomsMap);
-     /*  chunks.forEach((x: any) => {
-            // console.log("As");
-            console.log(x);
-        });*/
-    }
-    private storeData(data2: any, data3: any,  id: string, code: any): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
-            let arrnum: any[] = [];
-            let arrtype: any[] = [];
-            let arrfurn: any[] = [];
-            let arrsize: any[] = [];
-            let arrhref: any[] = [];
-            let res: any[] = [];
-            let res2: any[] = [];
-            let resultsaver: any[] = [];
-            data3[0].forEach((numElem: any) => {
-                arrnum.push(numElem);
-            });
-            data3[1].forEach((typeElem: any) => {
-                arrtype.push(typeElem);
-            });
-            data3[2].forEach((furnElem: any) => {
-                arrfurn.push(furnElem);
-            });
-            data3[3].forEach((sizeElem: any) => {
-                arrsize.push(sizeElem);
-            });
-            data3[4].forEach((sizeElem: any) => {
-                arrhref.push(sizeElem);
-            });
-            data3[0].forEach((elem: any, i: any) => {
-                let str1 = arrtype[i].replace(code + ": ", "type:");
-                let str2 = arrfurn[i].replace(code + ": ", "furniture:");
-                let str3 = arrsize[i].replace(code + ": ", "seats:");
-                let str4 = arrhref[i].replace(code + ": ", "href:");
-                res.push(elem + str1 + str2 + str3 + str4);
-            });
-            data2.forEach((item: any) => {
-                res2.push(item);
-               // console.log(item);
-            });
-            let addr = res2[1].replace(/ /g, "%20");
-            let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
-
-            this.getGeoInfo(url).then((data4: any) => {
-                let latlon = JSON.parse(JSON.stringify(data4));
-                let lat = latlon.lat;
-                let lon = latlon.lon;
-                res.forEach( (item: any) => {
-                    let num = item.replace("number:", "");
-                    let num2 = num.replace(/type:.*/, "");
-                    let seat = item.replace(/.*seats:/, "");
-                    let seat2 = seat.replace(/href:.*/, "");
-                    let seat3 = Number(seat2);
-                    let type = item.replace(/.*type:/, "");
-                    let type2 = type.replace(/furniture.*/, "");
-                    // Obtained regex online
-                    let type3 = type2.replace(/([A-Z])/g, " $1").trim();
-                    let furn = item.replace(/.*furniture:/, "");
-                    let furn2 = furn.replace(/seats:.*/, "");
-                    let href = item.replace(/.*href:/, "");
-                    let roomsname = code + "_" + num2;
-                    let obj = {
-                        rooms_fullname: res2[0], rooms_shortname: code, rooms_number: num2,
-                        rooms_name: roomsname, rooms_address: res2[1],
-                        rooms_lat: lat, rooms_lon: lon, rooms_seats: seat3,
-                        rooms_type: type3, rooms_furniture: furn2, rooms_href: href
-                    };
-                    let roomsobj = JSON.stringify(obj);
-                    this.roomsMap.get(id).push(roomsobj);
-                    // resultsaver.push(roomsobj);
-                });
-                // return resolve(resultsaver);
-            });
-        });
-    }
-    // ADDS ROOM DATA FURNITURE ADDRESS FULL NAME ETC
-    private roomData(content: any, id: string) {
-        return new Promise<any>((resolve, reject) => {
-            let resultsaver: any[] = [];
-            let codearr: any[] = [];
-            let roomCodes = Array.from(this.linksMap.keys());
-            JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
-                roomCodes.forEach((code: any) => {
-                    codearr.push(code);
-                    // console.log(code);
-                    let value = this.linksMap.get(code);
-                    let subs = value[0].slice(2, 47);
-                    resultsaver.push(zipRooms.file(subs).async("text").then((data: any) => {
-                        this.getData(data, code);
-                        this.getDataRoomNum(data, code);
-                        // console.log(this.nameArray1);
-                     /*   this.getData(data, code).then((data1: any) => {
-                            this.getDataRoomNum(data, code).then((data2: any) => {
-                                this.storeData(data1, data2, id, code).then((lon: any) => {
-                                    // this.roomsMap.get(id).push(lon);
-                                });
-                            });
-                        });*/
-                    }));
-            });
-                // console.log(this.nameArray1);
-                Promise.all(resultsaver).then(() => {
-                    this.placeData(id, codearr);
-                    // console.log(codearr);
-                    // console.log(this.nameArray1);
-                    // console.log(this.hrefArray1);
-                /*  this.addressArray1.forEach((item) => {
-                        console.log(item);
-                    });*/
-                });
-            });
-    });
-    }
+    }*/
     // GETS LINKS FROM INDEX.HTM IT ALSO GETS SHORT NAME
     private addRoom(data: any, code: string) {
         // let doc: any = parse5.parse(data);
@@ -372,148 +124,314 @@ export default class InsightFacade implements IInsightFacade {
         // console.log(merged);
         // this.check();
     }
-// GET DATA FROM THE ROOMS FROM THE LINKS
-    private getData(data: any, code: string) {
-        // return new Promise<any[]>((resolve, reject) => {
-            let promises: any[] = [];
-            let document: any = parse5.parse(data);
-            let dataNodes: any[] = document.childNodes;
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === "html") {
-                    // this.getDatar(childnode, code);
-                    // this.getDatar2(childnode, code);
-                    // this.getDataMix(childnode, code);
-                    this.getDataName(childnode, code);
-                    this.getDataAddress(childnode, code);
-                    // this.getDataCode(childnode, code);
-                /*    this.getDataName(childnode, code).then((data2: any) => {
-                        this.getDataAddress(childnode, code).then((data3: any) => {
-                            return resolve([data2, data3]);
+
+    // ADDS ROOM DATA FURNITURE ADDRESS FULL NAME ETC
+   /* private roomData(content: any, id: string) {
+        let that = this;
+        return new Promise<any>((resolve, reject) => {
+            let resultsaver: any[] = [];
+            let codearr: any[] = [];
+            let roomCodes = Array.from(this.linksMap.keys());
+            JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
+                roomCodes.forEach((code: any) => {
+                    codearr.push(code);
+                    // console.log(code);
+                    let value = this.linksMap.get(code);
+                    let subs = value[0].slice(2, 47);
+                    resultsaver.push(zipRooms.file(subs).async("text").then((data: any) => {
+                        this.getData(data, code);
+                        this.getDataRoomNum(data, code);
+                    }));
+                });
+
+                Promise.all(resultsaver).then(function () {
+                    that.placeData(id, codearr).then((x) => {
+                        let toSaveOnDisk: object[] = that.roomsMap.get(id);
+                        // if (toSaveOnDisk.length === 0) {
+                        //     that.coursesMap.delete(id);
+                        //     return reject(new InsightError("No sections were added"));
+                        // } else {
+                        fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
+                            return reject(new InsightError("Error Saving Files " + e));
                         });
-                    });*/
-                    // this.getDataAddress(childnode, code);
-                    // this.vie();
+
+                        let result: string[] = [];
+                        that.roomsMap.forEach(function (value, key) {
+                            result.push(key);
+                        });
+                        return resolve(result);
+                        // }
+                    });
+                }).catch((e) => {
+                    return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
+                });
+            });
+            });
+    }*/
+    private placeData(id: any, codearr: any) {
+        // return new Promise<any>((resolve, reject) => {
+            let arr: any[] = [];
+            let numarr: any[] = [];
+            let hrefarr: any[] = [];
+            let mixarr: any[] = [];
+            let mixarr2: any[][] = [];
+            let chunks: any[] = [];
+            let adr: any [] = [];
+            let mixarr3: any[] = [];
+            let resul: any[] = [];
+            this.nameArray1.forEach((data1: any) => {
+                // console.log(codearr[i]);
+                // console.log(this.nameArray1[i]);
+                arr.push(data1);
+            });
+            this.numberArray1.forEach((data1: any) => {
+                numarr.push(data1);
+            });
+            arr.forEach((data1: any, i) => {
+                let full = data1.replace(/.*:/, "");
+                let short = data1.replace(/:.*/, "");
+                this.hrefArray1.forEach((data2: any) => {
+                    data2.forEach((x: any) => {
+                        let shortref = x.replace(/.*room/, "");
+                        let shortref2 = short.replace("/", "");
+                        if (x.indexOf(short) === 0) {
+                            mixarr.push([data1, x, shortref2]);
+                        }
+
+                    });
+                });
+            });
+            let uniq = this.addressArray1.reduce((a, b) => {
+                if (a.indexOf(b) < 0) {
+                    a.push(b);
                 }
-            // });
-        });
-        // console.log(this.nameMap);
-        // console.log(promises);
-    }
-    // GET DATA FROM ROOM NUMBER
-    private getDataRoomNum(data: any, code: string) {
-            let document: any = parse5.parse(data);
-            let dataNodes: any[] = document.childNodes;
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === "html") {
-                    // this.getRoomNumber(childnode, code);
-                    // this.getRoomType(childnode, code);
-                    // this.getRoomFurn(childnode, code);
-                    // this.getRoomSize(childnode, code);
-                    // this.getRoomHref(childnode, code);
-                    this.getAll(childnode, code);
+                return a;
+            }, []);
+            uniq.forEach((x: any) => {
+                if (x.includes("Formerly known") || x.includes("Opening hours") || x.includes("TBD")) {
+                    // console
+                } else {
+                    adr.push(x);
                 }
             });
+            // console.log(adr);
+            this.mixArray1.forEach((data1: any) => {
+                data1.forEach((x: any, i: any) => {
+                    if (x.includes("http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/")) {
+                        mixarr2.push([x]);
+                    }
+                });
+                mixarr2.forEach((y: any) => {
+                    data1.forEach((t: any, c: any) => {
+                        if (y[0] === data1[c]) {
+                            chunks.push([data1[c], data1[c + 2], data1[c + 3], data1[c + 4]]);
+                        }
+                    });
+                });
+            });
+            arr.forEach((data1: any, i) => {
+                let full = data1.replace(/.*:/, "");
+                let short = data1.replace(/:.*/, "");
+                let adrarr: any[] = [];
+                uniq.forEach((x: any) => {
+                    let sub = x.substring(0, 4);
+                    // console.log(sub);
+                    if (short.includes(sub)) {
+                        mixarr3.push(data1 + " -- " + x);
+                    }
+                });
+            });
+            mixarr3.forEach((data1: any, i) => {
+                // let full = data1.replace(/.*:/, "");
+                let short = data1.replace(/:.*/, "");
+                let adrarr: any[] = [];
+                // console.log(short);
+                let full = data1.replace(/.*:/, "");
+                let full2 = full.replace(/ --.*/, "");
+
+                let addrs = data1.replace(/.* --/, "");
+                let addrs2 = addrs.replace(/.*--/, "");
+                // console.log(addrs2);
+                // console.log(data1);
+                // console.log(full2);
+                // console.log(adrarr);
+                // console.log(link2);
+                let addr = addrs2.replace(/ /g, "%20");
+                let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
+                // this.getGeoInfo(url).then((data4: any) => {
+                  //  let latlon = JSON.parse(JSON.stringify(data4));
+                   // let lati = latlon.lat;
+                   // let longi = latlon.lon;
+                    // console.log(data4);
+                    // console.log(latlon);
+                chunks.forEach((data2: any) => {
+                        // console.log(data2);
+                        if (data2[0].indexOf(short) === 0) {
+                            // console.log(data2[1]);
+                            let regex = /.*\//;
+                            let roomname = data2[0].replace(regex, "");
+                            let roomname2 = roomname.replace(/.*-/, "");
+                            let roomname3 = short + "_" + roomname2;
+                            let seats = data2[1].replace(/.*:/, "");
+                            let seats2 = Number(seats);
+                            let type = data2[3].replace(/.*:/, "");
+                            let furn = data2[2].replace(/.*:/, "");
+                            let href = data2[0].replace(/.*:/, "");
+
+                            let obj = {
+                                rooms_fullname: full2,
+                                rooms_shortname: short,
+                                rooms_number: roomname2,
+                                rooms_name: roomname3,
+                                rooms_address: addrs2,
+                                rooms_lat: "undefined",
+                                rooms_lon: "undefined",
+                                rooms_seats: seats2,
+                                rooms_type: type,
+                                rooms_furniture: furn,
+                                rooms_href: href
+                            };
+                            // console.log(obj);
+                            let roomsobj = JSON.parse(JSON.stringify(obj));
+                            resul.push(roomsobj);
+                            this.roomsMap.get(id).push(roomsobj);
+                        }
+                    });
+               // });
+                // console.log(resul);
+                // });
+                // console.log(this.roomsMap);
+            });
+      //  });
+    }
+    // GET DATA FROM THE ROOMS FROM THE LINKS
+    private getData(data: any, code: string) {
+        // return new Promise<any[]>((resolve, reject) => {
+        let promises: any[] = [];
+        let document: any = parse5.parse(data);
+        let dataNodes: any[] = document.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === "html") {
+                this.getDataName(childnode, code);
+                this.getDataAddress(childnode, code);
+            }
+            // });
+        });
     }
     // GET DATA NAME
     private getDataName(data: any, code: string) {
         // return new Promise<any[]>((resolve, reject) => {
-            let dataNodes: any[] = data.childNodes;
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === null || childnode.tagName === undefined) {
-                    // console.log("undef");
-                } else if (childnode.tagName !== "h2") {
-                    this.getDataName(childnode, code);
-                } else {
-                    // console.log(this.getDataName2(childnode, code));
-                    this.getDataName2(childnode, code);
-                }
-            });
+        let dataNodes: any[] = data.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === null || childnode.tagName === undefined) {
+                // console.log("undef");
+            } else if (childnode.tagName !== "h2") {
+                this.getDataName(childnode, code);
+            } else {
+                // console.log(this.getDataName2(childnode, code));
+                this.getDataName2(childnode, code);
+            }
+        });
         // });
     }
     // GET DATA NAME
     private getDataName2(data: any, code: string) {
-       // return new Promise<any[]>((resolve, reject) => {
-            let dataNodes: any[] = data.childNodes;
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === "span") {
-                    // console.log(childnode);
-                    this.getDataName3(childnode, code);
-                }
-            });
+        // return new Promise<any[]>((resolve, reject) => {
+        let dataNodes: any[] = data.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === "span") {
+                // console.log(childnode);
+                this.getDataName3(childnode, code);
+            }
+        });
         // });
     }
     // GET DATA NAME
     private getDataName3(data: any, code: string) {
-       // return new Promise<any[]>((resolve, reject) => {
-            let dataNodes: any[] = data.childNodes;
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.nodeName === "#text") {
-                    // this.nameMap.set(code, childnode.value);
-                    // console.log(code + ": " + childnode.value);
-                    // console.log("line");
-                    // console.log(childnode.value);
-                    this.nameArray1.push(code + ":" + childnode.value);
-                }
-            });
-       // });
+        // return new Promise<any[]>((resolve, reject) => {
+        let dataNodes: any[] = data.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.nodeName === "#text") {
+                // this.nameMap.set(code, childnode.value);
+                // console.log(code + ": " + childnode.value);
+                // console.log("line");
+                // console.log(childnode.value);
+                this.nameArray1.push(code + ":" + childnode.value);
+            }
+        });
+        // });
     }
     // GET DATA ADDRESS
-    // GET DATA ADDRESS
     private getDataAddress(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            let classVal = "building-info";
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === null || childnode.tagName === undefined) {
-                    // console.log("undef");
-                } else if (childnode.tagName !== "div") {
-                    this.getDataAddress(childnode, code);
-                } else {
-                    if (typeof childnode.attrs !== "undefined") {
-                        childnode.attrs.forEach((at: any) => {
-                            if (childnode.attrs.length >= 1) {
-                                if (at.value === classVal) {
-                                    // console.log(childnode);
-                                    this.getDataAddress5(childnode, code);
-                                } else {
-                                    this.getDataAddress(childnode, code);
-                                }
+        let dataNodes: any[] = data.childNodes;
+        let classVal = "building-info";
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === null || childnode.tagName === undefined) {
+                // console.log("undef");
+            } else if (childnode.tagName !== "div") {
+                this.getDataAddress(childnode, code);
+            } else {
+                if (typeof childnode.attrs !== "undefined") {
+                    childnode.attrs.forEach((at: any) => {
+                        if (childnode.attrs.length >= 1) {
+                            if (at.value === classVal) {
+                                // console.log(childnode);
+                                this.getDataAddress5(childnode, code);
+                            } else {
+                                this.getDataAddress(childnode, code);
                             }
-                        });
-                    }
+                        }
+                    });
                 }
+            }
         });
     }
     // GET DATA ADDRESS
     private getDataAddress5(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === "div") {
-                    this.getDataAddress6(childnode, code);
-                }
-            });
+        let dataNodes: any[] = data.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === "div") {
+                this.getDataAddress6(childnode, code);
+            }
+        });
     }
     // GET DATA ADDRESS
     private getDataAddress6(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === "div") {
-                    // console.log(childnode);
-                    this.getDataAddress7(childnode, code);
-                }
-            });
+        let dataNodes: any[] = data.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === "div") {
+                // console.log(childnode);
+                this.getDataAddress7(childnode, code);
+            }
+        });
     }
     // GET DATA ADDRESS
     private getDataAddress7(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.nodeName === "#text") {
-                    if (childnode.value.substring(0, 8) === "Building") {
-                        // nda
-                    } else {
-                        this.addressArray1.push(childnode.value);
-                    }
+        let dataNodes: any[] = data.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.nodeName === "#text") {
+                if (childnode.value.substring(0, 8) === "Building") {
+                    // nda
+                } else {
+                    this.addressArray1.push(code + "--" + childnode.value);
                 }
-            });
+            }
+        });
+    }
+    // GET DATA FROM ROOM NUMBER
+    private getDataRoomNum(data: any, code: string) {
+        let document: any = parse5.parse(data);
+        let dataNodes: any[] = document.childNodes;
+        dataNodes.forEach((childnode: any) => {
+            if (childnode.tagName === "html") {
+                // this.getRoomNumber(childnode, code);
+                // this.getRoomType(childnode, code);
+                // this.getRoomFurn(childnode, code);
+                // this.getRoomSize(childnode, code);
+                // this.getRoomHref(childnode, code);
+                this.getAll(childnode, code);
+            }
+        });
     }
     private getAll(data: any, code: string) {
         let dataNodes: any[] = data.childNodes;
@@ -599,7 +517,7 @@ export default class InsightFacade implements IInsightFacade {
             if (promises === undefined) {
                 // c
             } else {
-                 this.getAll4(promises, code);
+                this.getAll4(promises, code);
             }
         }
     }
@@ -623,12 +541,13 @@ export default class InsightFacade implements IInsightFacade {
                         if (tex.name === "href") {
                             // console.log("newwwwwwwwwwww val");
                             // console.log(tex.value);
-                             res.push(code + "-" + tex.value);
+                            res.push(code + ":" + tex.value);
                         }
                     });
                 } else {
                     let str = cnodes.value.replace(/\s/g, "");
-                    res.push(code + ":" + str);
+                    let str2 = cnodes.value.trim();
+                    res.push(code + ":" + str2);
                 }
             });
         });
@@ -649,843 +568,426 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
-    private getRoomNumber(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            let res: any[] = [];
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
-                    // console.log("undef");
-                } else if (childnode.tagName !== "tr") {
-                    this.getRoomNumber(childnode, code);
-                } else {
-                    res.push(childnode);
-                }
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                   // c
-                    } else {
-                    this.getRoomNumber2(res, code);
-                }
-            }
-    }
-    private getRoomNumber2(prom: any, code: string) {
-        let c1 = "odd";
-        let c2 = "even";
-        let c3 = "even views-row-last";
-        let c4 = "odd views-row-last";
-        let c5 = "even views-row-first";
-        let c6 = "odd views-row-first";
-        let res: any[] = [];
-        prom.forEach((datatr: any) => {
-            if (typeof datatr.attrs !== "undefined") {
-                datatr.attrs.forEach((at: any) => {
-                    if (datatr.attrs.length >= 1) {
-                        let x = at.value;
-                        // console.log(x);
-                        if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6) {
-                            // console.log(childnode);
-                            // console.log(x);
-                            res.push(datatr);
-                        }
-                    }
-                });
-            }
-        });
-        if (res.length !== 0) {
-            if (res === undefined) {
-                // c
-            } else {
-                // console.log(res);
-                this.getRoomNumber3(res, code);
-            }
-        }
-    }
-    private getRoomNumber3(prom: any, code: string) {
-            let classVal = "views-field views-field-field-room-number";
-            let classVal2 = "views-field views-field-field-room-capacity";
-            let promises: any[] = [];
-            prom.forEach((datar: any) => {
-                let x = datar.childNodes;
-               //  console.log(x);
-                x.forEach((dats: any) => {
-                    if (dats.tagName === "td") {
-                        // console.log("made it");
-                        if (typeof dats.attrs !== "undefined") {
-                            dats.attrs.forEach((atr: any) => {
-                                // console.log(atr);
-                                    if (atr.value === classVal) {
-                                        // console.log("eyyyyyyyyyy");
-                                        // console.log(x);
-                                        promises.push(dats);
-                                    }
-                            });
-                        }
-                    }
-                });
-            });
-            if (promises.length !== 0) {
-                if (promises === undefined) {
-                    // c
-                } else {
-                     // console.log(promises);
-                    this.getRoomNumber4(promises, code);
-                }
-            }
-    }
-    private getRoomNumber4(prom: any, code: string): any {
-            let res: any[] = [];
-            prom.forEach((data2: any) => {
-                let x = data2.childNodes;
-                x.forEach((cnodes: any) => {
-                    if (cnodes.tagName === "a") {
-                     let y = cnodes.childNodes;
-                     y.forEach((tex: any) => {
-                         if (tex.nodeName === "#text") {
-                             // console.log("newwwwwwwwwwww val");
-                             // console.log(tex.value);
-                             res.push(code + "-" + tex.value);
-                         }
-                     });
-                   }
-                });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                   // console.log(res);
-                    this.numberArray1.push(res);
-                }
-            }
-    }
-    private getRoomType(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            let res: any[] = [];
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
-                    // console.log("undef");
-                } else if (childnode.tagName !== "tr") {
-                    // Promise.all()
-                    this.getRoomType(childnode, code);
-                } else {
-                    res.push(childnode);
-                }
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomType2(res, code);
-                }
-            }
-    }
-    private getRoomType2(prom: any, code: string) {
-            //  let dataNodes: any[] = data.childNodes;
-            let c1 = "odd";
-            let c2 = "even";
-            let c3 = "even views-row-last";
-            let c4 = "odd views-row-last";
-            let c5 = "even views-row-first";
-            let c6 = "odd views-row-first";
-            let res: any[] = [];
-            prom.forEach((datatr: any) => {
-                if (typeof datatr.attrs !== "undefined") {
-                    datatr.attrs.forEach((at: any) => {
-                        if (datatr.attrs.length >= 1) {
-                            let x = at.value;
-                            // console.log(x);
-                            if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 ) {
-                                // console.log(childnode);
-                                // console.log(x);
-                                res.push(datatr);
-                            }
-                        }
-                    });
-                }
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomType3(res, code);
-                }
-            }
-    }
-    private getRoomType3(prom: any, code: string) {
-            // let dataNodes: any[] = data.childNodes;
-            // let classVal = "views-field views-field-field-room-number";
-            let classVal2 = "views-field views-field-field-room-type";
-            let res: any[] = [];
-            prom.forEach((datar: any) => {
-                let x = datar.childNodes;
-                //  console.log(x);
-                x.forEach((dats: any) => {
-                    if (dats.tagName === "td") {
-                        // console.log("made it");
-                        if (typeof dats.attrs !== "undefined") {
-                            dats.attrs.forEach((atr: any) => {
-                                // console.log(atr);
-                                if (atr.value === classVal2) {
-                                    // console.log("eyyyyyyyyyy");
-                                    // console.log(x);
-                                    res.push(dats);
-                                }
-                            });
-                        }
-                    }
-                });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomType4(res, code);
-                }
-            }
-    }
-    private getRoomType4(prom: any, code: string) {
-            let res: any[] = [];
-            prom.forEach((data2: any) => {
-               let x = data2.childNodes;
-               x.forEach((cnodes: any) => {
-                   let str = cnodes.value.replace(/\s/g, "");
-                   res.push(code + ": " + str);
-               });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.typeArray1.push(res);
-                }
-            }
-    }
-    private getRoomFurn(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            let res: any[] = [];
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
-                    // console.log("undef");
-                } else if (childnode.tagName !== "tr") {
-                    // Promise.all()
-                    this.getRoomFurn(childnode, code);
-                } else {
-                    res.push(childnode);
-                }
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomFurn2(res, code);
-                }
-            }
-    }
-    private getRoomFurn2(prom: any, code: string) {
-        //  let dataNodes: any[] = data.childNodes;
-        let c1 = "odd";
-        let c2 = "even";
-        let c3 = "even views-row-last";
-        let c4 = "odd views-row-last";
-        let c5 = "even views-row-first";
-        let c6 = "odd views-row-first";
-        let res: any[] = [];
-        prom.forEach((datatr: any) => {
-            if (typeof datatr.attrs !== "undefined") {
-                datatr.attrs.forEach((at: any) => {
-                    if (datatr.attrs.length >= 1) {
-                        let x = at.value;
-                        // console.log(x);
-                        if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6) {
-                            // console.log(childnode);
-                            // console.log(x);
-                            res.push(datatr);
-                        }
-                    }
-                });
-            }
-        });
-        if (res.length !== 0) {
-            if (res === undefined) {
-                // c
-            } else {
-                // console.log(res);
-                this.getRoomFurn3(res, code);
-            }
-        }
-    }
-    private getRoomFurn3(prom: any, code: string) {
-            // let dataNodes: any[] = data.childNodes;
-            // let classVal = "views-field views-field-field-room-number";
-            let classVal2 = "views-field views-field-field-room-furniture";
-            let res: any[] = [];
-            prom.forEach((datar: any) => {
-                let x = datar.childNodes;
-                //  console.log(x);
-                x.forEach((dats: any) => {
-                    if (dats.tagName === "td") {
-                        // console.log("made it");
-                        if (typeof dats.attrs !== "undefined") {
-                            dats.attrs.forEach((atr: any) => {
-                                // console.log(atr);
-                                if (atr.value === classVal2) {
-                                    // console.log("eyyyyyyyyyy");
-                                    // console.log(x);
-                                    res.push(dats);
-                                }
-                            });
-                        }
-                    }
-                });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomFurn4(res, code);
-                }
-            }
-    }
-    private getRoomFurn4(prom: any, code: string) {
-            let res: any[] = [];
-            prom.forEach((data2: any) => {
-                let x = data2.childNodes;
-                x.forEach((cnodes: any) => {
-                    let str = cnodes.value.replace(/\s/g, "");
-                    res.push(code + ": " + str);
-                });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.furnArray1.push(res);
-                }
-            }
-    }
-    private getRoomSize(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            let res: any[] = [];
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
-                    // console.log("undef");
-                } else if (childnode.tagName !== "tr") {
-                    // Promise.all()
-                    this.getRoomSize(childnode, code);
-                } else {
-                    res.push(childnode);
-                }
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomSize2(res, code);
-                }
-            }
-    }
-    private getRoomSize2(prom: any, code: string) {
-            //  let dataNodes: any[] = data.childNodes;
-            let c1 = "odd";
-            let c2 = "even";
-            let c3 = "even views-row-last";
-            let c4 = "odd views-row-last";
-            let c5 = "even views-row-first";
-            let c6 = "odd views-row-first";
-            let res: any[] = [];
-            prom.forEach((datatr: any) => {
-                if (typeof datatr.attrs !== "undefined") {
-                    datatr.attrs.forEach((at: any) => {
-                        if (datatr.attrs.length >= 1) {
-                            let x = at.value;
-                            // console.log(x);
-                            if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 ) {
-                                // console.log(childnode);
-                                // console.log(x);
-                                res.push(datatr);
-                            }
-                        }
-                    });
-                }
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomSize3(res, code);
-                }
-            }
-    }
-    private getRoomSize3(prom: any, code: string) {
-            // let dataNodes: any[] = data.childNodes;
-            // let classVal = "views-field views-field-field-room-number";
-            let classVal2 = "views-field views-field-field-room-capacity";
-            let res: any[] = [];
-            prom.forEach((datar: any) => {
-                let x = datar.childNodes;
-                //  console.log(x);
-                x.forEach((dats: any) => {
-                    if (dats.tagName === "td") {
-                        // console.log("made it");
-                        if (typeof dats.attrs !== "undefined") {
-                            dats.attrs.forEach((atr: any) => {
-                                // console.log(atr);
-                                if (atr.value === classVal2) {
-                                    // console.log("eyyyyyyyyyy");
-                                    // console.log(x);
-                                    res.push(dats);
-                                }
-                            });
-                        }
-                    }
-                });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomSize4(res, code);
-                }
-            }
-    }
-    private getRoomSize4(prom: any, code: string) {
-            let res: any[] = [];
-            prom.forEach((data2: any) => {
-                let x = data2.childNodes;
-                x.forEach((cnodes: any) => {
-                    let str = cnodes.value.replace(/\s/g, "");
-                    res.push(code + ":" + str);
-                });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.sizeArray1.push(res);
-                }
-            }
-    }
-    private getRoomHref(data: any, code: string) {
-            let dataNodes: any[] = data.childNodes;
-            let res: any[] = [];
-            dataNodes.forEach((childnode: any) => {
-                if (childnode.tagName === null || childnode.tagName === undefined || childnode.length === 0) {
-                    // console.log("undef");
-                } else if (childnode.tagName !== "tr") {
-                    // Promise.all()
-                    this.getRoomHref(childnode, code);
-                } else {
-                    res.push(childnode);
-                }
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomHref2(res, code);
-                }
-            }
-    }
-    private getRoomHref2(prom: any, code: string) {
-            //  let dataNodes: any[] = data.childNodes;
-            let c1 = "odd";
-            let c2 = "even";
-            let c3 = "even views-row-last";
-            let c4 = "odd views-row-last";
-            let c5 = "even views-row-first";
-            let c6 = "odd views-row-first";
-            let res: any[] = [];
-            prom.forEach((datatr: any) => {
-                if (typeof datatr.attrs !== "undefined") {
-                    datatr.attrs.forEach((at: any) => {
-                        if (datatr.attrs.length >= 1) {
-                            let x = at.value;
-                            // console.log(x);
-                            if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 ) {
-                                // console.log(childnode);
-                                // console.log(x);
-                                res.push(datatr);
-                            }
-                        }
-                    });
-                }
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomHref3(res, code);
-                }
-            }
-    }
-    private getRoomHref3(prom: any, code: string) {
-            // let dataNodes: any[] = data.childNodes;
-            let classVal = "views-field views-field-field-room-number";
-            let classVal2 = "views-field views-field-field-room-capacity";
-            let res: any[] = [];
-            prom.forEach((datar: any) => {
-                let x = datar.childNodes;
-                //  console.log(x);
-                x.forEach((dats: any) => {
-                    if (dats.tagName === "td") {
-                        // console.log("made it");
-                        if (typeof dats.attrs !== "undefined") {
-                            dats.attrs.forEach((atr: any) => {
-                                // console.log(atr);
-                                if (atr.value === classVal) {
-                                    // console.log("eyyyyyyyyyy");
-                                    // console.log(x);
-                                    res.push(dats);
-                                }
-                            });
-                        }
-                    }
-                });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    // console.log(res);
-                    this.getRoomHref4(res, code);
-                }
-            }
-    }
-    private getRoomHref4(prom: any, code: string) {
-            let classVal = "views-field views-field-field-room-number";
-            let classVal2 = "views-field views-field-field-room-type";
-            let res: any[] = [];
-            // let dataNodes: any[] = data.childNodes;
-            // this.numArray.push(code);
-            // foreach prom, data attrs
-            // prom.forEach((data4: any) => {
-            // console.log(data4);
-            // console.log("new arrayyyyyyyyyyyyyyyyyyy");
-            // console.log(prom);
-            prom.forEach((data2: any) => {
-                let x = data2.childNodes;
-                x.forEach((cnodes: any) => {
-                    if (cnodes.tagName === "a") {
-                        let y = cnodes.attrs;
-                        y.forEach((tex: any) => {
-                            if (tex.name === "href") {
-                                // console.log("newwwwwwwwwwww val");
-                                // console.log(tex.value);
-                                res.push(code + ": " + tex.value);
-                            }
-                        });
-                    }
-                });
-            });
-            if (res.length !== 0) {
-                if (res === undefined) {
-                    // c
-                } else {
-                    this.hrefArray1.push(res);
-                }
-            }
-    }
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-        return new Promise<string[]>((resolve, reject) => {
-            let promises: any[] = [];
-            let filter: string = "A";
-            if (this.coursesMap.has(id)) {
-                filter = "has ID";
-            } else if (!id || id.length === 0 || id === "") {
-                filter = "Not valid";
+        let that = this;
+        let promises: any[] = [];
+        return new Promise<string[]>(function (resolve, reject) {
+            if (typeof id !== "string" || typeof content !== "string" || kind === undefined || kind === null) {
+                reject(new InsightError("Invalid params"));
             }
-            switch (filter) {
-                case "Not valid": {
-                    return reject(new InsightError("Invalid Id"));
-                }
-                case "has ID": {
-                    return reject(new InsightError("Id is already added"));
-                }
-                default: {
-                    this.coursesMap.set(id, []);
-                }
+            if (that.coursesMap.has(id)) {
+                return reject(new InsightError("Id is already added"));
             }
+            if (!id || id.length === 0 || id === "") {
+                return reject(new InsightError("Invalid Id"));
+            }
+            // add room -----------------------
             if (kind === InsightDatasetKind.Rooms) {
                 JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
                     // console.log(zipRooms.file("index.htm"));
                     // console.log(zipRooms);
                     // console.log(zipRooms.file("index.htm").async("text"));
-                        promises.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
-                             this.roomsMap.set(id, []);
-                             this.addRoom(data, id);
-                             this.roomData(content, id).then((x: any) => {
-                                 // console.log(this.roomsMap);
-                             });
-                            // console.log(this.roomsMap);
-                        }));
-                });
-                Promise.all(promises).then((result) => {
-                    // co
-                });
-            }
-            JSZip.loadAsync(content, {base64: true}).then((zip: JSZip) => {
-                // console.log(zip);
-            /*    this.addPromises(zip, id).then((data: string[]) => {
-                    // console.log(data);
-                    res = data;
-                    // console.log(this.coursesMap.get(id));
-                });*/
-                // console.log(this.coursesMap.get(id));
-                // console.log(this.coursesMap.entries());
-                // console.log(zip.files);
-                // console.log(zip);
-                if (zip.length < 1) {
-                    return reject(new InsightError("Invalid Id"));
-                }
-                if (kind === InsightDatasetKind.Courses) {
-                    zip.forEach(((relativePath, file: JSZipObject) => {
-                        promises.push(file.async("text").then((data: string) => {
-                            // console.log(data);
-                            this.addCourse(data, id);
-                            /*         .then((data2: any) => {
-                                     // console.log(res);
-                                     return data2;
-                                 }).catch((x) => {
-                                     // console.log("add course did not work " + x);
-                                     throw new Error("add course fucked up " + x);
-                                     // return reject(new InsightError("add course did not work " + x));
-                                 });*/
-                            // console.log(res);
-                            // console.log(this.coursesMap); // save the course info a
-                        }).catch((e) => {
-                            return reject(new InsightError("1 " + e));
-                        }));
-                    }));
-                } else {
-                    return reject(new InsightError("Desired folder for the dataset kind does not exist"));
-                }
-                Promise.all(promises).then((result) => {
-                    // console.log(res);
-                    let arr: string[] = this.coursesMap.get(id);
-                    // console.log(arr);
-                    // console.log(this.coursesMap.get(id));
-                    let dat = Object.assign({}, arr);
-                    fs.writeFile("msg" + id + ".txt", JSON.stringify(arr), (e) => {
-                        if (e) {
-                            console.log("reeeeee" + e + " error");
-                        } else {
-                            return Promise.resolve(arr);
-                        }
-                    });
-                    return result;
-                });
-            }).catch((e) => {
-                return reject(new InsightError("zip " + e));
-            });
-        });
-}
-  /*  private checker(id: string) {
-       // console.log(this.coursesMap.get("coursesOne"));
-       // console.log(this.coursesMap.get("coursesTwo"));
-       // console.log(this.coursesMap.get("coursesDouble"));
-        /!*let arr: string[] = this.coursesMap.get(id);
-        console.log(arr);
-        let dat = Object.assign({}, arr);
-        fs.writeFile("msg" + id + ".txt", arr, (e) => {
-            if (e) {
-             console.log(e + " error");
-            } else {
-                return Promise.resolve(JSON.stringify(dat));
-            }
-        });*!/
-    }*/
-    private addCourse(data: string, datasetId: string) {
-        // return new Promise<any[]>((resolve, reject) => {
-            // console.log(data);
-            // let dat = Object.assign({}, data);
-            // console.log(dat);
-            // let parsedData;
-   /*         if (data.length === 0) {
-               // console.log("this is the fucker: " + data);
-                return reject(new InsightError("peaceeeeeee " + data.toString() + "noting"));
-            }*/
-            // console.log(data);
-            try {
-                            // console.log(data);
-                        let parsedData = JSON.parse(data);
-                            // console.log(parsedData);
-                        let filterPromises: any[] = [];
-                        if (parsedData.result.length === 0) {
-                            throw new Error("0 section.");
-                    }
-                        this.coursesMap.set(datasetId, []);
-                        let dataObj: object[] = parsedData.result;
-                        dataObj.forEach((section: any) => {
-                            this.filters([section], datasetId).then((stuff3: any) => {
-                                let dataObjParse: any[] = stuff3;
-                                // this.coursesMap.set(datasetId, []);
-                                this.coursesMap.get(datasetId).push(dataObjParse);
-                                // console.log(this.coursesMap.get(datasetId));
-                                // console.log(datasetId);
-                                // return resolve(dataObjParse);
-                            }).catch((e) => {
-                                throw new Error("0 reject");
-                            });
+                    promises.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
+                        that.roomsMap.set(id, []);
+                        that.addRoom(data, id);
+                        let resultsaver: any[] = [];
+                        let codearr: any[] = [];
+                        let roomCodes = Array.from(that.linksMap.keys());
+                        roomCodes.forEach((code: any) => {
+                            codearr.push(code);
+                            // console.log(code);
+                            let value = that.linksMap.get(code);
+                            let subs = value[0].slice(2, 47);
+                            resultsaver.push(zipRooms.file(subs).async("text").then((datax: any) => {
+                                that.getData(datax, code);
+                                that.getDataRoomNum(datax, code);
+                            }));
                         });
-                    } catch (e) {
-                        // console.log(e);
-                        throw new Error("errirrr " + e );
-                    }
-    // });
-    }
-    // filterPromises[section] = stuff3;
-    // this.coursesMap.get(datasetId).push(stuff3);
-    // console.log(stuff3);
-            // console.log(this.coursesMap.get(datasetId));
-            // this.checker(datasetId);
-           // return resolve(this.coursesMap.get(datasetId));
-            /*  for (let i = 0; i <= dataObj.length ; i++) {
-                  let dataObj2: object[] = [dataObj[i]];
-                  if (dataObj[i].hasOwnProperty(undefined)) {
-                      console.log("reeeeeeeeeee");
-                  }
-                  let stuff2 = this.filters(dataObj2);
-                  filterPromises[i] = [stuff2];
-                  this.coursesMap.set(datasetId, stuff2);
-                  // console.log(stuff2);
-              }
-              console.log(this.coursesMap.entries());*/
-            // return resolve(filterPromises);
-    private  filters (someone: object[], datasetId: string): Promise<InsightCourse> {
-        return new Promise<InsightCourse>((resolve, reject) => {
-           /* if (someone === undefined) {
-                return reject(new InsightError("it is undefined"));
-            }*/
-           try {
-               someone.map((sect: any) => {
-                   let subject: string = sect.Subject as string;
-                   let year: number = sect.Year as number;
-                   let professor: string = sect.Professor as string;
-                   let id: string = sect.Course as string;
-                   let avg: number = sect.Avg as number;
-                   let title: string = sect.Title as string;
-                   let pass: string = sect.Pass as string;
-                   let fail: string = sect.Fail as string;
-                   let uuid: string = sect.id.toString() as string;
-                   let audit: number = sect.Audit as number;
+                        Promise.all(resultsaver).then(function () {
+                                that.placeData(id, codearr);
+                                let toSaveOnDisk: object[] = that.roomsMap.get(id);
+                                // if (toSaveOnDisk.length === 0) {
+                                //     that.coursesMap.delete(id);
+                                //     return reject(new InsightError("No sections were added"));
+                                // } else {
+                                let str5 = "yeet";
+                                fs.writeFile("data/" + id + str5 + ".json", JSON.stringify(toSaveOnDisk), function (e) {
+                                    return reject(new InsightError("Error Saving Files " + e));
+                                });
 
-                   let filteredCourse: InsightCourse = {
-                       courses_dept: subject,
-                       courses_id: id,
-                       courses_avg: avg,
-                       courses_instructor: professor,
-                       courses_title: title,
-                       courses_pass: pass,
-                       courses_fail: fail,
-                       courses_uuid: uuid,
-                       courses_audit: audit,
-                       courses_year: year,
-                   };
-                   // this.coursesMap.get(datasetId).push(filteredCourse);
-                   return resolve(filteredCourse);
-               });
-           } catch (e) {
-               console.log(e);
-               return reject("Error");
-           }
-    });
-    }
-/*    private addCourse(data: string, id: string) {
-        let vary = JSON.parse(data);
-        let dataArray: object[] = vary.result;
-        let sub: string = dataArray.Subject as string;
-        console.log(dataArray.sub);
-    }*/
-
-    /*public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-        return new Promise<string[]>((resolve, reject) => {
-            let entries: any = [];
-            JSZip.loadAsync(content, {base64: true}).then((zip: JSZip) => {
-                zip.folder("courses/").forEach(((relativePath, fileObject: JSZipObject) => {
-                    entries.push(fileObject.async("text").then((data: string) => {
-                       // this.addCourse(data, id); // save the course info a
-                        console.log(fileObject);
-                        return Promise.resolve(entries);
-                    }).catch((e) => {
-                        return Promise.reject(new InsightError("Error processing encoded course data " + e));
+                                let result: string[] = [];
+                                that.roomsMap.forEach(function (value, key) {
+                                    result.push(key);
+                                });
+                                return resolve(result);
+                                // }
+                        }).catch((e) => {
+                            return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
+                        });
+                        // console.log(this.roomsMap);
                     }));
-                }));
-               // return Promise.resolve(entries);
-            });
-            // return Promise.resolve(entries);
-    });
-    }*/
-    public removeDataset(id: string): Promise<string> {// no changes needed
-        return new Promise<string>((resolve, reject) => {
+                });
+            } else if (kind === InsightDatasetKind.Courses) {
+                // ---------------------------------
+                that.coursesMap.set(id, []);
+                JSZip.loadAsync(content, {base64: true}).then((unzipped: JSZip) => {
+
+                    let filesPromise: any[] = [];
+                    if (unzipped.files.hasOwnProperty("courses/") || unzipped.length > 0) {
+                        unzipped.forEach((function (relativePath, fileObject: JSZipObject) {
+
+                            filesPromise.push(fileObject.async("text").then((data: string) => {
+                                try {
+                                    let parsedInfo = JSON.parse(data);
+                                    if ((parsedInfo.result.length === 0)) {
+                                        throw new Error("None to store");
+                                    }
+                                    parsedInfo.result.forEach(function (section: any) {
+                                        let dept: string = section.Subject;
+                                        let iid: string = section.Course;
+                                        let avg: number = section.Avg;
+                                        let instructor: string = section.Professor;
+                                        let title: string = section.Title;
+                                        let pass: number = section.Pass;
+                                        let fail: number = section.Fail;
+                                        let audit: number = section.Audit;
+                                        let uuid: string = section.id.toString();
+                                        let year: number = Number(section.Year);
+
+                                        // let validCourse: CourseSaver = new CourseSaver(dept, id,
+                                        //     avg, instructor, title, pass, fail, audit, uuid, year);
+                                        let validCourse: any = {
+                                            dept: String,
+                                            id: String,
+                                            avg: Number,
+                                            instructor: String,
+                                            title: String,
+                                            pass: Number,
+                                            fail: Number,
+                                            audit: Number,
+                                            uuid: String,
+                                            year: Number
+                                        };
+                                        validCourse.dept = dept;
+                                        validCourse.id = iid;
+                                        validCourse.avg = avg;
+                                        validCourse.instructor = instructor;
+                                        validCourse.title = title;
+                                        validCourse.pass = pass;
+                                        validCourse.fail = fail;
+                                        validCourse.audit = audit;
+                                        validCourse.uuid = uuid;
+                                        validCourse.year = year;
+                                        that.coursesMap.get(id).push(validCourse);
+                                    });
+
+                                } catch (e) {
+                                    // not in JSON format or some fields of different type/missing-> skip this course
+                                }
+                            }).catch((e) => {
+                                return reject(new InsightError("Error in adding dataset " + e));
+                            }));
+                        }));
+                    } else {
+                        return reject(new InsightError("Desired folder for the dataset kind does not exist"));
+                    }
+                    Promise.all(filesPromise).then(function () {
+                        let toSaveOnDisk: object[] = that.coursesMap.get(id);
+                        // if (toSaveOnDisk.length === 0) {
+                        //     that.coursesMap.delete(id);
+                        //     return reject(new InsightError("No sections were added"));
+                        // } else {
+                        fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
+                            return reject(new InsightError("Error Saving Files " + e));
+                        });
+
+                        let result: string[] = [];
+                        that.coursesMap.forEach(function (value, key) {
+                            result.push(key);
+                        });
+                        return resolve(result);
+                        // }
+                    });
+                }).catch((e) => {
+                    return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
+                });
+            }
+        });
+    }
+
+    public removeDataset(id: string): Promise<string> {
+        let that = this;
+        return new Promise<string>(function (resolve, reject) {
             if (id === "") {
                 return reject(new NotFoundError("Invalid ID"));
             } else if (id === null || !id) {
                 return reject(new InsightError("Invalid ID"));
-            } else if (!this.coursesMap.has(id)) {
-                return reject(new NotFoundError("Not found"));
+            } else if (!that.coursesMap.has(id)) {
+                return reject(new NotFoundError("Id not in Map"));
             }
-       /*     if (this.coursesMap.has(id)) {
-                this.removeFromMemory(id, InsightDatasetKind.Courses).then((succ) => {
-                    return resolve(id);
-                }).catch((err) => {
-                    return reject(new NotFoundError("error :" +  err ));
+            if (that.coursesMap.has(id)) {
+                fs.readdir(InsightDatasetKind.Courses.toString(), function (e, files) {
+                    if (e) {
+                        return reject(new InsightError("Dataset not added yet " + e));
+                    }
                 });
-            } else if (!this.coursesMap.has(id)) {
-                return reject(new NotFoundError("Not found"));
-            }*/
-            this.coursesMap.delete(id);
+            }
+
+            that.coursesMap.delete(id);
             return resolve (id);
         });
     }
-    private removeFromMemory(id: string, kind: InsightDatasetKind): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            fs.readdir(kind.toString(), (err, files) => {
-                if (err) {
-                    // console.log(err + "1");
-                    return reject("error in deleting: " + err);
+    public performQuery(query: any): Promise<any[]> {
+        let that = this;
+        return new Promise<any[]>(function (resolve, reject) {
+            try {
+                let filter: InsightFilter = query.WHERE;
+                let options = query.OPTIONS;
+                let order = options.ORDER;
+                let columns = options.COLUMNS;
+                let id: string = columns[0].split("_")[0];
+                if (that.coursesMap.get(id) === undefined) {
+                        reject(new InsightError("noot"));
+                }
+                // let sections = fs.readFileSync("./data/" + id + ".json", "UTF8");
+                // if (!sections) {
+                //     reject(new InsightError("id does not exist"));
+                // }
+                // let parsedInfo = JSON.parse(sections);
+                let result: any[];
+                if (Object.keys(filter).length === 0) {
+                    result = that.coursesMap.get(id);
+
+                    if (result.length > 5000) {
+                        throw new InsightError("Too many sections in result");
+                    }
                 } else {
-                    if (files.includes(id)) {
-                        const pathy = Path.join(kind, id);
-                        fs.unlink(pathy, (err2) => {
-                            if (err2) {
-                                //  console.log(err2);
-                                reject(false);
+                    let thisResult: any[] = [];
+
+                    for (let section of that.coursesMap.get(id)) {
+                        // check if you can apply filter to the key
+                        if (InsightFacade.isSectionValid(filter, section, id)) {
+                            thisResult.push(section);
+                        }
+                    }
+                    // result over 5000 to add
+                    if (thisResult.length > 5000) {
+                        throw new InsightError("Result exceeds 5000 limit");
+                    }
+                    result = thisResult;
+                }
+                // keep only the desired columns in query
+                if (columns && columns.length !== 0) {
+                    let columnResult: object[] = [];
+                    result.forEach( function (section: any) {
+                        let columnSection: any = {};
+                        columns.forEach( function (key: any) {
+                            if (InsightFacade.validKeyHelper(key, id)) {
+                                let res = key.substring(0, key.indexOf("_"));
+                                key = key.substring(key.indexOf("_") + 1);
+                                columnSection[res + "_" + key] = section[key];
+                            }
+                        });
+                        columnResult.push(columnSection);
+                    });
+                    result = columnResult;
+                    // result = this.desiredColumnsHelper(result, columns);
+                }
+                // Sort the result if order is included
+                if (order !== undefined || order !== null) {
+                    if (columns.includes(order)) {
+                        result = result.sort( function (a, b) {
+                            let x = a[order];
+                            let y = b[order];
+                            if (x === y) {
+                                return 0;
+                            } else if (x > y ) {
+                                return 1;
                             } else {
-                                resolve(true);
+                                return -1;
                             }
                         });
                     } else {
-                        reject(false);
+                        throw new InsightError("ORDER not in COLUMNS");
                     }
                 }
-            });
+                // resolve if no problems
+                return resolve(result);
+            } catch (e) {
+                return reject(new InsightError("Error in reading query"));
+            }
+
         });
     }
 
-    public performQuery(query: any): Promise<any[]> {
-        return Promise.reject("Not implemented.");
+    private static validKeyHelper(key: string, id: string): boolean {
+        // check if the key being passed is a valid one
+        switch (key) {
+            case id + "_dept":
+                return true;
+            case id + "_id":
+                return true;
+            case id + "_instructor":
+                return true;
+            case id + "_title":
+                return true;
+            case id + "_uuid":
+                return true;
+            case id + "_avg":
+                return true;
+            case id + "_pass":
+                return true;
+            case id + "_fail":
+                return true;
+            case id + "_audit":
+                return true;
+            case id + "_year":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // Check if filter applies to given section
+    private static isSectionValid(filter: InsightFilter, section: any, id: string): boolean {
+        if (filter.hasOwnProperty("AND")) {
+            if (filter.AND.length === 0 ) {
+
+                throw new InsightError("Not enough conditions for AND");
+            }
+                // for each filter section must be valid
+                // recursive call to each filter in the array on the section
+            for (let insideFilter of filter.AND) {
+                if (!this.isSectionValid(insideFilter, section, id)) {
+                    return false;
+                }
+            }
+                // if all filters valid on each section
+            return true;
+
+        }
+        if (filter.hasOwnProperty("OR")) {
+            // OR must be 1 or more
+            if (filter.OR.length === 0) {
+                throw new InsightError("Not enough conditions for OR");
+            }
+                // for at least one filter section must be valid:
+                // recursive call to each filter in the array on the section
+            for (let insideFilter of filter.OR) {
+                if (this.isSectionValid(insideFilter, section, id)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+            // check if it is an MCOMPARATOR
+        if (filter.hasOwnProperty("GT") || filter.hasOwnProperty("LT") || filter.hasOwnProperty("EQ")) {
+            // this.validateMComFilterHelper(filter);
+            let body = Object.values(filter)[0];
+            // MCOMPARATOR must be a number
+            // check for valid value
+            if (typeof Object.values(body)[0] !== "number") {
+                throw new InsightError("Invalid value");
+            }
+            // check for valid key
+            if (!this.validKeyHelper(Object.keys(body)[0], id)) {
+                throw new InsightError("Invalid key");
+            }
+
+            if (filter.hasOwnProperty("GT")) {
+                let yup = Object.keys(filter.GT)[0]; // courses_avg
+                yup = yup.substring(yup.indexOf("_") + 1); // avg
+
+                if (section[yup] > Object.values(filter.GT)[0]) { // section[avg]
+                    return true;
+                } else {
+                    return false;
+                }
+
+            } else if (filter.hasOwnProperty("LT")) {
+                let yup = Object.keys(filter.LT)[0];
+                yup = yup.substring(yup.indexOf("_") + 1);
+
+                if (section[yup] < Object.values(filter.LT)[0]) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            } else {
+                let yup = Object.keys(filter.EQ)[0];
+                yup = yup.substring(yup.indexOf("_") + 1);
+
+                if (section[ yup] === Object.values(filter.EQ)[0]) {
+
+                    return true;
+                } else {
+                    return false;
+                }
+
+            }
+        } else if (filter.hasOwnProperty("NOT")) {
+
+            // recursively call the same function with the same inputs but negated
+            return (!this.isSectionValid(filter.NOT, section, id));
+
+            // Check if it is an SComparison
+        } else if (filter.hasOwnProperty("IS")) {
+
+            // return InsightFacade.handleSComparisonHelper(filter.IS, section);
+
+            let key: any = Object.keys(filter.IS)[0]; // courses_id
+            // check if key is not invalid
+            if (!this.validKeyHelper(key, id)) {
+                throw new InsightError("Invalid key");
+            }
+            let value: any = Object.values(filter.IS)[0]; // courses_avg: VALUE
+            // check if value is of right type
+            if (typeof value !== "string") {
+                throw new InsightError("Invalid type");
+            }
+            let actualRes: string = section[key.substring(key.indexOf("_") + 1)]; // section[id]
+            // check each wildcard case
+            if (value.includes("*")) {
+                if (value.length === 1) {
+                    return value === "*";
+                    // *ell*, *ello, hell*
+                } else if (value.length === 2 && value.startsWith("**")) {
+                    return value === "**";
+                } else if (value.startsWith("**") || value.endsWith("**")) {
+                    throw new InsightError("Asteriks cannot be in the middle");
+                } else if (value.startsWith("*") && value.endsWith("**")) {
+                    throw new InsightError("Asteriks cannot be in the middle");
+                } else if (value.startsWith("**") && value.endsWith("*")) {
+                    throw new InsightError("Asteriks cannot be in the middle");
+                } else if (value.startsWith("*") && value.endsWith("*")) {
+                    return actualRes.includes(value.substring(1, value.length - 1));
+                } else if (value.startsWith("*")) {
+                    return actualRes.endsWith(value.substring(1));
+                } else if (value.endsWith("*")) {
+                    return actualRes.startsWith(value.substring(0, value.length - 1));
+                } else {
+                    // h**lo or h*llo === error
+                    throw new InsightError("Asteriks cannot be in the middle");
+                }
+            }
+            return value === actualRes;
+        } else {
+            // if no there is no filter
+            if (filter.constructor === Object && Object.keys(filter).length === 0) {
+                return false;
+            } else {
+                throw new InsightError("Did not match any of the keys");
+            }
+        }
     }
     public listDatasets(): Promise<InsightDataset[]> {
-        return new Promise<InsightDataset[]> ( (resolve, reject) => {
+        let that = this;
+        return new Promise<InsightDataset[]> ( function (resolve, reject) {
             let result: InsightDataset[] = [];
 
-            for (let id of this.coursesMap.keys()) {
-                let crows: number = this.coursesMap.get(id).length;
-                // console.log(crows);
+            for (let id of that.coursesMap.keys()) {
+                let crows: number = that.coursesMap.get(id).length;
                 result.push({id, kind: InsightDatasetKind.Courses, numRows: crows});
             }
 

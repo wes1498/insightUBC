@@ -9,30 +9,32 @@ export enum InsightDatasetKind {
     Rooms = "rooms",
 }
 
-export interface InsightDataset {
-    id: string;
-    kind: InsightDatasetKind;
-    numRows: number;
-}
-
-export interface InsightCourse {
-    [key: string]: string | number;
-}
-export interface InsightRoom {
-    [key: string]: string | number;
+export interface InsightFilter {
+    "AND": InsightFilter[];
+    "OR": InsightFilter[];
+    "LT": {[key: string]: number};
+    "GT": {[key: string]: number};
+    "EQ": {[key: string]: number};
+    "IS": {[key: string]: string};
+    "NOT": InsightFilter;
 }
 export interface IGeoResponse {
     lat?: number;
     lon?: number;
     error?: string;
 }
+export interface InsightDataset {
+    id: string;
+    kind: InsightDatasetKind;
+    numRows: number;
+}
+
 export class InsightError extends Error {
     constructor(...args: any[]) {
         super(...args);
         Error.captureStackTrace(this, InsightError);
     }
 }
-
 export class NotFoundError extends Error {
     constructor(...args: any[]) {
         super(...args);
