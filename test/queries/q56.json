@@ -1,21 +1,19 @@
 {
-    "title": "double IS used",
+    "title": "Q56 EMPTY COLUMN",
     "query": {
         "WHERE": {
-            "IS": {
-                "IS": {
-                    "courses_dept": "math"
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
                 }
             }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
-        }
+            ]}
+
     },
     "isQueryValid": false,
-    "result": "Not implemented."
+    "result": "Q56 EMPTY COLUMN"
+
 }

@@ -1,28 +1,26 @@
-{ 
-  "title": "invalid mcomparator",
+{
+    "title": "Instructor number",
     "query": {
-  "WHERE": {
-    "OR": [
-      {
-        "UT": {
-          "courses_avg": 90
+        "WHERE": {
+            "IS": {
+                "courses_instructor": 0
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ],
+            "ORDER": "courses_uuid"
         }
-      },
-      {
-        "IS": {
-          "courses_dept": "cpsc"
-        }
-      }
-    ]
-  },
-  "OPTIONS": {
-    "COLUMNS": [
-      "courses_dept",
-      "courses_avg"
-    ],
-    "ORDER": "courses_avg"
-  }
-},
-      "isQueryValid": false,
-     "result":[{}]
-    }
+    },
+    "isQueryValid": false,
+    "result": "Not implemented."
+}

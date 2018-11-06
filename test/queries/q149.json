@@ -1,8 +1,10 @@
 {
-    "title": "no filter in WHERE",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "courses_avg" : 90
+            "IS": {
+                "courses_year": "a"
+            }
         },
         "OPTIONS": {
             "COLUMNS": [
@@ -13,5 +15,5 @@
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented."
+    "result": "Incorrect Filter: IS"
 }

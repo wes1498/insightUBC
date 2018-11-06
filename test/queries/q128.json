@@ -1,19 +1,60 @@
+
 {
-    "title": "avg with true",
+    "title": "LT avg -18",
     "query": {
         "WHERE": {
-            "LT": {
-                "courses_avg": true
-            }
+            "AND": [
+                {
+                    "LT": {
+                        "courses_avg": -18
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_fail": 190
+                    }
+                }
+            ]
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
         }
     },
-    "isQueryValid": false,
-    "result": "Error not Implemented"
+    "isQueryValid": true,
+    "result":[]
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

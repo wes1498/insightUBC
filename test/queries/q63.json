@@ -1,26 +1,18 @@
 {
-    "title": "EMPTY AND param ",
+    "title": "Q64 NOT EMPTY INSIDE",
     "query": {
         "WHERE": {
-            "AND": [
-                {
-                    "EQ": {
-                        "courses_avg": 97
-                    }
-                },
-                {
+            "NOT": {
 
-                }
-            ]
+            }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "Not implemented."
+    "result": "Q64 NOT EMPTY INSIDE"
+
 }

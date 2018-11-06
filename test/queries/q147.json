@@ -1,9 +1,9 @@
 {
-    "title": "GT with empty key",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "GT": {
-                "" : 90
+            "IS": {
+                "courses_fail": "a"
             }
         },
         "OPTIONS": {
@@ -15,5 +15,5 @@
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented"
+    "result": "Incorrect Filter: IS"
 }

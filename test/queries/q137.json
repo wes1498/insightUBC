@@ -1,11 +1,7 @@
 {
-    "title": "dept with false",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
-        "WHERE": {
-            "IS": {
-                "courses_dept": false
-            }
-        },
+        "WHERE": {},
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
@@ -15,5 +11,5 @@
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented"
+    "result": "Too Many Courses"
 }

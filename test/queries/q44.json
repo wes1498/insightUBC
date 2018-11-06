@@ -1,19 +1,18 @@
 {
-    "title": " empty order string",
+    "title": "FILTER -> SCOMPARISON:IS",
     "query": {
         "WHERE": {
-            "EQ": {
-                "courses_avg": 99
-            }
+            "IS": {"courses_uuid": "50"}
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": ""
+                "courses_avg",
+                "courses_id"
+
+            ]
         }
     },
-    "isQueryValid": false,
-    "result": "Error not implemented"
+    "isQueryValid": true,
+    "result":[{"courses_dept":"japn","courses_avg":73.36,"courses_id":"101"}]
 }

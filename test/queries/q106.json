@@ -1,19 +1,31 @@
 {
-    "title": "IS with UUID",
+    "title": "Q106 LT with []",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_uuid": 20
-            }
+            "LT": []
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "error not implemented."
+    "result": "Q106 LT with []"
 }
+
+
+
+
+
+
+
+

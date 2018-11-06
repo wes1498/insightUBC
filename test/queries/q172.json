@@ -1,19 +1,30 @@
 {
-    "title": "passing objects",
-    "query": {
+    "title": "Misspell apply",
+    "query":{
         "WHERE": {
-            "AND": [
-                {}
-            ]
+            "GT": {
+                "courses_avg": 95
+            }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
+                "courses_title",
+                "overallAvg"
+            ]
+        },
+        "TRANSFORMATION": {
+            "GROUP": [
+                "courses_title"
             ],
-            "ORDER": "courses_avg"
+            "APPL": [
+                {
+                    "overallAvg": {
+                        "AVG": "courses_avg"
+                    }
+                }
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented."
+    "result": "Misspell apply"
 }

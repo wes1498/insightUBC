@@ -1,19 +1,38 @@
 {
-    "title": "GT with dept",
+    "title": "Q114 IS with true",
     "query": {
         "WHERE": {
-            "GT": {
-                "courses_dept": "math"
-            }
+            "IS": true
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "error not implemented."
+    "result": "Q114 IS with true"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

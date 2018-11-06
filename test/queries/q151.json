@@ -1,19 +1,10 @@
 {
-    "title": "a nested empty wildcard",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "AND": [
-                {
-                    "IS": {
-                        "courses_dept": "*"
-                    }
-                },
-                {
-                    "EQ": {
-                        "courses_pass": 300
-                    }
-                }
-            ]
+            "IS": {
+                "asdf": 1
+            }
         },
         "OPTIONS": {
             "COLUMNS": [
@@ -23,13 +14,6 @@
             "ORDER": "courses_avg"
         }
     },
-    "isQueryValid": true,
-    "result": [
-        {"courses_dept":"chem","courses_avg":67.56},
-        {"courses_dept":"psyc","courses_avg":67.69},
-        {"courses_dept":"psyc","courses_avg":69.94},
-        {"courses_dept":"eosc","courses_avg":73.23},
-        {"courses_dept":"biol","courses_avg":79.22},
-        {"courses_dept":"apsc","courses_avg":82.66}
-    ]
+    "isQueryValid": false,
+    "result": "Incorrect Filter: IS"
 }

@@ -1,9 +1,9 @@
 {
-    "title": "title with false",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_title": false
+            "GT": {
+                "courses_id": 97
             }
         },
         "OPTIONS": {
@@ -15,5 +15,5 @@
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented"
+    "result": "Incorrect Filter: IS"
 }

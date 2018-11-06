@@ -1,19 +1,17 @@
 {
-    "title": "passing objects",
-    "query": {
+    "title": "Attempt to query courses as rooms",
+    "query":{
         "WHERE": {
-            "EQ": {
-                "courses_avg": []
+            "IS": {
+                "courses_type": "Small Group"
             }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_type"
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented."
+    "result": "Err: can't query courses as rooms"
 }

@@ -13,6 +13,7 @@ import {JSZipObject} from "jszip";
 import * as fs from "fs";
 import * as parse5 from "parse5/lib";
 import * as http from "http";
+import {Decimal} from "decimal.js";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -169,6 +170,7 @@ export default class InsightFacade implements IInsightFacade {
             });
     }*/
     private placeData(id: any, codearr: any) {
+            let that = this;
         // return new Promise<any>((resolve, reject) => {
             let arr: any[] = [];
             let numarr: any[] = [];
@@ -294,7 +296,7 @@ export default class InsightFacade implements IInsightFacade {
                             // console.log(obj);
                             let roomsobj = JSON.parse(JSON.stringify(obj));
                             resul.push(roomsobj);
-                            this.roomsMap.get(id).push(roomsobj);
+                            that.roomsMap.get(id).push(roomsobj);
                         }
                     });
                // });
@@ -745,83 +747,365 @@ export default class InsightFacade implements IInsightFacade {
                 let options = query.OPTIONS;
                 let order = options.ORDER;
                 let columns = options.COLUMNS;
+                let transformations = query.TRANSFORMATIONS;
                 let id: string = columns[0].split("_")[0];
                 if (that.coursesMap.get(id) === undefined) {
-                        reject(new InsightError("noot"));
+                    reject(new InsightError("noot"));
                 }
-                // let sections = fs.readFileSync("./data/" + id + ".json", "UTF8");
-                // if (!sections) {
-                //     reject(new InsightError("id does not exist"));
-                // }
-                // let parsedInfo = JSON.parse(sections);
+                console.log(that.roomsMap.size);
+                let dataset = id === "courses" ? that.coursesMap.get(id) : that.roomsMap.get(id);
+
                 let result: any[];
-                if (Object.keys(filter).length === 0) {
-                    result = that.coursesMap.get(id);
+                if (id === "courses") {
+                    if (Object.keys(filter).length === 0) {
+                        result = that.coursesMap.get(id);
 
-                    if (result.length > 5000) {
-                        throw new InsightError("Too many sections in result");
+                        if (result.length > 5000) {
+                            throw new InsightError("Too many sections in result");
+                        }
+                    } else {
+                        let thisResult: any[] = [];
+
+                        for (let section of that.coursesMap.get(id)) {
+                            // check if you can apply filter to the key
+                            if (InsightFacade.isSectionValid(filter, section, id)) {
+                                thisResult.push(section);
+                            }
+                        }
+                        // result over 5000 to add
+                        if (thisResult.length > 5000) {
+                            throw new InsightError("Result exceeds 5000 limit");
+                        }
+                        dataset = thisResult; // 25 results
                     }
-                } else {
-                    let thisResult: any[] = [];
+                } else if (id === "rooms") {
+                    if (Object.keys(filter).length === 0) {
+                        result = that.roomsMap.get(id);
 
-                    for (let section of that.coursesMap.get(id)) {
-                        // check if you can apply filter to the key
-                        if (InsightFacade.isSectionValid(filter, section, id)) {
-                            thisResult.push(section);
+                        if (result.length > 5000) {
+                            throw new InsightError("Too many sections in result");
+                        }
+                    } else {
+                        let thisResult: any[] = [];
+
+                        for (let room of that.roomsMap.get(id)) {
+                            // check if you can apply filter to the key
+                            if (InsightFacade.isSectionValid(filter, room, id)) {
+                                thisResult.push(room);
+                            }
+                        }
+                        // result over 5000 to add
+                        if (thisResult.length > 5000) {
+                            throw new InsightError("Result exceeds 5000 limit");
+                        }
+                        dataset = thisResult; // 25 results
+                    }
+                }
+                for (let q of Object.keys(query)) {
+                    if (q !== "WHERE") {
+                        if (q !== "OPTIONS") {
+                            if (q !== "TRANSFORMATIONS") {
+                                throw new InsightError("Now this should work");
+                            }
                         }
                     }
-                    // result over 5000 to add
-                    if (thisResult.length > 5000) {
-                        throw new InsightError("Result exceeds 5000 limit");
+                }
+
+                if (transformations !== undefined && transformations !== null) {
+                    console.log(Object.keys(query));
+                    let keys: any[] = Object.keys(query);
+
+                    if (!Object.keys(transformations).includes("GROUP", 0)) {
+                        throw new InsightError ("must have GROUP spelled");
                     }
-                    result = thisResult;
+                    if (!Object.keys(transformations).includes("APPLY")) {
+                        throw new InsightError ("must have APPLY spelled");
+                    }
+                    let transformedDataset = [];
+                    let groups: Map<string, any> = new Map<string, any>();
+                    if (transformations.GROUP === undefined || transformations.GROUP.length === 0) {
+                        throw new InsightError("GROUP must be non-empty array");
+                    }
+
+                    for (let values of dataset) {
+                        let groupingVal: string = "";
+                        for (let pair of transformations.GROUP) {
+                            if (!transformations.APPLY.includes(pair) &&
+                                !InsightFacade.validCourseKeyHelper(pair, id)) {
+                                throw new InsightError("invalid key in GROUP");
+                            }
+                            let key = pair.split("_")[1]; // key = title
+                            let value: string = values[key] as string; // grab value from values[title]
+
+                            if (values) {
+                                groupingVal += value; // "" + "Career Planning"
+                            } else {
+                                throw new InsightError("the pair was not a valid key");
+                            }
+                        }
+
+                        if (!groups.get(groupingVal)) {
+                            groups.set(groupingVal, []); // each grouptitle has its array of grouped items
+                        }
+                        groups.get(groupingVal).push(values); // push sections that group to Career Planning
+                        // console.log(groups.get(groupingVal));
+                    }
+                    for (let group of groups.values()) { // group {title(1): ___} of title(n)
+                        let entry: {[key: string]: any } = {}; // initialize {[key: stirng]: any}
+                        for (let pair of transformations.GROUP) {
+                            let key = pair.split("_")[1]; // title
+                            entry[key] = group[0][key]; // [title: Career Planning]
+                        }
+                        let applyKeys: string[] = []; // array for keys to apply token on
+                        for (let object of transformations.APPLY) { // object: overallAvg: {<key>:<token>}
+                            let applyKey = Object.keys(object)[0]; // applyKey = overallAvg
+                            if (!applyKey.includes("_")) {
+                                if (!applyKeys.includes(applyKey)) { // if token not in array
+                                    applyKeys.push(applyKey);
+                                } else {
+                                    throw new InsightError("Duplicated apply key not allowed");
+                                }
+                            } else {
+                                throw new InsightError("applyKey cannot contain underscore");
+                            }
+                            let applyToken = Object.keys(object[applyKey])[0]; // Key of overallAvg[applyKey] = "AVG"
+                            let pair = object[applyKey][applyToken]; // what token performs on: courses_avg
+                            let key = pair.split("_")[1]; // avg
+                            let setVal: any[] = [];
+                            for (let element of group) {
+                                // console.log(group);
+                                setVal.push(element[key]); // setVal has courses_avg for each section { 90, 80, 70, etc}
+                            }
+                            let value: number;
+                            if (applyToken === "MAX") {
+                                value = setVal[0];
+                                value = that.applyMaxHelper(value, setVal);
+                            } else if (applyToken === "MIN") {
+                                value = setVal[0];
+                                value = that.applyMinHelper(value, setVal);
+                            } else if (applyToken === "SUM") {
+                                let total = new Decimal(0);
+                                value = that.applySumHelper(total, setVal);
+                            } else if (applyToken === "AVG") {
+                                let sum = new Decimal(0);
+                                value = that.applyAverageHelper(sum, setVal);
+                            } else if (applyToken === "COUNT") {
+                                let unique = setVal.filter((values, index, self) => {
+                                    return self.indexOf(values) === index;
+                                });
+                                value = unique.length;
+                            } else {
+                                throw new InsightError("Token does not exist");
+                            }
+                            entry[applyKey] = value;
+                        }
+                        transformedDataset.push(entry);
+                    }
+                    dataset = transformedDataset;
                 }
                 // keep only the desired columns in query
                 if (columns && columns.length !== 0) {
                     let columnResult: object[] = [];
-                    result.forEach( function (section: any) {
+                    dataset.forEach(function (section: any) {
                         let columnSection: any = {};
-                        columns.forEach( function (key: any) {
-                            if (InsightFacade.validKeyHelper(key, id)) {
-                                let res = key.substring(0, key.indexOf("_"));
-                                key = key.substring(key.indexOf("_") + 1);
-                                columnSection[res + "_" + key] = section[key];
+                        columns.forEach(function (key: any) {
+                            let cols;
+                            if (query.TRANSFORMATIONS !== undefined) {
+                                if (key.includes("_")) {
+                                    if (query.TRANSFORMATIONS.GROUP !== undefined) {
+                                        for (let b of query.TRANSFORMATIONS.GROUP) { // group has an array of keys
+                                            if (b === key) {
+                                                cols = key.split("_")[1]; // cols = title
+                                                break;
+                                            }
+                                        }
+                                        if (cols === undefined) {
+                                            throw  new InsightError("Columns didnt map to any GROUP key");
+                                        }
+                                    }
+                                } else if (query.TRANSFORMATIONS.APPLY !== undefined) {
+                                    for (let a of query.TRANSFORMATIONS.APPLY) { // apply has an array of keys
+                                        if (Object.keys(a)[0] === key) {
+                                            cols = key;
+                                            break;
+                                        }
+                                    }
+                                    if (cols !== key) {
+                                        throw  new InsightError("Columns didnt map to any apply key");
+                                    }
+                                } else {
+                                    throw new InsightError("Columns key not in apply");
+                                }
+                            } else {
+                                if (key.includes("_")) {
+                                    cols = key.split("_")[1];
+                                } else {
+                                    cols = key;
+                                }
                             }
+                            columnSection[key] = section[cols];
                         });
                         columnResult.push(columnSection);
                     });
                     result = columnResult;
-                    // result = this.desiredColumnsHelper(result, columns);
                 }
-                // Sort the result if order is included
-                if (order !== undefined || order !== null) {
+
+                if (order !== undefined && order !== null) {
                     if (columns.includes(order)) {
-                        result = result.sort( function (a, b) {
-                            let x = a[order];
-                            let y = b[order];
-                            if (x === y) {
-                                return 0;
-                            } else if (x > y ) {
-                                return 1;
-                            } else {
-                                return -1;
+                        result = that.Sorter(result, order, columns);
+                    } else if (order.dir) {
+                        if (order.keys !== undefined) {
+                            for (let c of order.keys) {
+                                if (!columns.includes(c)) {
+                                    throw new InsightError("NOT IN HERE");
+                                }
                             }
-                        });
+                            result = that.Sorter(result, order, columns);
+                        } else {
+                            throw new InsightError("SHIT");
+                        }
                     } else {
-                        throw new InsightError("ORDER not in COLUMNS");
+                        throw new InsightError("goddam");
                     }
                 }
                 // resolve if no problems
                 return resolve(result);
             } catch (e) {
-                return reject(new InsightError("Error in reading query"));
+                return reject(new InsightError("Error in reading query " + e));
             }
 
         });
     }
+    private applyAverageHelper(sum: any, setVal: any[]): number {
+        for (let values of setVal) {
+            sum = sum.add(new Decimal(values));
+        }
+        return Number((Number(sum) / setVal.length).toFixed(2));
+    }
+    private applySumHelper(total: any, setVal: any[]): number {
+        for (let values of setVal) {
+            total = total.add(new Decimal(values));
+        }
+        return Number(total.toFixed(2));
+    }
+    private applyMaxHelper(value: number, setVal: any[]): number {
+        for (let values of setVal) {
+            if (typeof values !== "number") {
+                throw new InsightError("MAX uses nubmers only");
+            } else {
+                if (values > value) {
+                    value = values;
+                }
+            }
+        }
+        return value;
+    }
+    private applyMinHelper(value: number, setVal: any[]): number {
+        for (let values of setVal) {
+            if (typeof values !== "number") {
+                throw new InsightError("MAX uses nubmers only");
+            } else {
+                if (values < value) {
+                    value = values;
+                }
+            }
+        }
+        return value;
+    }
+    private Sorter(result: any[], order: any, columns: string[]): any[] {
+        let key = order as string;
+        let sorted: any;
+        if (typeof order === "string") {
+            // columns needs sorting key
+            if (columns.includes(key)) {
+                result.sort((left, right): any => {
+                    if (left[key] > right[key]) {
+                        return 1;
+                    } else if (left[key] < right[key]) {
+                        return -1;
+                    }
+                });
+            } else {
+                throw new Error("Order key MUST BE IN COLUMNS");
+            }
+            sorted = result;
+        } else {
+            let keyOrder = order.keys; // array of keys in order
+            let cPointer: number;
+            // need nested functio (closure) to access all variables and functions
+            // defined inside outer function
+            function Larger(left: any, right: any, keys: string): number {
+                if (!columns.includes(keys)) {
+                    throw new InsightError("Order key MUST BE IN COLUMNS x 2");
+                }
+                if (left[keys] > right[keys]) {
+                    return 1;
+                } else if (left[keys] < right [keys]) {
+                    return -1;
+                } else {
+                    cPointer += 1;
+                    if (cPointer < keyOrder.length) {
+                        return Larger(left, right, keyOrder[cPointer]);
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+            result.sort((left, right) => {
+                cPointer = 0;
+                if (order.dir === undefined || order.dir === null) {
+                    throw new Error("disgusting");
+                } else if (order.dir === "DOWN") {
+                    return Larger(right, left, keyOrder[cPointer]);
+                } else if (order.dir === "UP") {
+                    return Larger(left, right, keyOrder[cPointer]);
+                } else {
+                    throw new Error("Not even a value");
+                }
+            });
+            sorted = result;
+        }
+        return sorted;
+    }
 
-    private static validKeyHelper(key: string, id: string): boolean {
+    private static validRoomsKeyHelper(key: string, id: string): boolean {
         // check if the key being passed is a valid one
+        if (id === "courses") {
+            throw new InsightError("cannot query courses as rooms");
+        }
+        switch (key) {
+            case id + "_fullname":
+                return true;
+            case id + "_shortname":
+                return true;
+            case id + "_number":
+                return true;
+            case id + "_name":
+                return true;
+            case id + "_address":
+                return true;
+            case id + "_lat":
+                return true;
+            case id + "_lon":
+                return true;
+            case id + "_seats":
+                return true;
+            case id + "_type":
+                return true;
+            case id + "_furniture":
+                return true;
+            case id + "_href":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static validCourseKeyHelper(key: string, id: string): boolean {
+        // check if the key being passed is a valid one
+        if (id === "rooms") {
+            throw new InsightError("cannot query rooms as courses");
+        }
         switch (key) {
             case id + "_dept":
                 return true;
@@ -848,21 +1132,21 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    // Check if filter applies to given section
+// Check if filter applies to given section
     private static isSectionValid(filter: InsightFilter, section: any, id: string): boolean {
         if (filter.hasOwnProperty("AND")) {
             if (filter.AND.length === 0 ) {
 
                 throw new InsightError("Not enough conditions for AND");
             }
-                // for each filter section must be valid
-                // recursive call to each filter in the array on the section
+            // for each filter section must be valid
+            // recursive call to each filter in the array on the section
             for (let insideFilter of filter.AND) {
                 if (!this.isSectionValid(insideFilter, section, id)) {
                     return false;
                 }
             }
-                // if all filters valid on each section
+            // if all filters valid on each section
             return true;
 
         }
@@ -871,8 +1155,8 @@ export default class InsightFacade implements IInsightFacade {
             if (filter.OR.length === 0) {
                 throw new InsightError("Not enough conditions for OR");
             }
-                // for at least one filter section must be valid:
-                // recursive call to each filter in the array on the section
+            // for at least one filter section must be valid:
+            // recursive call to each filter in the array on the section
             for (let insideFilter of filter.OR) {
                 if (this.isSectionValid(insideFilter, section, id)) {
                     return true;
@@ -880,18 +1164,54 @@ export default class InsightFacade implements IInsightFacade {
             }
             return false;
         }
-            // check if it is an MCOMPARATOR
+        // check if it is an MCOMPARATOR
         if (filter.hasOwnProperty("GT") || filter.hasOwnProperty("LT") || filter.hasOwnProperty("EQ")) {
-            // this.validateMComFilterHelper(filter);
             let body = Object.values(filter)[0];
             // MCOMPARATOR must be a number
             // check for valid value
             if (typeof Object.values(body)[0] !== "number") {
                 throw new InsightError("Invalid value");
             }
-            // check for valid key
-            if (!this.validKeyHelper(Object.keys(body)[0], id)) {
-                throw new InsightError("Invalid key");
+            if (id === "courses") {
+                if (!this.validCourseKeyHelper(Object.keys(body)[0], id)) {
+                    throw new InsightError("Invalid Course key");
+                }
+                switch (Object.keys(body)[0]) {
+                    case id + "_dept":
+                        throw new InsightError("Not valid key");
+                    case id + "_id":
+                        throw new InsightError("Not valid key");
+                    case id + "_instructor":
+                        throw new InsightError("Not valid key");
+                    case id + "_title":
+                        throw new InsightError("Not valid key");
+                    case id + "_uuid":
+                        throw new InsightError("Not valid key");
+                    default:
+                        break;
+                }
+            } else if (id === "rooms") {
+                if (!this.validRoomsKeyHelper(Object.keys(body)[0], id)) {
+                    throw new InsightError("Invalid Rooms key");
+                }
+                switch (Object.keys(body)[0]) {
+                    case id + "_fullname":
+                        throw new InsightError("Not valid key");
+                    case id + "_shortname":
+                        throw new InsightError("Not valid key");
+                    case id + "_number":
+                        throw new InsightError("Not valid key");
+                    case id + "_address":
+                        throw new InsightError("Not valid key");
+                    case id + "_type":
+                        throw new InsightError("Not valid key");
+                    case id + "_furniture":
+                        throw new InsightError("Not valid key");
+                    case id + "_href":
+                        throw new InsightError("Not valid key");
+                    default:
+                        break;
+                }
             }
 
             if (filter.hasOwnProperty("GT")) {
@@ -934,38 +1254,76 @@ export default class InsightFacade implements IInsightFacade {
             // Check if it is an SComparison
         } else if (filter.hasOwnProperty("IS")) {
 
-            // return InsightFacade.handleSComparisonHelper(filter.IS, section);
-
             let key: any = Object.keys(filter.IS)[0]; // courses_id
             // check if key is not invalid
-            if (!this.validKeyHelper(key, id)) {
-                throw new InsightError("Invalid key");
-            }
+
             let value: any = Object.values(filter.IS)[0]; // courses_avg: VALUE
             // check if value is of right type
             if (typeof value !== "string") {
                 throw new InsightError("Invalid type");
             }
+            if (id === "courses") {
+                if (!this.validCourseKeyHelper(key, id)) {
+                    throw new InsightError("Invalid Course key");
+                }
+                switch (key) {
+                    case id + "_avg":
+                        throw new InsightError("Not valid key");
+                    case id + "_pass":
+                        throw new InsightError("Not valid key");
+                    case id + "_fail":
+                        throw new InsightError("Not valid key");
+                    case id + "_year":
+                        throw new InsightError("Not valid key");
+                    case id + "_audit":
+                        throw new InsightError("Not valid key");
+                    default:
+                        break;
+                }
+            } else if (id === "rooms") {
+                if (!this.validRoomsKeyHelper(key, id)) {
+                    throw new InsightError("Invalid Rooms key");
+                }
+                switch (key) {
+                    case id + "_lat":
+                        throw new InsightError("Not valid key");
+                    case id + "_lon":
+                        throw new InsightError("Not valid key");
+                    case id + "_seats":
+                        throw new InsightError("Not valid key");
+                    default:
+                        break;
+                }
+            }
+
             let actualRes: string = section[key.substring(key.indexOf("_") + 1)]; // section[id]
             // check each wildcard case
             if (value.includes("*")) {
-                if (value.length === 1) {
-                    return value === "*";
-                    // *ell*, *ello, hell*
-                } else if (value.length === 2 && value.startsWith("**")) {
-                    return value === "**";
-                } else if (value.startsWith("**") || value.endsWith("**")) {
-                    throw new InsightError("Asteriks cannot be in the middle");
-                } else if (value.startsWith("*") && value.endsWith("**")) {
-                    throw new InsightError("Asteriks cannot be in the middle");
-                } else if (value.startsWith("**") && value.endsWith("*")) {
-                    throw new InsightError("Asteriks cannot be in the middle");
-                } else if (value.startsWith("*") && value.endsWith("*")) {
-                    return actualRes.includes(value.substring(1, value.length - 1));
-                } else if (value.startsWith("*")) {
-                    return actualRes.endsWith(value.substring(1));
-                } else if (value.endsWith("*")) {
-                    return actualRes.startsWith(value.substring(0, value.length - 1));
+                let valueArray: string[] = value.split("*");
+                if (valueArray.length === 2) {
+                    if (valueArray[0] === "") {
+                        if (valueArray.length > 2) {
+                            throw new InsightError("Asterisks cannot be in the middle");
+                        }
+                        if (value.startsWith("*")) {
+                            return actualRes.endsWith(value.substring(1));
+                        }
+                    }
+                    if (valueArray[1] === "") {
+                        if (valueArray.length > 2) {
+                            throw new InsightError("Asterisks cannot be ");
+                        }
+                        if (value.endsWith("*")) {
+                            return actualRes.startsWith(value.substring(0, value.length - 1));
+                        }
+                    } else {
+                        throw new InsightError ("Asterisk Error Occured");
+                    }
+                }
+                if (valueArray.length === 3 && valueArray[0] === "" && valueArray[2] === "") {
+                    if (value.startsWith("*") && value.endsWith("*")) {
+                        return actualRes.includes(value.substring(1, value.length - 1));
+                    }
                 } else {
                     // h**lo or h*llo === error
                     throw new InsightError("Asteriks cannot be in the middle");
@@ -981,6 +1339,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
+
     public listDatasets(): Promise<InsightDataset[]> {
         let that = this;
         return new Promise<InsightDataset[]> ( function (resolve, reject) {

@@ -1,27 +1,25 @@
 {
-    "title": "OR only has one param ",
+    "title": "Q65 IS WITH ID",
     "query": {
         "WHERE": {
-            "OR": [
+            "AND": [
                 {
-                    "EQ": {
-                        "courses_avg": 97
+                    "IS": {"courses_id": "213"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 85
                     }
                 }
             ]
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
     "isQueryValid": true,
-    "result": [
-        {"courses_dept":"crwr","courses_avg":97},
-        {"courses_dept":"epse","courses_avg":97},
-        {"courses_dept":"psyc","courses_avg":97}
-    ]
+    "result":[{"courses_id":"213"},{"courses_id":"213"},{"courses_id":"213"}]
+
 }

@@ -1,12 +1,54 @@
- {
-  "title": "Missing the option section ",
+{
+    "title": "Broken key in options",
     "query": {
-  "WHERE":{
-      "GT":{
-         "courses_avg":97
-      }
-   }
-   },
-   "isQueryValid": false,
-    "result": []
-    }
+        "WHERE": {
+            "AND": [
+                {
+                    "LT": {
+                        "courses_avg": 90
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 65
+                    }
+                },
+                {
+                    "OR": [
+                        {
+                            "IS": {
+                                "courses_dept": "comm"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept": "cpsc"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_pass": 100
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_de",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ],
+            "ORDER": "courses_dept"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Broken key in options"
+}

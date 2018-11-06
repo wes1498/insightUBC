@@ -1,21 +1,33 @@
 {
-    "title": "ORDER misspelled",
+    "title": "Q103 LT fail false",
     "query": {
-        "WHEREE": {
-            "EQ": {
-                "courses_avg": 90
+        "WHERE": {
+            "LT": {
+                "courses_fail": false
             }
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDEER": [
-                "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
             ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented."
+    "result": "Q103 LT fail false"
 }
+
+
+
+
+
+
+
+

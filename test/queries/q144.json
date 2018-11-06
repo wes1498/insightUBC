@@ -1,9 +1,9 @@
 {
-    "title": "fail with false",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_fail": false
+            "GT": {
+                "casdf": 97
             }
         },
         "OPTIONS": {
@@ -15,5 +15,5 @@
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented"
+    "result": "Incorrect Filter: IS"
 }

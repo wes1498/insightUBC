@@ -1,9 +1,9 @@
 {
-    "title": "audit with false",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "EQ": {
-                "courses_audit": false
+            "IS": {
+                "courses_avg": "a"
             }
         },
         "OPTIONS": {
@@ -15,5 +15,5 @@
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented"
+    "result": "Incorrect Filter: IS"
 }

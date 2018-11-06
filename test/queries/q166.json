@@ -1,19 +1,17 @@
 {
-    "title": "passing objects",
-    "query": {
+    "title": "Attempt to query rooms as courses",
+    "query":{
         "WHERE": {
-            "LT": {
-                "courses_avg": {}
+            "GT": {
+                "rooms_avg": 95
             }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "rooms_avg"
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented."
+    "result": "Err: can't query rooms as courses"
 }

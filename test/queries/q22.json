@@ -1,31 +1,24 @@
-{ 
-  "title": "asterisk instructor before  and after",
+{
+    "title": "Nested NOT",
     "query": {
-  "WHERE": {
-    "AND": [
-      {
-        "GT": {
-          "courses_avg": 87
+        "WHERE": {
+            "NOT": {
+                "NOT": {
+                    "LT": {
+                        "courses_avg": 1
+                    }
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
         }
-      },
-      {
-        "IS": {
-          "courses_instructor": "*gregor*"
-        }
-      }
-    ]
-  },
-  "OPTIONS": {
-    "COLUMNS": [
-      "courses_dept",
-      "courses_id",
-      "courses_avg",
-      "courses_instructor"
-    ],
-    "ORDER": "courses_avg"
-    }
-  },
-   "isQueryValid": true,
-      "result":[{"courses_dept":"babs","courses_id":"540","courses_avg":87.24,"courses_instructor":"werker, gregory"},{"courses_dept":"etec","courses_id":"521","courses_avg":87.25,"courses_instructor":"mcgregor, heather"},{"courses_dept":"thtr","courses_id":"472","courses_avg":87.4,"courses_instructor":"mcgregor, chris"},{"courses_dept":"math","courses_id":"537","courses_avg":88,"courses_instructor":"martin, gregory"},{"courses_dept":"thtr","courses_id":"472","courses_avg":88,"courses_instructor":"mcgregor, chris"},{"courses_dept":"babs","courses_id":"540","courses_avg":88.88,"courses_instructor":"werker, gregory"}]
-    }
-    
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"frst","courses_id":"202","courses_avg":0},{"courses_dept":"lfs","courses_id":"100","courses_avg":0},{"courses_dept":"lfs","courses_id":"100","courses_avg":0}]
+}

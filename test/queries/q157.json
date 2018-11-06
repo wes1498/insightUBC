@@ -1,27 +1,26 @@
 {
-    "title": "reject where order not in columns",
-    "query": {
+    "title": "Keys in COLUMNS must be in GROUP or APPLY when TRANSFORMATIONS is present",
+    "query":{
         "WHERE": {
-            "AND": [
-                {
-                    "GT": {
-                        "courses_avg": 69
-                    }
-                },
-                {
-                    "LT": {
-                        "courses_avg": 70
-                    }
-                }
-            ]
+            "IS": {
+                "courses_instructor": "kiczales, gregor"
+            }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept"
+                "courses_title",
+                "courses_year"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title",
+                "courses_avg"
             ],
-            "ORDER": "courses_avg"
+            "APPLY": []
         }
     },
-    "isQueryValid": false,
-    "result": "Not implemented."
+    "isQueryValid":false,
+    "result": "Keys in COLUMNS must be in GROUP or APPLY when TRANSFORMATIONS is present"
+
 }

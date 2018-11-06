@@ -1,21 +1,25 @@
 {
-    "title": "avg not number",
+    "title": "Q73 IS WITH INVALID KEY",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_id": "33"
-            }
+            "AND": [
+                {
+                    "IS": {"sdsds": "100"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
-    "isQueryValid": true,
-    "result": [
+    "isQueryValid": false,
+    "result": "Q73 IS WITH INVALID KEY"
 
-    ]
 }

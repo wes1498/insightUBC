@@ -1,19 +1,26 @@
 {
-    "title": "wild card at middle",
+    "title": "Q84 INPUTSTRING NULL and courses_instructor null",
     "query": {
         "WHERE": {
             "IS": {
-                "courses_dept": "m*th"
+                "courses_instructor": null
             }
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented."
+    "result": "Q84 INPUTSTRING NULL and courses_instructor null"
 }
+

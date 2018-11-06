@@ -1,19 +1,25 @@
 {
-    "title": "instructor not string",
+    "title": "Q71 IS WITH AUDIT",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_instructor": 97
-            }
+            "AND": [
+                {
+                    "IS": {"courses_audit": 90}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "Not implemented."
+    "result": "Q71 IS WITH ADIT"
+
 }

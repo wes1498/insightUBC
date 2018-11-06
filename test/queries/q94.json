@@ -1,22 +1,30 @@
 {
-    "title": "Courses audit neg num",
+    "title": "Q94 IS instructor []",
     "query": {
         "WHERE": {
-            "GT": {
-                "courses_audit": -1
+            "IS": {
+                "courses_instructor": []
             }
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": [
-                "courses_dept",
-                "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
             ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented."
+    "result": "Q94 IS instructor []"
 }
+
+
+
+
+

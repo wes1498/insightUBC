@@ -1,19 +1,25 @@
 {
-    "title": "null in IS ",
+    "title": "Q67 IS WITH INSTRUCTOR",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_dept": null
-            }
+            "AND": [
+                {
+                    "IS": {"courses_instructor": "kiczales, gregor"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 85
+                    }
+                }
+            ]
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
-    "isQueryValid": false,
-    "result": "Not implemented."
+    "isQueryValid": true,
+    "result":[{"courses_id":"110"}]
+
 }

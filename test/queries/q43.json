@@ -1,37 +1,19 @@
 {
-    "title": "complex",
+    "title": "FILTER -> MCOMPARISON: EQ",
     "query": {
         "WHERE": {
-            "OR": [
-                {
-                    "AND": [
-                        {
-                            "IS": {
-                                "courses_dept": "math"
-                            }
-                        },
-                        {
-                            "EQ": {
-                                "courses_avg": 80
-                            }
-                        }
-                    ]
-                }
-            ]
+            "EQ": {"courses_avg": 50}
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_avg",
+                "courses_id"
+
+            ]
         }
     },
     "isQueryValid": true,
-    "result": [
-        {"courses_dept":"math","courses_avg":80},
-        {"courses_dept":"math","courses_avg":80},
-        {"courses_dept":"math","courses_avg":80},
-        {"courses_dept":"math","courses_avg":80}
-    ]
+    "result":[{"courses_dept":"busi","courses_avg":50,"courses_id":"441"},{"courses_dept":"chbe","courses_avg":50,"courses_id":"474"},{"courses_dept":"psyc","courses_avg":50,"courses_id":"315"}]
 }
+

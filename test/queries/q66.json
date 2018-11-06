@@ -1,27 +1,25 @@
 {
-    "title": "AND only has one param ",
+    "title": "Q66 IS WITH AVG",
     "query": {
         "WHERE": {
             "AND": [
                 {
-                    "EQ": {
-                        "courses_avg": 97
+                    "IS": {"courses_avg": 98}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 85
                     }
                 }
             ]
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
-    "isQueryValid": true,
-    "result": [
-        {"courses_dept":"crwr","courses_avg":97},
-        {"courses_dept":"epse","courses_avg":97},
-        {"courses_dept":"psyc","courses_avg":97}
-    ]
+    "isQueryValid": false,
+    "result": "Q66 IS WITH AVG"
+
 }

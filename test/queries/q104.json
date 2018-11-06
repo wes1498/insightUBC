@@ -1,21 +1,33 @@
 {
-    "title": "COLUMNS misspelled",
+    "title": "Q104 GT avg false",
     "query": {
-        "WHEREE": {
-            "EQ": {
-                "courses_avg": 90
+        "WHERE": {
+            "GT": {
+                "courses_avg": false
             }
         },
         "OPTIONS": {
-            "COLUMMNS": [
+            "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": [
-                "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
             ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented."
+    "result": "Q104 GT avg false"
 }
+
+
+
+
+
+
+
+

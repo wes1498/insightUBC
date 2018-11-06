@@ -1,9 +1,9 @@
 {
-    "title": "pass with true",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "EQ": {
-                "courses_pass": false
+            "GT": {
+                "courses_uuid": 97
             }
         },
         "OPTIONS": {
@@ -15,5 +15,5 @@
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented"
+    "result": "Incorrect Filter: IS"
 }

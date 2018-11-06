@@ -1,17 +1,30 @@
 {
-    "title": "passing objects",
-    "query": {
+    "title": "SUM string",
+    "query":{
         "WHERE": {
-            "LT": true
+            "GT": {
+                "courses_avg": 95
+            }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
+                "courses_title",
+                "overallMAX"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
             ],
-            "ORDER": "courses_avg"
+            "APPLY": [
+                {
+                    "overallMAX": {
+                        "SUM": "courses_title"
+                    }
+                }
+            ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not Implemented."
+    "result": "SUM string"
 }

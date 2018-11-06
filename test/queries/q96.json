@@ -1,22 +1,30 @@
 {
-    "title": "Courses dept null",
+    "title": "Q94 GT fail []",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_dept": null
+            "GT": {
+                "courses_fail": []
             }
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": [
-                "courses_dept",
-                "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
             ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented."
+    "result": "Q94 GT fail []"
 }
+
+
+
+
+

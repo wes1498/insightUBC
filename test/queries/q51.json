@@ -1,12 +1,24 @@
 {
-    "title": "No OPTIONS",
+    "title": "Q51 WHERE MISSPELLED",
     "query": {
-        "WHERE": {
-            "GT": {
-                "courses_avg": 97
+        "WHER": {
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
+                }
             }
-        }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+            ],
+            "ORDER":"courses_avg"}
+
     },
     "isQueryValid": false,
-    "result": "Not implemented."
+    "result": "Q51 WHERE MISSPELLED"
+
 }
+

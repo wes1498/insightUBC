@@ -1,21 +1,26 @@
-{ 
-  "title": "passing object",
+{
+    "title": "avg string",
     "query": {
-  "WHERE": {
-    "GT": {
-      "courses_avg": {}
-    }
-  },
-  "OPTIONS": {
-    "COLUMNS": [
-      "courses_dept",
-      "courses_avg",
-      "courses_fail"
-    ],
-    "ORDER": "courses_fail"
-  }
-  },
-     "isQueryValid": false,
-     "result":[{}]
-    }
-    
+        "WHERE": {
+            "EQ": {
+                "courses_avg": "90"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ],
+            "ORDER": "courses_uuid"
+        }
+    },
+    "isQueryValid": false,
+    "result": "Not implemented."
+}

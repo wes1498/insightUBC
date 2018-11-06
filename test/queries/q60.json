@@ -1,21 +1,20 @@
 {
-    "title": "double EQ",
+    "title": "Q59 NOT WITH MCOMPARISON:GT",
     "query": {
         "WHERE": {
-            "EQ": {
-                "EQ": {
-                    "courses_avg": 90
+            "NOT": {
+                "GT": {
+                    "courses_avg": 1
                 }
             }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
-    "isQueryValid": false,
-    "result": "Not implemented."
+    "isQueryValid": true,
+    "result":[{"courses_id":"202"},{"courses_id":"100"},{"courses_id":"100"},{"courses_id":"475"}]
 }
+

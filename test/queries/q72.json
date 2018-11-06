@@ -1,19 +1,24 @@
 {
-    "title": "dep not string",
+    "title": "Q72 IS WITH UUID",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_dept": 97
-            }
+            "AND": [
+                {
+                    "IS": {"courses_uuid": "100"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
-    "isQueryValid": false,
-    "result": "Not implemented."
+    "isQueryValid": true,
+    "result":[{"courses_id":"302"}]
 }

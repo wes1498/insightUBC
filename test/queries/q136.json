@@ -1,19 +1,29 @@
-{
-    "title": "uuid with true",
+ {
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "IS": {
-                "courses_uuid": true
-            }
+            "AND": [
+                {
+                    "IS": {
+                        "courses_uuid": "100"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
+                "courses_id",
+                "courses_uuid",
                 "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+            ]
         }
     },
-    "isQueryValid": false,
-    "result": "Error not Implemented"
+    "isQueryValid": true,
+    "result":[{"courses_dept":"japn","courses_id":"302","courses_uuid":"100","courses_avg":76.1}]
 }

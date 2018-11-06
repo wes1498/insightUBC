@@ -1,21 +1,20 @@
 {
-    "title": "double LT",
+    "title": "Q59 NOT WITH MCOMPARISON:LT",
     "query": {
         "WHERE": {
-            "LT": {
+            "NOT": {
                 "LT": {
-                    "courses_avg": 90
+                    "courses_avg": 99
                 }
             }
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
-    "isQueryValid": false,
-    "result": "Not implemented."
+    "isQueryValid": true,
+    "result":[{"courses_id":"574"},{"courses_id":"527"},{"courses_id":"527"}]
+
 }

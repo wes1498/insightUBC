@@ -1,9 +1,9 @@
 {
-    "title": "LT with empty key",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "LT": {
-                "" : 90
+            "IS": {
+                "courses_pass": "a"
             }
         },
         "OPTIONS": {
@@ -15,5 +15,5 @@
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented"
+    "result": "Incorrect Filter: IS"
 }

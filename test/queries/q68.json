@@ -1,19 +1,25 @@
 {
-    "title": "null in  EQ",
+    "title": "Q68 IS WITH TITLE",
     "query": {
         "WHERE": {
-            "EQ": {
-                "courses_avg": null
-            }
+            "AND": [
+                {
+                    "IS": {"courses_title": "intr sd plnt tax"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
         },
         "OPTIONS": {
             "COLUMNS": [
-                "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": "courses_avg"
+                "courses_id"
+            ]
         }
     },
-    "isQueryValid": false,
-    "result": "Not implemented."
+    "isQueryValid": true,
+    "result":[{"courses_id":"324"},{"courses_id":"324"},{"courses_id":"324"},{"courses_id":"324"},{"courses_id":"324"},{"courses_id":"324"},{"courses_id":"324"},{"courses_id":"324"},{"courses_id":"324"},{"courses_id":"324"}]
+
 }

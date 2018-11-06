@@ -1,22 +1,30 @@
 {
-    "title": "Courses instructor null",
+    "title": "Q97 EQ avg []",
     "query": {
         "WHERE": {
             "EQ": {
-                "courses_instructor": null
+                "courses_avg": []
             }
         },
         "OPTIONS": {
             "COLUMNS": [
                 "courses_dept",
-                "courses_avg"
-            ],
-            "ORDER": [
-                "courses_dept",
-                "courses_avg"
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
             ]
         }
     },
     "isQueryValid": false,
-    "result": "Error not implemented."
+    "result": "Q97 EQ avg []"
 }
+
+
+
+
+

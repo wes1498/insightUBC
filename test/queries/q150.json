@@ -1,19 +1,10 @@
 {
-    "title": "a nested wildcard",
+    "title": "SELECT dept, avg WHERE avg > 97",
     "query": {
         "WHERE": {
-            "AND": [
-                {
-                    "IS": {
-                        "courses_dept": "*ath"
-                    }
-                },
-                {
-                    "EQ": {
-                        "courses_pass": 150
-                    }
-                }
-            ]
+            "IS": {
+                "asdf": "a"
+            }
         },
         "OPTIONS": {
             "COLUMNS": [
@@ -23,12 +14,6 @@
             "ORDER": "courses_avg"
         }
     },
-    "isQueryValid": true,
-    "result": [
-        {"courses_dept":"math","courses_avg":61.52},
-        {"courses_dept":"math","courses_avg":66.44},
-        {"courses_dept":"math","courses_avg":70.76},
-        {"courses_dept":"math","courses_avg":78.65},
-        {"courses_dept":"math","courses_avg":78.93}
-    ]
+    "isQueryValid": false,
+    "result": "Incorrect Filter: IS"
 }

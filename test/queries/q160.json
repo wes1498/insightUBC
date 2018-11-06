@@ -1,16 +1,23 @@
 {
-    "title": "reject where order not in columns",
-    "query": {
+    "title": "GROUP must be a non-empty array",
+    "query":{
         "WHERE": {
-            "GT": {
-                "courses_avg": 97
+            "IS": {
+                "courses_instructor": "kiczales, gregor"
             }
         },
         "OPTIONS": {
-            "COLUMNS": "wesley",
-            "ORDER": "courses_id"
+            "COLUMNS": [
+                "courses_title"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+            ],
+            "APPLY": []
         }
     },
-    "isQueryValid": false,
-    "result": "Not implemented."
+    "isQueryValid":false,
+    "result": "GROUP must be a non-empty array"
+
 }

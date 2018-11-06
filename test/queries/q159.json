@@ -1,16 +1,21 @@
 {
-    "title": "reject where order not in columns",
-    "query": {
+    "title": "TRANSFORMATIONS missing GROUP",
+    "query":{
         "WHERE": {
-            "GT": {
-                "courses_avg": 97
+            "IS": {
+                "courses_instructor": "kiczales, gregor"
             }
         },
         "OPTIONS": {
-            "COLUMNS": null,
-            "ORDER": "courses_id"
+            "COLUMNS": [
+                "courses_title"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "APPLY": []
         }
     },
-    "isQueryValid": false,
-    "result": "Not implemented."
+    "isQueryValid":false,
+    "result": "TRANSFORMATIONS missing GROUP"
+
 }
