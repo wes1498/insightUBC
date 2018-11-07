@@ -1,6 +1,5 @@
 import Log from "../Util";
 import {
-    IGeoResponse,
     IInsightFacade,
     InsightDataset,
     InsightDatasetKind,
@@ -11,8 +10,8 @@ import {
 import * as JSZip from "jszip";
 import {JSZipObject} from "jszip";
 import * as fs from "fs";
-import * as http from "http";
 import {Decimal} from "decimal.js";
+
 const parse5 = require("parse5");
 /**
  * This is the main programmatic entry point for the project.
@@ -21,6 +20,7 @@ const parse5 = require("parse5");
  */
 
 export default class InsightFacade implements IInsightFacade {
+    private mydatasets: Map<string, any[]>;
     private coursesMap: Map<string, any>;
     private roomsMap: Map<string, any[]>;
     private linksMap: Map<string, any>;
@@ -34,6 +34,7 @@ export default class InsightFacade implements IInsightFacade {
     private mixArray1: string[][] = [];
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
+        this.mydatasets = new Map<string, any>();
         this.coursesMap = new Map<string, any>();
         this.roomsMap = new Map<string, any[]>();
         this.linksMap = new Map<string, any>();
@@ -236,7 +237,6 @@ export default class InsightFacade implements IInsightFacade {
                 });
             });
             mixarr3.forEach((data1: any, i) => {
-                // let full = data1.replace(/.*:/, "");
                 let short = data1.replace(/:.*/, "");
                 let adrarr: any[] = [];
                 let full = data1.replace(/.*:/, "");
@@ -248,39 +248,40 @@ export default class InsightFacade implements IInsightFacade {
                 let addr = addrs2.replace(/ /g, "%20");
                 let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
                 // this.getGeoInfo(url).then((data4: any) => {
-                  //  let latlon = JSON.parse(JSON.stringify(data4));
-                   // let lati = latlon.lat;
-                   // let longi = latlon.lon;
-
+                //  let latlon = JSON.parse(JSON.stringify(data4));
+                // let lati = latlon.lat;
+                // let longi = latlon.lon;
                 chunks.forEach((data2: any) => {
 
-                        if (data2[0].indexOf(short) === 0) {
-                            let regex = /.*\//;
-                            let roomname = data2[0].replace(regex, "");
-                            let roomname2 = roomname.replace(/.*-/, "");
-                            let roomname3 = short + "_" + roomname2;
-                            let seats = data2[1].replace(/.*:/, "");
-                            let seats2 = Number(seats);
-                            let type = data2[3].replace(/.*:/, "");
-                            let furn = data2[2].replace(/.*:/, "");
-                            let href = data2[0].replace(/.*:/, "");
+                    if (data2[0].indexOf(short) === 0) {
+                        let regex = /.*\//;
+                        let roomname = data2[0].replace(regex, "");
+                        let roomname2 = roomname.replace(/.*-/, "");
+                        let roomname3 = short + "_" + roomname2;
+                        let seats = data2[1].replace(/.*:/, "");
+                        let seats2 = Number(seats);
+                        let type = data2[3].replace(/.*:/, "");
+                        let furn = data2[2].replace(/.*:/, "");
+                        let href = data2[0].replace(/.*:/, "");
 
-                            let obj = {
-                                rooms_fullname: full2,
-                                rooms_shortname: short,
-                                rooms_number: roomname2,
-                                rooms_name: roomname3,
-                                rooms_address: addrs2,
-                                rooms_lat: "undefined",
-                                rooms_lon: "undefined",
-                                rooms_seats: seats2,
-                                rooms_type: type,
-                                rooms_furniture: furn,
-                                rooms_href: href
-                            };
-                            let roomsobj = JSON.parse(JSON.stringify(obj));
-                            resul.push(roomsobj);
-                            that.roomsMap.get(id).push(roomsobj);
+                        let obj = {
+                            rooms_fullname: full2,
+                            rooms_shortname: short,
+                            rooms_number: roomname2,
+                            rooms_name: roomname3,
+                            rooms_address: addrs2,
+                            rooms_lat: "undefined",
+                            rooms_lon: "undefined",
+                            rooms_seats: seats2,
+                            rooms_type: type,
+                            rooms_furniture: furn,
+                            rooms_href: href
+                        };
+
+                        let roomsobj = JSON.parse(JSON.stringify(obj));
+                        resul.push(roomsobj);
+                        that.roomsMap.get(id).push(roomsobj);
+                        that.mydatasets.set(id, roomsobj);
                         }
                     });
 
@@ -543,6 +544,7 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         let promises: any[] = [];
         return new Promise<string[]>(function (resolve, reject) {
+
             if (typeof id !== "string" || typeof content !== "string" || kind === undefined || kind === null) {
                 reject(new InsightError("Invalid params"));
             }
@@ -647,6 +649,7 @@ export default class InsightFacade implements IInsightFacade {
                                         validCourse.uuid = uuid;
                                         validCourse.year = year;
                                         that.coursesMap.get(id).push(validCourse);
+                                        that.mydatasets.set(id, validCourse);
                                     });
 
                                 } catch (e) {
@@ -715,14 +718,23 @@ export default class InsightFacade implements IInsightFacade {
                 let columns = options.COLUMNS;
                 let transformations = query.TRANSFORMATIONS;
                 let id: string = columns[0].split("_")[0];
-                if (that.coursesMap.get(id) === undefined) {
-                    reject(new InsightError("noot"));
-                }
+                let dataset;
 
-                let dataset = id === "courses" ? that.coursesMap.get(id) : that.roomsMap.get(id);
+                if (that.coursesMap.get(id)) {
+                    dataset = that.coursesMap.get(id);
+                } else if (that.roomsMap.get(id)) {
+                    dataset = that.roomsMap.get(id);
+                } else {
+                    throw new Error("Can't find dataset with id: " + id);
+                }
+                // if (that.coursesMap.get(id) === undefined) {
+                //     reject(new InsightError("noot"));
+                // }
+
+                // let dataset = id === "courses" ? that.coursesMap.get(id) : that.roomsMap.get(id);
 
                 let result: any[];
-                if (id === "courses") {
+                if (that.coursesMap.get(id)) {
                     if (Object.keys(filter).length === 0) {
                         result = that.coursesMap.get(id);
 
@@ -1175,6 +1187,27 @@ export default class InsightFacade implements IInsightFacade {
                     default:
                         break;
                 }
+                if (filter.hasOwnProperty("GT")) {
+                    if (section[Object.keys(filter.GT)[0]] > Object.values(filter.GT)[0]) { // section[rooms_lat]
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else if (filter.hasOwnProperty("LT")) {
+                    if (section[Object.keys(filter.LT)[0]] < Object.values(filter.LT)[0]) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+
+                    if (section[Object.keys(filter.EQ)[0]] === Object.values(filter.EQ)[0]) {
+
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
             }
 
             if (filter.hasOwnProperty("GT")) {
@@ -1257,6 +1290,40 @@ export default class InsightFacade implements IInsightFacade {
                     default:
                         break;
                 }
+                let actualRoom: string = section[key]; // section[rooms_lat]
+                // check each wildcard case
+                if (value.includes("*")) {
+                    let valueArray: string[] = value.split("*");
+                    if (valueArray.length === 2) {
+                        if (valueArray[0] === "") {
+                            if (valueArray.length > 2) {
+                                throw new InsightError("Asterisks cannot be in the middle");
+                            }
+                            if (value.startsWith("*")) {
+                                return actualRoom.endsWith(value.substring(1));
+                            }
+                        }
+                        if (valueArray[1] === "") {
+                            if (valueArray.length > 2) {
+                                throw new InsightError("Asterisks cannot be ");
+                            }
+                            if (value.endsWith("*")) {
+                                return actualRoom.startsWith(value.substring(0, value.length - 1));
+                            }
+                        } else {
+                            throw new InsightError ("Asterisk Error Occured");
+                        }
+                    }
+                    if (valueArray.length === 3 && valueArray[0] === "" && valueArray[2] === "") {
+                        if (value.startsWith("*") && value.endsWith("*")) {
+                            return actualRoom.includes(value.substring(1, value.length - 1));
+                        }
+                    } else {
+                        // h**lo or h*llo === error
+                        throw new InsightError("Asteriks cannot be in the middle");
+                    }
+                }
+                return value === actualRoom;
             }
 
             let actualRes: string = section[key.substring(key.indexOf("_") + 1)]; // section[id]
@@ -1312,8 +1379,13 @@ export default class InsightFacade implements IInsightFacade {
                 let crows: number = that.coursesMap.get(id).length;
                 result.push({id, kind: InsightDatasetKind.Courses, numRows: crows});
             }
+            for (let id of that.roomsMap.keys()) {
+                let crows: number = that.roomsMap.get(id).length;
+                result.push({id, kind: InsightDatasetKind.Rooms, numRows: crows});
+            }
 
             resolve(result);
         });
     }
+
 }
