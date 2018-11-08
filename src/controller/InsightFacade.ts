@@ -51,19 +51,19 @@ export default class InsightFacade implements IInsightFacade {
         this.mixArray1 = [];
         this.latlonArray1 = [];
     }
-   private getGeoInfo(url: string): Promise<IGeoResponse> {
+   private getGeo(url: string): Promise<IGeoResponse> {
         return new Promise<IGeoResponse>((resolve, reject) => {
             http.get(url, (result) => {
                 result.setEncoding("utf8");
                 let body = "";
-                result.on("data", (stream) => {
-                    body += stream;
+                result.on("data", (chunk) => {
+                    body += chunk;
                 }).on("error", (err) => {
-                    reject(err);
+                     return reject(err);
                 });
                 result.on("end", () => {
-                    let result1: IGeoResponse = JSON.parse(body);
-                    resolve(result1);
+                    let resultVal: IGeoResponse = JSON.parse(body);
+                    return resolve(resultVal);
                 });
             });
         });
@@ -278,15 +278,15 @@ export default class InsightFacade implements IInsightFacade {
 
             let addr = addrs2.replace(/ /g, "%20");
             let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
-            let fx = that.getGeoInfo(url);
+            let fx = that.getGeo(url);
             Promise.all([fx]).then((j: any) => {
                 // console.log(j);
-                // let rest = await  that.getGeoInfo(url);
+                // let rest = await  that.getGeo(url);
                 let latlon = JSON.parse(JSON.stringify(j[0]));
                 let lati = latlon.lat;
                 let longi = latlon.lon;
             // console.log(latlonarr2);
-                // this.getGeoInfo(url).then((data4: any) => {
+                // this.getGeo(url).then((data4: any) => {
                 //  let latlon = JSON.parse(JSON.stringify(data4));
                 // let lati = latlon.lat;
                 // let longi = latlon.lon;
@@ -731,7 +731,8 @@ export default class InsightFacade implements IInsightFacade {
             // rooms map is added here ------------------------
             let path =  process.cwd() + "/data/roomstest.json";
             let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
-            that.roomsMap.get(id).push(JSON.stringify(json));
+            that.roomsMap.get(id).push(json);
+            console.log(that.roomsMap);
         });
     }
 
@@ -771,7 +772,7 @@ export default class InsightFacade implements IInsightFacade {
                 let id: string = columns[0].split("_")[0];
                 let dataset;
                 // check map is here
-                // console.log(that.roomsMap);
+                 // console.log(that.roomsMap);
 
                 if (that.coursesMap.get(id)) {
                     dataset = that.coursesMap.get(id);
