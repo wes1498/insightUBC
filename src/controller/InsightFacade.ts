@@ -184,9 +184,11 @@ export default class InsightFacade implements IInsightFacade {
             let resul: any[] = [];
             this.nameArray1.forEach((data1: any) => {
                 arr.push(data1);
+                // console.log(data1);
             });
             this.numberArray1.forEach((data1: any) => {
                 numarr.push(data1);
+                // console.log(data1);
             });
             // getting all the rooms stuff together
             arr.forEach((data1: any, i) => {
@@ -198,6 +200,7 @@ export default class InsightFacade implements IInsightFacade {
                         let shortref2 = short.replace("/", "");
                         if (x.indexOf(short) === 0) {
                             mixarr.push([data1, x, shortref2]);
+                            // console.log(data1);
                         }
 
                     });
@@ -219,6 +222,7 @@ export default class InsightFacade implements IInsightFacade {
             });
             // putting all room stuff together
             this.mixArray1.forEach((data1: any) => {
+                // console.log(data1);
                 data1.forEach((x: any, i: any) => {
                     if (x.includes("http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/")) {
                         mixarr2.push([x]);
@@ -239,11 +243,16 @@ export default class InsightFacade implements IInsightFacade {
                 let adrarr: any[] = [];
                 uniq.forEach((x: any) => {
                     let sub = x.substring(0, 4);
-                    if (short.includes(sub)) {
+                    let sub2 = x.substring(0, 3);
+                    if (short.includes(sub) || short.includes(sub2) ) {
                         mixarr3.push(data1 + " -- " + x);
                     }
                 });
             });
+      /*  mixarr3.forEach((data1: any) => {
+            console.log(data1);
+            // console.log(data1);
+        });*/
             // console.log(mixarr3);
             let latlonprom = that.putData(mixarr3, chunks, id);
       /*      Promise.all(latlonprom).then((x: any) => {
@@ -321,7 +330,7 @@ export default class InsightFacade implements IInsightFacade {
                     //     that.coursesMap.delete(id);
                     //     return reject(new InsightError("No sections were added"));
                     // } else {
-                let str5 = "testyour";
+                let str5 = "test";
                 fs.writeFile("data/" + id + str5 + ".json", JSON.stringify(toSaveOnDisk), function (e) {
                        // g
                     });
@@ -329,6 +338,14 @@ export default class InsightFacade implements IInsightFacade {
                 // console.log(that.roomsMap);
             });
             });
+        // console.log(that.roomsMap);
+     /*   fs.readFile(path, function read(err, data) {
+            if (err) {
+                throw err;
+            }
+            let content = data;
+            console.log(content);
+        });*/
         // console.log(latlonarr2);
         // return latlonarr;
         // let b = await that.roomsMap;
@@ -484,6 +501,7 @@ export default class InsightFacade implements IInsightFacade {
         let c4 = "odd views-row-last";
         let c5 = "even views-row-first";
         let c6 = "odd views-row-first";
+        let c7 = "odd views-row-first views-row-last";
         let res: any[] = [];
         prom.forEach((datatr: any) => {
             if (typeof datatr.attrs !== "undefined") {
@@ -491,7 +509,7 @@ export default class InsightFacade implements IInsightFacade {
                     if (datatr.attrs.length >= 1) {
                         let x = at.value;
 
-                        if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6) {
+                        if (x === c1 || x === c2 || x === c3 || x === c4 || x === c5 || x === c6 || x === c7) {
 
                             res.push(datatr);
                         }
@@ -620,30 +638,8 @@ export default class InsightFacade implements IInsightFacade {
                             }));
                         });
                         Promise.all(resultsaver).then(function () {
-                                that.placeData(id, codearr);
-                                // console.log(that.roomsMap);
-                                // console.log(that.roomsMap);
-                                // console.log(that.mydatasets);
-                                let toSaveOnDisk: object[] = that.roomsMap.get(id);
-                                // if (toSaveOnDisk.length === 0) {
-                                //     that.coursesMap.delete(id);
-                                //     return reject(new InsightError("No sections were added"));
-                                // } else {
-                                let str5 = "test";
-                                fs.writeFile("data/" + id + str5 + ".json", JSON.stringify(toSaveOnDisk), function (e) {
-                                    return reject(new InsightError("Error Saving Files " + e));
-                                });
-
-                                let result: string[] = [];
-                                that.roomsMap.forEach(function (value, key) {
-                                    result.push(key);
-                                });
-                                return resolve(result);
-                                // }
-                        }).catch((e) => {
-                            return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
+                            that.placeData(id, codearr);
                         });
-
                     }));
                 });
             } else if (kind === InsightDatasetKind.Courses) {
@@ -732,6 +728,10 @@ export default class InsightFacade implements IInsightFacade {
                     return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
                 });
             }
+            // rooms map is added here ------------------------
+            let path =  process.cwd() + "/data/roomstest.json";
+            let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
+            that.roomsMap.get(id).push(JSON.stringify(json));
         });
     }
 
@@ -761,6 +761,8 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         return new Promise<any[]>(function (resolve, reject) {
             try {
+                // let cwd = process.cwd();
+                // console.log(cwd);
                 let filter: InsightFilter = query.WHERE;
                 let options = query.OPTIONS;
                 let order = options.ORDER;
@@ -768,6 +770,8 @@ export default class InsightFacade implements IInsightFacade {
                 let transformations = query.TRANSFORMATIONS;
                 let id: string = columns[0].split("_")[0];
                 let dataset;
+                // check map is here
+                // console.log(that.roomsMap);
 
                 if (that.coursesMap.get(id)) {
                     dataset = that.coursesMap.get(id);
@@ -785,6 +789,7 @@ export default class InsightFacade implements IInsightFacade {
                 let result: any[];
                 if (that.coursesMap.get(id)) {
                     if (Object.keys(filter).length === 0) {
+                        // console.log(that.coursesMap);
                         result = that.coursesMap.get(id);
 
                         if (result.length > 5000) {
