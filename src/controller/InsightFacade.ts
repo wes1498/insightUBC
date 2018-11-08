@@ -5,12 +5,14 @@ import {
     InsightDatasetKind,
     InsightError,
     InsightFilter,
-    NotFoundError
+    NotFoundError,
+    IGeoResponse
 } from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {JSZipObject} from "jszip";
 import * as fs from "fs";
 import {Decimal} from "decimal.js";
+import * as http from "http";
 
 const parse5 = require("parse5");
 /**
@@ -32,6 +34,7 @@ export default class InsightFacade implements IInsightFacade {
     private sizeArray1: string[][] = [];
     private hrefArray1: string[][] = [];
     private mixArray1: string[][] = [];
+    private latlonArray1: string[][] = [];
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
         this.mydatasets = new Map<string, any>();
@@ -46,8 +49,9 @@ export default class InsightFacade implements IInsightFacade {
         this.sizeArray1 = [];
         this.hrefArray1 = [];
         this.mixArray1 = [];
+        this.latlonArray1 = [];
     }
-   /* private getGeoInfo(url: string): Promise<IGeoResponse> {
+   private getGeoInfo(url: string): Promise<IGeoResponse> {
         return new Promise<IGeoResponse>((resolve, reject) => {
             http.get(url, (result) => {
                 result.setEncoding("utf8");
@@ -63,7 +67,7 @@ export default class InsightFacade implements IInsightFacade {
                 });
             });
         });
-    }*/
+    }
     // GETS LINKS FROM INDEX.HTM IT ALSO GETS SHORT NAME
     private addRoom(data: any, code: string) {
         // let doc: any = parse5.parse(data);
@@ -166,7 +170,7 @@ export default class InsightFacade implements IInsightFacade {
             });
             });
     }*/
-    private placeData(id: any, codearr: any) {
+    private placeData(id: any, codearr: any): any {
             let that = this;
         // return new Promise<any>((resolve, reject) => {
             let arr: any[] = [];
@@ -184,9 +188,10 @@ export default class InsightFacade implements IInsightFacade {
             this.numberArray1.forEach((data1: any) => {
                 numarr.push(data1);
             });
+            // getting all the rooms stuff together
             arr.forEach((data1: any, i) => {
                 let full = data1.replace(/.*:/, "");
-                let short = data1.replace(/:.*/, "");
+                let short = data1.replace(/:.*!/, "");
                 this.hrefArray1.forEach((data2: any) => {
                     data2.forEach((x: any) => {
                         let shortref = x.replace(/.*room/, "");
@@ -198,6 +203,7 @@ export default class InsightFacade implements IInsightFacade {
                     });
                 });
             });
+            // getting only the correct addresses
             let uniq = this.addressArray1.reduce((a, b) => {
                 if (a.indexOf(b) < 0) {
                     a.push(b);
@@ -211,6 +217,7 @@ export default class InsightFacade implements IInsightFacade {
                     adr.push(x);
                 }
             });
+            // putting all room stuff together
             this.mixArray1.forEach((data1: any) => {
                 data1.forEach((x: any, i: any) => {
                     if (x.includes("http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/")) {
@@ -225,6 +232,7 @@ export default class InsightFacade implements IInsightFacade {
                     });
                 });
             });
+            // Puting address and names together
             arr.forEach((data1: any, i) => {
                 let full = data1.replace(/.*:/, "");
                 let short = data1.replace(/:.*/, "");
@@ -236,17 +244,39 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 });
             });
-            mixarr3.forEach((data1: any, i) => {
-                let short = data1.replace(/:.*/, "");
-                let adrarr: any[] = [];
-                let full = data1.replace(/.*:/, "");
-                let full2 = full.replace(/ --.*/, "");
+            // console.log(mixarr3);
+            let latlonprom = that.putData(mixarr3, chunks, id);
+      /*      Promise.all(latlonprom).then((x: any) => {
+              that.latlonArray1.forEach((t: any) => {
+                 t.rooms_lat = "null";
+                 console.log(t);
+              });
+            });*/
+      //  });
+    }
+    private putData(mixarr3: any, chunks: any, id: any): any {
+        let that = this;
+        let latlonarr: any[] = [];
+        let latlonarr2: any[] = [];
+        mixarr3.forEach((data1: any) => {
+            let short = data1.replace(/:.*/, "");
+            let adrarr: any[] = [];
+            let full = data1.replace(/.*:/, "");
+            let full2 = full.replace(/ --.*/, "");
 
-                let addrs = data1.replace(/.* --/, "");
-                let addrs2 = addrs.replace(/.*--/, "");
+            let addrs = data1.replace(/.* --/, "");
+            let addrs2 = addrs.replace(/.*--/, "");
 
-                let addr = addrs2.replace(/ /g, "%20");
-                let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
+            let addr = addrs2.replace(/ /g, "%20");
+            let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
+            let fx = that.getGeoInfo(url);
+            Promise.all([fx]).then((j: any) => {
+                // console.log(j);
+                // let rest = await  that.getGeoInfo(url);
+                let latlon = JSON.parse(JSON.stringify(j[0]));
+                let lati = latlon.lat;
+                let longi = latlon.lon;
+            // console.log(latlonarr2);
                 // this.getGeoInfo(url).then((data4: any) => {
                 //  let latlon = JSON.parse(JSON.stringify(data4));
                 // let lati = latlon.lat;
@@ -270,8 +300,8 @@ export default class InsightFacade implements IInsightFacade {
                             rooms_number: roomname2,
                             rooms_name: roomname3,
                             rooms_address: addrs2,
-                            rooms_lat: "undefined",
-                            rooms_lon: "undefined",
+                            rooms_lat: lati,
+                            rooms_lon: longi,
                             rooms_seats: seats2,
                             rooms_type: type,
                             rooms_furniture: furn,
@@ -279,14 +309,30 @@ export default class InsightFacade implements IInsightFacade {
                         };
 
                         let roomsobj = JSON.parse(JSON.stringify(obj));
-                        resul.push(roomsobj);
+                        // resul.push(roomsobj);
                         that.roomsMap.get(id).push(roomsobj);
+                        // console.log(roomsobj);
+                        // that.latlonArray1.push(roomsobj);
                         that.mydatasets.set(id, roomsobj);
-                        }
+                    }
+                });
+                let toSaveOnDisk: object[] = that.roomsMap.get(id);
+                    // if (toSaveOnDisk.length === 0) {
+                    //     that.coursesMap.delete(id);
+                    //     return reject(new InsightError("No sections were added"));
+                    // } else {
+                let str5 = "testyour";
+                fs.writeFile("data/" + id + str5 + ".json", JSON.stringify(toSaveOnDisk), function (e) {
+                       // g
                     });
-
+                // return that.roomsMap;
+                // console.log(that.roomsMap);
             });
-      //  });
+            });
+        // console.log(latlonarr2);
+        // return latlonarr;
+        // let b = await that.roomsMap;
+        // console.log()
     }
     // GET DATA FROM THE ROOMS FROM THE LINKS
     private getData(data: any, code: string) {
@@ -575,12 +621,15 @@ export default class InsightFacade implements IInsightFacade {
                         });
                         Promise.all(resultsaver).then(function () {
                                 that.placeData(id, codearr);
+                                // console.log(that.roomsMap);
+                                // console.log(that.roomsMap);
+                                // console.log(that.mydatasets);
                                 let toSaveOnDisk: object[] = that.roomsMap.get(id);
                                 // if (toSaveOnDisk.length === 0) {
                                 //     that.coursesMap.delete(id);
                                 //     return reject(new InsightError("No sections were added"));
                                 // } else {
-                                let str5 = "yeet";
+                                let str5 = "test";
                                 fs.writeFile("data/" + id + str5 + ".json", JSON.stringify(toSaveOnDisk), function (e) {
                                     return reject(new InsightError("Error Saving Files " + e));
                                 });
