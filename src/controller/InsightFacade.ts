@@ -331,7 +331,7 @@ export default class InsightFacade implements IInsightFacade {
                     //     return reject(new InsightError("No sections were added"));
                     // } else {
                 let str5 = "test";
-                fs.writeFile("data/" + id + str5 + ".json", JSON.stringify(toSaveOnDisk), function (e) {
+                fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
                        // g
                     });
                 // return that.roomsMap;
@@ -642,6 +642,9 @@ export default class InsightFacade implements IInsightFacade {
                         });
                     }));
                 });
+                let path =  process.cwd() + "/data/roomstest.json";
+                let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
+                that.roomsMap.get(id).push(json);
             } else if (kind === InsightDatasetKind.Courses) {
                 // ---------------------------------
                 that.coursesMap.set(id, []);
@@ -729,10 +732,6 @@ export default class InsightFacade implements IInsightFacade {
                 });
             }
             // rooms map is added here ------------------------
-            let path =  process.cwd() + "/data/roomstest.json";
-            let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
-            that.roomsMap.get(id).push(json);
-            console.log(that.roomsMap);
         });
     }
 
@@ -778,6 +777,7 @@ export default class InsightFacade implements IInsightFacade {
                     dataset = that.coursesMap.get(id);
                 } else if (that.roomsMap.get(id)) {
                     dataset = that.roomsMap.get(id);
+                   // console.log(dataset);
                 } else {
                     throw new Error("Can't find dataset with id: " + id);
                 }
@@ -812,6 +812,7 @@ export default class InsightFacade implements IInsightFacade {
                         dataset = thisResult; // 25 results
                     }
                 } else if (id === "rooms") {
+                    // console.log(that.roomsMap.get(id));
                     if (Object.keys(filter).length === 0) {
                         result = that.roomsMap.get(id);
 
@@ -820,7 +821,6 @@ export default class InsightFacade implements IInsightFacade {
                         }
                     } else {
                         let thisResult: any[] = [];
-
                         for (let room of that.roomsMap.get(id)) {
                             // check if you can apply filter to the key
                             if (InsightFacade.isSectionValid(filter, room, id)) {
@@ -832,6 +832,7 @@ export default class InsightFacade implements IInsightFacade {
                             throw new InsightError("Result exceeds 5000 limit");
                         }
                         dataset = thisResult; // 25 results
+                        // console.log(dataset);
                     }
                 }
                 for (let q of Object.keys(query)) {
@@ -1224,6 +1225,7 @@ export default class InsightFacade implements IInsightFacade {
                 if (!this.validRoomsKeyHelper(Object.keys(body)[0], id)) {
                     throw new InsightError("Invalid Rooms key");
                 }
+                // console.log(Object.keys(body)[2]);
                 switch (Object.keys(body)[0]) {
                     case id + "_fullname":
                         throw new InsightError("Not valid key");
@@ -1346,6 +1348,7 @@ export default class InsightFacade implements IInsightFacade {
                         break;
                 }
                 let actualRoom: string = section[key]; // section[rooms_lat]
+                // console.log(actualRoom);
                 // check each wildcard case
                 if (value.includes("*")) {
                     let valueArray: string[] = value.split("*");
