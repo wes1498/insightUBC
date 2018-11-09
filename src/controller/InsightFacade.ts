@@ -254,8 +254,12 @@ export default class InsightFacade implements IInsightFacade {
             // console.log(data1);
         });*/
             // console.log(mixarr3);
-            let latlonprom = that.putData(mixarr3, chunks, id);
-      /*      Promise.all(latlonprom).then((x: any) => {
+            that.putData(mixarr3, chunks, id).then((x: any) => {
+            let path = process.cwd() + "/data/rooms.json";
+            let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
+            that.roomsMap.get(id).push(json);
+            });
+        /*      Promise.all(latlonprom).then((x: any) => {
               that.latlonArray1.forEach((t: any) => {
                  t.rooms_lat = "null";
                  console.log(t);
@@ -264,92 +268,95 @@ export default class InsightFacade implements IInsightFacade {
       //  });
     }
     private putData(mixarr3: any, chunks: any, id: any): any {
-        let that = this;
-        let latlonarr: any[] = [];
-        let latlonarr2: any[] = [];
-        mixarr3.forEach((data1: any) => {
-            let short = data1.replace(/:.*/, "");
-            let adrarr: any[] = [];
-            let full = data1.replace(/.*:/, "");
-            let full2 = full.replace(/ --.*/, "");
+        return new Promise<any>((resolve, reject) => {
+            let that = this;
+            let latlonarr: any[] = [];
+            let latlonarr2: any[] = [];
+            mixarr3.forEach((data1: any) => {
+                let short = data1.replace(/:.*/, "");
+                let adrarr: any[] = [];
+                let full = data1.replace(/.*:/, "");
+                let full2 = full.replace(/ --.*/, "");
 
-            let addrs = data1.replace(/.* --/, "");
-            let addrs2 = addrs.replace(/.*--/, "");
+                let addrs = data1.replace(/.* --/, "");
+                let addrs2 = addrs.replace(/.*--/, "");
 
-            let addr = addrs2.replace(/ /g, "%20");
-            let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
-            let fx = that.getGeo(url);
-            Promise.all([fx]).then((j: any) => {
-                // console.log(j);
-                // let rest = await  that.getGeo(url);
-                let latlon = JSON.parse(JSON.stringify(j[0]));
-                let lati = latlon.lat;
-                let longi = latlon.lon;
-            // console.log(latlonarr2);
-                // this.getGeo(url).then((data4: any) => {
-                //  let latlon = JSON.parse(JSON.stringify(data4));
-                // let lati = latlon.lat;
-                // let longi = latlon.lon;
-                chunks.forEach((data2: any) => {
+                let addr = addrs2.replace(/ /g, "%20");
+                let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
+                let fx = that.getGeo(url);
+                Promise.all([fx]).then((j: any) => {
+                    // console.log(j);
+                    // let rest = await  that.getGeo(url);
+                    let latlon = JSON.parse(JSON.stringify(j[0]));
+                    let lati = latlon.lat;
+                    let longi = latlon.lon;
+                    // console.log(latlonarr2);
+                    // this.getGeo(url).then((data4: any) => {
+                    //  let latlon = JSON.parse(JSON.stringify(data4));
+                    // let lati = latlon.lat;
+                    // let longi = latlon.lon;
+                    chunks.forEach((data2: any) => {
 
-                    if (data2[0].indexOf(short) === 0) {
-                        let regex = /.*\//;
-                        let roomname = data2[0].replace(regex, "");
-                        let roomname2 = roomname.replace(/.*-/, "");
-                        let roomname3 = short + "_" + roomname2;
-                        let seats = data2[1].replace(/.*:/, "");
-                        let seats2 = Number(seats);
-                        let type = data2[3].replace(/.*:/, "");
-                        let furn = data2[2].replace(/.*:/, "");
-                        let href = data2[0].replace(/.*:/, "");
+                        if (data2[0].indexOf(short) === 0) {
+                            let regex = /.*\//;
+                            let roomname = data2[0].replace(regex, "");
+                            let roomname2 = roomname.replace(/.*-/, "");
+                            let roomname3 = short + "_" + roomname2;
+                            let seats = data2[1].replace(/.*:/, "");
+                            let seats2 = Number(seats);
+                            let type = data2[3].replace(/.*:/, "");
+                            let furn = data2[2].replace(/.*:/, "");
+                            let href = data2[0].replace(/.*:/, "");
 
-                        let obj = {
-                            rooms_fullname: full2,
-                            rooms_shortname: short,
-                            rooms_number: roomname2,
-                            rooms_name: roomname3,
-                            rooms_address: addrs2,
-                            rooms_lat: lati,
-                            rooms_lon: longi,
-                            rooms_seats: seats2,
-                            rooms_type: type,
-                            rooms_furniture: furn,
-                            rooms_href: href
-                        };
+                            let obj = {
+                                rooms_fullname: full2,
+                                rooms_shortname: short,
+                                rooms_number: roomname2,
+                                rooms_name: roomname3,
+                                rooms_address: addrs2,
+                                rooms_lat: lati,
+                                rooms_lon: longi,
+                                rooms_seats: seats2,
+                                rooms_type: type,
+                                rooms_furniture: furn,
+                                rooms_href: href
+                            };
 
-                        let roomsobj = JSON.parse(JSON.stringify(obj));
-                        // resul.push(roomsobj);
-                        that.roomsMap.get(id).push(roomsobj);
-                        // console.log(roomsobj);
-                        // that.latlonArray1.push(roomsobj);
-                        that.mydatasets.set(id, roomsobj);
-                    }
-                });
-                let toSaveOnDisk: object[] = that.roomsMap.get(id);
+                            let roomsobj = JSON.parse(JSON.stringify(obj));
+                            // resul.push(roomsobj);
+                            that.roomsMap.get(id).push(roomsobj);
+                            // console.log(roomsobj);
+                            // that.latlonArray1.push(roomsobj);
+                            that.mydatasets.set(id, roomsobj);
+                        }
+                    });
+                    let toSaveOnDisk: object[] = that.roomsMap.get(id);
                     // if (toSaveOnDisk.length === 0) {
                     //     that.coursesMap.delete(id);
                     //     return reject(new InsightError("No sections were added"));
                     // } else {
-                let str5 = "test";
-                fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
-                       // g
+                    let str5 = "test";
+                    fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
+                        // c
                     });
-                // return that.roomsMap;
-                // console.log(that.roomsMap);
+                    // return that.roomsMap;
+                    // console.log(that.roomsMap);
+                });
             });
-            });
-        // console.log(that.roomsMap);
-     /*   fs.readFile(path, function read(err, data) {
-            if (err) {
-                throw err;
-            }
-            let content = data;
-            console.log(content);
-        });*/
-        // console.log(latlonarr2);
-        // return latlonarr;
-        // let b = await that.roomsMap;
-        // console.log()
+            // console.log(that.roomsMap);
+            /*   fs.readFile(path, function read(err, data) {
+                   if (err) {
+                       throw err;
+                   }
+                   let content = data;
+                   console.log(content);
+               });*/
+            // console.log(latlonarr2);
+            // return latlonarr;
+            // let b = await that.roomsMap;
+            // console.log()
+            return resolve("whatevr");
+        });
     }
     // GET DATA FROM THE ROOMS FROM THE LINKS
     private getData(data: any, code: string) {
@@ -639,12 +646,24 @@ export default class InsightFacade implements IInsightFacade {
                         });
                         Promise.all(resultsaver).then(function () {
                             that.placeData(id, codearr);
+                            let toSaveOnDisk: object[] = that.roomsMap.get(id);
+                            // if (toSaveOnDisk.length === 0) {
+                            //     that.coursesMap.delete(id);
+                            //     return reject(new InsightError("No sections were added"));
+                            // } else {
+                            fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
+                                return reject(new InsightError("Error Saving Files " + e));
+                            });
+
+                            let result: string[] = [];
+                            that.roomsMap.forEach(function (value, key) {
+                                result.push(key);
+                            });
+                            return resolve(result);
+                            // }
                         });
                     }));
                 });
-                let path =  process.cwd() + "/data/roomstest.json";
-                let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
-                that.roomsMap.get(id).push(json);
             } else if (kind === InsightDatasetKind.Courses) {
                 // ---------------------------------
                 that.coursesMap.set(id, []);
