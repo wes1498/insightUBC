@@ -244,7 +244,7 @@ export default class InsightFacade implements IInsightFacade {
             let short = "";
             let full = "";
             let full2 = "";
-            console.log(mixarr3);
+            // console.log(mixarr3);
             mixarr3.forEach((data1: any) => {
                 // console.log(data1);
                 short = data1.replace(/:.*/, "");
