@@ -15,6 +15,8 @@ import {Decimal} from "decimal.js";
 import * as http from "http";
 
 const parse5 = require("parse5");
+const COURSES = InsightDatasetKind.Courses;
+const ROOMS = InsightDatasetKind.Rooms;
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -786,7 +788,7 @@ export default class InsightFacade implements IInsightFacade {
                 // let dataset = id === "courses" ? that.coursesMap.get(id) : that.roomsMap.get(id);
 
                 let result: any[];
-                if (id === "courses") {
+                if (id === COURSES) {
                     if (Object.keys(filter).length === 0) {
                         // console.log(that.coursesMap);
                         result = that.coursesMap.get(id);
@@ -809,7 +811,7 @@ export default class InsightFacade implements IInsightFacade {
                         }
                         dataset = thisResult; // 25 results
                     }
-                } else if (id === "rooms") {
+                } else if (id === ROOMS) {
                     // console.log(that.roomsMap.get(id));
                     if (Object.keys(filter).length === 0) {
                         result = that.roomsMap.get(id);
@@ -859,84 +861,160 @@ export default class InsightFacade implements IInsightFacade {
                         throw new InsightError("GROUP must be non-empty array");
                     }
 
-                    for (let values of dataset) {
-                        let groupingVal: string = "";
-                        for (let pair of transformations.GROUP) {
-                            if (!transformations.APPLY.includes(pair) &&
-                                !InsightFacade.validCourseKeyHelper(pair, id)) {
-                                throw new InsightError("invalid key in GROUP");
-                            }
-                            let key = pair.split("_")[1]; // key = title
-                            let value: string = values[key] as string; // grab value from values[title]
-
-                            if (values) {
-                                groupingVal += value; // "" + "Career Planning"
-                            } else {
-                                throw new InsightError("the pair was not a valid key");
-                            }
-                        }
-
-                        if (!groups.get(groupingVal)) {
-                            groups.set(groupingVal, []); // each grouptitle has its array of grouped items
-                        }
-                        groups.get(groupingVal).push(values); // push sections that group to Career Planning
-                    }
-                    for (let group of groups.values()) { // group {title(1): ___} of title(n)
-                        let entry: {[key: string]: any } = {}; // initialize {[key: stirng]: any}
-                        for (let pair of transformations.GROUP) {
-                            let key = pair.split("_")[1]; // title
-                            entry[key] = group[0][key]; // [title: Career Planning]
-                        }
-                        let applyKeys: string[] = []; // array for keys to apply token on
-                        for (let object of transformations.APPLY) { // object: overallAvg: {<key>:<token>}
-                            let applyKey = Object.keys(object)[0]; // applyKey = overallAvg
-                            if (!applyKey.includes("_")) {
-                                if (!applyKeys.includes(applyKey)) { // if token not in array
-                                    applyKeys.push(applyKey);
-                                } else {
-                                    throw new InsightError("Duplicated apply key not allowed");
+                    if (id === COURSES) {
+                        for (let values of dataset) {
+                            let groupingVal: string = "";
+                            for (let pair of transformations.GROUP) {
+                                if (!query.OPTIONS.COLUMNS.includes(pair) &&
+                                    !InsightFacade.validCourseKeyHelper(pair, id)) {
+                                    throw new InsightError("invalid key in GROUP");
                                 }
-                            } else {
-                                throw new InsightError("applyKey cannot contain underscore");
+                                let key = pair.split("_")[1]; // key = title
+                                let value: string = values[key] as string; // grab value from values[title]
+
+                                if (values) {
+                                    groupingVal += value; // "" + "Career Planning"
+                                } else {
+                                    throw new InsightError("the pair was not a valid key");
+                                }
                             }
-                            let applyToken = Object.keys(object[applyKey])[0]; // Key of overallAvg[applyKey] = "AVG"
-                            let pair = object[applyKey][applyToken]; // what token performs on: courses_avg
-                            let key = pair.split("_")[1]; // avg
-                            let setVal: any[] = [];
-                            for (let element of group) {
-                                setVal.push(element[key]); // setVal has courses_avg for each section { 90, 80, 70, etc}
+
+                            if (!groups.get(groupingVal)) {
+                                groups.set(groupingVal, []); // each grouptitle has its array of grouped items
                             }
-                            let value: number;
-                            if (applyToken === "MAX") {
-                                value = setVal[0];
-                                value = that.applyMaxHelper(value, setVal);
-                            } else if (applyToken === "MIN") {
-                                value = setVal[0];
-                                value = that.applyMinHelper(value, setVal);
-                            } else if (applyToken === "SUM") {
-                                let total = new Decimal(0);
-                                value = that.applySumHelper(total, setVal);
-                            } else if (applyToken === "AVG") {
-                                let sum = new Decimal(0);
-                                value = that.applyAverageHelper(sum, setVal);
-                            } else if (applyToken === "COUNT") {
-                                let unique = setVal.filter((values, index, self) => {
-                                    return self.indexOf(values) === index;
-                                });
-                                value = unique.length;
-                            } else {
-                                throw new InsightError("Token does not exist");
-                            }
-                            entry[applyKey] = value;
+                            groups.get(groupingVal).push(values); // push sections that group to Career Planning
                         }
-                        transformedDataset.push(entry);
+                        for (let group of groups.values()) { // group {title(1): ___} of title(n)
+                            let entry: {[key: string]: any } = {}; // initialize {[key: stirng]: any}
+                            for (let pair of transformations.GROUP) {
+                                let key = pair.split("_")[1]; // title
+                                entry[key] = group[0][key]; // [title: Career Planning]
+                            }
+                            let applyKeys: string[] = []; // array for keys to apply token on
+                            for (let object of transformations.APPLY) { // object: overallAvg: {<key>:<token>}
+                                let applyKey = Object.keys(object)[0]; // applyKey = overallAvg
+                                if (!applyKey.includes("_")) {
+                                    if (!applyKeys.includes(applyKey)) { // if token not in array
+                                        applyKeys.push(applyKey);
+                                    } else {
+                                        throw new InsightError("Duplicated apply key not allowed");
+                                    }
+                                } else {
+                                    throw new InsightError("applyKey cannot contain underscore");
+                                }
+                                let applyToken = Object.keys(object[applyKey])[0];
+                                let pair = object[applyKey][applyToken]; // what token performs on: courses_avg
+                                let key = pair.split("_")[1]; // avg
+                                let setVal: any[] = [];
+                                for (let element of group) {
+                                    setVal.push(element[key]); // setVal has courses_avg for each section
+                                }
+                                let value: number;
+                                if (applyToken === "MAX") {
+                                    value = setVal[0];
+                                    value = that.applyMaxHelper(value, setVal);
+                                } else if (applyToken === "MIN") {
+                                    value = setVal[0];
+                                    value = that.applyMinHelper(value, setVal);
+                                } else if (applyToken === "SUM") {
+                                    let total = new Decimal(0);
+                                    value = that.applySumHelper(total, setVal);
+                                } else if (applyToken === "AVG") {
+                                    let sum = new Decimal(0);
+                                    value = that.applyAverageHelper(sum, setVal);
+                                } else if (applyToken === "COUNT") {
+                                    let unique = setVal.filter((values, index, self) => {
+                                        return self.indexOf(values) === index;
+                                    });
+                                    value = unique.length;
+                                } else {
+                                    throw new InsightError("Token does not exist");
+                                }
+                                entry[applyKey] = value;
+                            }
+                            transformedDataset.push(entry);
+                        }
+                    } else if (id === ROOMS) {
+                        for (let values of dataset) {
+                            let groupingVal: string = "";
+                            for (let pair of transformations.GROUP) {
+                                if (!query.OPTIONS.COLUMNS.includes(pair) &&
+                                    !InsightFacade.validCourseKeyHelper(pair, id)) {
+                                    throw new InsightError("invalid key in GROUP");
+                                }
+                                // let key = pair.split("_")[1]; // key = title
+                                let value: string = values[pair] as string; // grab value from values[title]
+
+                                if (values) {
+                                    groupingVal += value; // "" + "Career Planning"
+                                } else {
+                                    throw new InsightError("the pair was not a valid key");
+                                }
+                            }
+
+                            if (!groups.get(groupingVal)) {
+                                groups.set(groupingVal, []); // each grouptitle has its array of grouped items
+                            }
+                            groups.get(groupingVal).push(values); // push sections that group to Career Planning
+                        }
+                        for (let group of groups.values()) { // group {title(1): ___} of title(n)
+                            let entry: {[key: string]: any } = {}; // initialize {[key: stirng]: any}
+                            for (let pair of transformations.GROUP) {
+                                // let key = pair.split("_")[1]; // title
+                                entry[pair] = group[0][pair]; // [title: Career Planning]
+                            }
+                            let applyKeys: string[] = []; // array for keys to apply token on
+                            for (let object of transformations.APPLY) { // object: overallAvg: {<key>:<token>}
+                                let applyKey = Object.keys(object)[0]; // applyKey = overallAvg
+                                if (!applyKey.includes("_")) {
+                                    if (!applyKeys.includes(applyKey)) { // if token not in array
+                                        applyKeys.push(applyKey);
+                                    } else {
+                                        throw new InsightError("Duplicated apply key not allowed");
+                                    }
+                                } else {
+                                    throw new InsightError("applyKey cannot contain underscore");
+                                }
+                                let applyToken = Object.keys(object[applyKey])[0]; // Key of overallAvg[applyKey]
+                                let pair = object[applyKey][applyToken]; // what token performs on: courses_avg
+                                // let key = pair.split("_")[1]; // avg
+                                let setVal: any[] = [];
+                                for (let element of group) {
+                                    setVal.push(element[pair]); // setVal has courses_avg for each section { 90, 80, 70
+                                }
+                                let value: number;
+                                if (applyToken === "MAX") {
+                                    value = setVal[0];
+                                    value = that.applyMaxHelper(value, setVal);
+                                } else if (applyToken === "MIN") {
+                                    value = setVal[0];
+                                    value = that.applyMinHelper(value, setVal);
+                                } else if (applyToken === "SUM") {
+                                    let total = new Decimal(0);
+                                    value = that.applySumHelper(total, setVal);
+                                } else if (applyToken === "AVG") {
+                                    let sum = new Decimal(0);
+                                    value = that.applyAverageHelper(sum, setVal);
+                                } else if (applyToken === "COUNT") {
+                                    let unique = setVal.filter((values, index, self) => {
+                                        return self.indexOf(values) === index;
+                                    });
+                                    value = unique.length;
+                                } else {
+                                    throw new InsightError("Token does not exist");
+                                }
+                                entry[applyKey] = value;
+                            }
+                            transformedDataset.push(entry);
+                        }
                     }
+
                     dataset = transformedDataset;
                 }
                 // keep only the desired columns in query
                 if (columns && columns.length !== 0) {
                     let columnResult: object[] = [];
-                    if (id === "courses") {
+                    if (id === COURSES) {
                         dataset.forEach(function (section: any) {
                             let columnSection: any = {};
                             columns.forEach(function (key: any) {
@@ -979,7 +1057,7 @@ export default class InsightFacade implements IInsightFacade {
                             columnResult.push(columnSection);
                         });
                         result = columnResult;
-                    } else if (id === "rooms") {
+                    } else if (id === ROOMS) {
                         dataset.forEach(function (room: any) {
                             let columnRoom: any = {};
                             columns.forEach(function (key: any) {
@@ -1147,7 +1225,7 @@ export default class InsightFacade implements IInsightFacade {
 
     private static validRoomsKeyHelper(key: string, id: string): boolean {
         // check if the key being passed is a valid one
-        if (id === "courses") {
+        if (id === COURSES) {
             throw new InsightError("cannot query courses as rooms");
         }
         switch (key) {
@@ -1180,7 +1258,7 @@ export default class InsightFacade implements IInsightFacade {
 
     private static validCourseKeyHelper(key: string, id: string): boolean {
         // check if the key being passed is a valid one
-        if (id === "rooms") {
+        if (id === ROOMS) {
             throw new InsightError("cannot query rooms as courses");
         }
         switch (key) {
