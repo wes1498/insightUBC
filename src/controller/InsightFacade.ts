@@ -755,7 +755,7 @@ export default class InsightFacade implements IInsightFacade {
                 // let dataset = id === "courses" ? that.coursesMap.get(id) : that.roomsMap.get(id);
 
                 let result: any[];
-                if (that.coursesMap.get(id)) {
+                if (id === "courses") {
                     if (Object.keys(filter).length === 0) {
                         // console.log(that.coursesMap);
                         result = that.coursesMap.get(id);
@@ -905,48 +905,95 @@ export default class InsightFacade implements IInsightFacade {
                 // keep only the desired columns in query
                 if (columns && columns.length !== 0) {
                     let columnResult: object[] = [];
-                    dataset.forEach(function (section: any) {
-                        let columnSection: any = {};
-                        columns.forEach(function (key: any) {
-                            let cols;
-                            if (query.TRANSFORMATIONS !== undefined) {
-                                if (key.includes("_")) {
-                                    if (query.TRANSFORMATIONS.GROUP !== undefined) {
-                                        for (let b of query.TRANSFORMATIONS.GROUP) { // group has an array of keys
-                                            if (b === key) {
-                                                cols = key.split("_")[1]; // cols = title
+                    if (id === "courses") {
+                        dataset.forEach(function (section: any) {
+                            let columnSection: any = {};
+                            columns.forEach(function (key: any) {
+                                let cols;
+                                if (query.TRANSFORMATIONS !== undefined) {
+                                    if (key.includes("_")) {
+                                        if (query.TRANSFORMATIONS.GROUP !== undefined) {
+                                            for (let b of query.TRANSFORMATIONS.GROUP) { // group has an array of keys
+                                                if (b === key) {
+                                                    cols = key.split("_")[1]; // cols = title
+                                                    break;
+                                                }
+                                            }
+                                            if (cols === undefined) {
+                                                throw  new InsightError("Columns didnt map to any GROUP key");
+                                            }
+                                        }
+                                    } else if (query.TRANSFORMATIONS.APPLY !== undefined) {
+                                        for (let a of query.TRANSFORMATIONS.APPLY) { // apply has an array of keys
+                                            if (Object.keys(a)[0] === key) {
+                                                cols = key;
                                                 break;
                                             }
                                         }
-                                        if (cols === undefined) {
-                                            throw  new InsightError("Columns didnt map to any GROUP key");
+                                        if (cols !== key) {
+                                            throw  new InsightError("Columns didnt map to any apply key");
                                         }
-                                    }
-                                } else if (query.TRANSFORMATIONS.APPLY !== undefined) {
-                                    for (let a of query.TRANSFORMATIONS.APPLY) { // apply has an array of keys
-                                        if (Object.keys(a)[0] === key) {
-                                            cols = key;
-                                            break;
-                                        }
-                                    }
-                                    if (cols !== key) {
-                                        throw  new InsightError("Columns didnt map to any apply key");
+                                    } else {
+                                        throw new InsightError("Columns key not in apply");
                                     }
                                 } else {
-                                    throw new InsightError("Columns key not in apply");
+                                    if (key.includes("_")) {
+                                        cols = key.split("_")[1];
+                                    } else {
+                                        cols = key;
+                                    }
                                 }
-                            } else {
-                                if (key.includes("_")) {
-                                    cols = key.split("_")[1];
-                                } else {
-                                    cols = key;
-                                }
-                            }
-                            columnSection[key] = section[cols];
+                                columnSection[key] = section[cols];
+                            });
+                            columnResult.push(columnSection);
                         });
-                        columnResult.push(columnSection);
-                    });
-                    result = columnResult;
+                        result = columnResult;
+                    } else if (id === "rooms") {
+                        dataset.forEach(function (room: any) {
+                            let columnRoom: any = {};
+                            columns.forEach(function (key: any) {
+                                let cols;
+                                if (query.TRANSFORMATIONS !== undefined) {
+                                    if (key.includes("_")) {
+                                        if (query.TRANSFORMATIONS.GROUP !== undefined) {
+                                            for (let b of query.TRANSFORMATIONS.GROUP) { // group has an array of keys
+                                                if (b === key) {
+                                                    // cols = key.split("_")[1]; // cols = title
+                                                    cols = key;
+                                                    break;
+                                                }
+                                            }
+                                            if (cols === undefined) {
+                                                throw  new InsightError("Columns didnt map to any GROUP key");
+                                            }
+                                        }
+                                    } else if (query.TRANSFORMATIONS.APPLY !== undefined) {
+                                        for (let a of query.TRANSFORMATIONS.APPLY) { // apply has an array of keys
+                                            if (Object.keys(a)[0] === key) {
+                                                cols = key;
+                                                break;
+                                            }
+                                        }
+                                        if (cols !== key) {
+                                            throw  new InsightError("Columns didnt map to any apply key");
+                                        }
+                                    } else {
+                                        throw new InsightError("Columns key not in apply");
+                                    }
+                                } else {
+                                    if (key.includes("_")) {
+                                        // cols = key.split("_")[1];
+                                        cols = key;
+                                    } else {
+                                        throw new InsightError("Incorrect KEY format");
+                                    }
+                                }
+                                columnRoom[key] = room[cols];
+                            });
+                            columnResult.push(columnRoom);
+                        });
+                        result = columnResult;
+                    }
                 }
 
                 if (order !== undefined && order !== null) {
