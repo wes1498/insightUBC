@@ -205,7 +205,7 @@ export default class InsightFacade implements IInsightFacade {
                 result.on("data", (chunk) => {
                     body += chunk;
                 }).on("error", (err) => {
-                    return reject(err);
+                    return reject("GEO ERROR: " + err);
                 });
                 result.on("end", () => {
                     let resultVal: IGeoResponse = JSON.parse(body);
@@ -542,7 +542,7 @@ export default class InsightFacade implements IInsightFacade {
             if (typeof id !== "string" || typeof content !== "string" || kind === undefined || kind === null) {
                 reject(new InsightError("Invalid params"));
             }
-            if (that.coursesMap.has(id)) {
+            if (that.coursesMap.has(id) || that.roomsMap.has(id)) {
                 return reject(new InsightError("Id is already added"));
             }
             if (!id || id.length === 0 || id === "") {
@@ -552,9 +552,7 @@ export default class InsightFacade implements IInsightFacade {
             if (kind === InsightDatasetKind.Rooms) {
                 that.roomsMap.set(id, []);
                 JSZip.loadAsync(content, {base64: true}).then(async (zipRooms: JSZip) => {
-                    // promises.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
                         let promiseRooms = await zipRooms.file("index.htm").async("text");
-                        // console.log(promiseRooms);
                         that.addRoomLinks(promiseRooms, id);
                         let resultSaver: any[] = [];
                         let shortCodeArray: any[] = [];
@@ -566,19 +564,14 @@ export default class InsightFacade implements IInsightFacade {
                             resultSaver.push(zipRooms.file(subs).async("text").then((datax: any) => {
                                 that.addRooms(datax, code, shortCodeArray, id);
                                 // that.placeData(id, shortCodeArray);
+                            }).catch((e) => {
+                                return reject(new InsightError("Error in adding roomsdataset " + e));
                             }));
                         });
-                        // console.log(that.roomsMap);
-                        // console.log(resultSaver);
                         Promise.all(resultSaver).then( async (t: any) => {
                             let res = await that.placeData(id, shortCodeArray);
-                            // console.log("new -------------------------------------------");
-                            // console.log(res);
                             res.forEach((x: any) => {
-                               // that.roomsMap.get(id).push(x[0]);
-                               // that.roomsMap.get(id).push(JSON.stringify(x));
                                 x.forEach((y: any) => {
-                                    // console.log(y);
                                     that.roomsMap.get(id).push(y);
                                 });
                            });
@@ -588,33 +581,16 @@ export default class InsightFacade implements IInsightFacade {
                             fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
                                     return reject(new InsightError("Error Saving Files " + e));
                                 });
-                                /*  let path = process.cwd() + "/data/rooms.json";
-                                  let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
-                                  that.roomsMap.get(id).push(json);*/
                             let result: string[] = [];
                             that.roomsMap.forEach(function (value, key) {
                                 // console.log(key);
                                 result.push(key);
                             });
-                            // console.log(that.roomsMap);
-                            // console.log(result);
                             return resolve(result);
-                       /*     let toSaveOnDisk: object[] = that.roomsMap.get(id);
-                            fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
-                                return reject(new InsightError("Error Saving Files " + e));
-                            });
-                          /!*  let path = process.cwd() + "/data/rooms.json";
-                            let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
-                            that.roomsMap.get(id).push(json);*!/
-
-                            let result: string[] = [];
-                            that.roomsMap.forEach(function (value, key) {
-                                result.push(key);
-                            });
-                            return resolve(result);*/
-                            // }
                         });
                    // }));
+                }).catch((e) => {
+                    return reject(new InsightError("Error decoding contents of rooms: Invalid Zip " + e));
                 });
             } else if (kind === InsightDatasetKind.Courses) {
                 // ---------------------------------
@@ -674,7 +650,7 @@ export default class InsightFacade implements IInsightFacade {
                                     // not in JSON format or some fields of different type/missing-> skip this course
                                 }
                             }).catch((e) => {
-                                return reject(new InsightError("Error in adding dataset " + e));
+                                return reject(new InsightError("Error in adding coursesdataset " + e));
                             }));
                         }));
                     } else {
@@ -698,7 +674,7 @@ export default class InsightFacade implements IInsightFacade {
                         // }
                     });
                 }).catch((e) => {
-                    return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
+                    return reject(new InsightError("Error decoding contents of courses: Invalid Zip " + e));
                 });
             }
             // rooms map is added here ------------------------
@@ -712,19 +688,40 @@ export default class InsightFacade implements IInsightFacade {
                 return reject(new NotFoundError("Invalid ID"));
             } else if (id === null || !id) {
                 return reject(new InsightError("Invalid ID"));
-            } else if (!that.coursesMap.has(id)) {
-                return reject(new NotFoundError("Id not in Map"));
+            } else if (id === "rooms") {
+                if ((!that.roomsMap.has(id))) {
+                    return reject(new NotFoundError("Id not in Map"));
+                }
+            } else if (id === "courses") {
+                if (!that.coursesMap.has(id)) {
+                    return reject(new NotFoundError("Id not in Map"));
+                }
             }
-            if (that.coursesMap.has(id)) {
+            if (that.roomsMap.has(id)) {
+                that.roomsMap.delete(id);
+                // console.log(InsightDatasetKind.Rooms.toString());
+             /*   fs.readdir(InsightDatasetKind.Courses.toString(), function (e, files) {
+                    if (e) {
+                        return reject(new InsightError("Dataset not added yet " + e));
+                    }*/
+                return resolve(id);
+               // });
+            } else if (that.coursesMap.has(id)) {
+                that.coursesMap.delete(id);
                 fs.readdir(InsightDatasetKind.Courses.toString(), function (e, files) {
                     if (e) {
                         return reject(new InsightError("Dataset not added yet " + e));
                     }
+                    return resolve (id);
                 });
             }
-
-            that.coursesMap.delete(id);
-            return resolve (id);
+      /*      if (id === "courses") {
+                that.coursesMap.delete(id);
+                return resolve (id);
+            } else {
+                that.roomsMap.delete(id);
+                return resolve(id);
+            }*/
         });
     }
     public performQuery(query: any): Promise<any[]> {
