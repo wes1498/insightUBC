@@ -1,0 +1,22 @@
+{
+    "title": "ORDER BY invalid key",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+            ],
+            "ORDER":"invalid"}
+
+    },
+    "isQueryValid": false,
+    "result": "Order by invalid key"
+}

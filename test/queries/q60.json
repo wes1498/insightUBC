@@ -1,0 +1,20 @@
+{
+    "title": "Q59 NOT WITH MCOMPARISON:GT",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "GT": {
+                    "courses_avg": 1
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_id":"202"},{"courses_id":"100"},{"courses_id":"100"},{"courses_id":"475"}]
+}
+

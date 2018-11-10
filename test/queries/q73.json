@@ -1,0 +1,25 @@
+{
+    "title": "Q73 IS WITH INVALID KEY",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {"sdsds": "100"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q73 IS WITH INVALID KEY"
+
+}

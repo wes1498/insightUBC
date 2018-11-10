@@ -1,0 +1,18 @@
+{
+    "title": "Order column is not in options",
+    "query": {
+        "WHERE": {
+            "LT": {
+                "courses_avg": 90
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept"
+            ]
+        },
+        "ORDER": "courses_id"
+    },
+    "isQueryValid": false,
+    "result": "Order Column Not in Options"
+}

@@ -1,0 +1,26 @@
+{
+    "title": "GROUP BY invalid key, APPLY none",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "courses_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title",
+                "courses_ssss"
+            ],
+            "APPLY": [
+
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Invalid key courses_ssss"
+}

@@ -1,0 +1,128 @@
+{
+    "title": "Q78 OR WITH MCMPARATOR",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "GT": {
+                        "courses_avg": 99
+                    }
+                },
+                {
+                    "LT": {
+                        "courses_avg": 1
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_avg": 67
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {
+            "courses_id": "351"
+        },
+        {
+            "courses_id": "351"
+        },
+        {
+            "courses_id": "351"
+        },
+        {
+            "courses_id": "351"
+        },
+        {
+            "courses_id": "441"
+        },
+        {
+            "courses_id": "441"
+        },
+        {
+            "courses_id": "451"
+        },
+        {
+            "courses_id": "311"
+        },
+        {
+            "courses_id": "311"
+        },
+        {
+            "courses_id": "574"
+        },
+        {
+            "courses_id": "200"
+        },
+        {
+            "courses_id": "227"
+        },
+        {
+            "courses_id": "321"
+        },
+        {
+            "courses_id": "430"
+        },
+        {
+            "courses_id": "430"
+        },
+        {
+            "courses_id": "202"
+        },
+        {
+            "courses_id": "270"
+        },
+        {
+            "courses_id": "202"
+        },
+        {
+            "courses_id": "100"
+        },
+        {
+            "courses_id": "100"
+        },
+        {
+            "courses_id": "100"
+        },
+        {
+            "courses_id": "527"
+        },
+        {
+            "courses_id": "527"
+        },
+        {
+            "courses_id": "170"
+        },
+        {
+            "courses_id": "310"
+        },
+        {
+            "courses_id": "310"
+        },
+        {
+            "courses_id": "320"
+        },
+        {
+            "courses_id": "222"
+        },
+        {
+            "courses_id": "222"
+        },
+        {
+            "courses_id": "113"
+        },
+        {
+            "courses_id": "536"
+        },
+        {
+            "courses_id": "536"
+        }
+    ]
+}

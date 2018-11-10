@@ -1,0 +1,36 @@
+{
+    "title": "Q112 IS with {}",
+    "query": {
+        "WHERE": {
+            "IS": {}
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q112 IS with {}"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

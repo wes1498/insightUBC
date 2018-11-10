@@ -1,0 +1,23 @@
+{
+    "title": "TRANSFORMATIONS missing APPLY",
+    "query":{
+        "WHERE": {
+            "IS": {
+                "courses_instructor": "kiczales, gregor"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ]
+        }
+    },
+    "isQueryValid":false,
+    "result": "TRANSFORMATIONS missing APPLY"
+
+}

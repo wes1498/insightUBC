@@ -1,0 +1,23 @@
+{
+    "title": "Q52 OPTIONS MISSPELLED",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
+                }
+            }
+        },
+        "OPTION": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+            ],
+            "ORDER":"courses_avg"}
+
+    },
+    "isQueryValid": false,
+    "result": "Q52 OPTIONS MISSPELLED"
+
+}

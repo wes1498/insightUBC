@@ -1,0 +1,25 @@
+{
+    "title": "GROUP BY title, APPLY none",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "courses_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY": [
+
+            ]
+        }
+    },
+    "isQueryValid":true,
+    "result":[{"courses_title":"dev wkshp/sem"},{"courses_title":"eng mtls lab"},{"courses_title":"aud&non-txt arch"},{"courses_title":"audi prctcm iv"},{"courses_title":"med tech project"},{"courses_title":"thermodynamics"},{"courses_title":"math operations"},{"courses_title":"dynam struct 2"},{"courses_title":"schl counselling"},{"courses_title":"counsl adolescnt"},{"courses_title":"career planning"},{"courses_title":"prgm devl cnsl"},{"courses_title":""},{"courses_title":"prep writ career"},{"courses_title":"thesis"},{"courses_title":"ds tec ii sc c&p"},{"courses_title":"fn & educ change"},{"courses_title":"adlt edu pract"},{"courses_title":"res mthd in educ"},{"courses_title":"multimedia sys"},{"courses_title":"tch'g hghly able"},{"courses_title":"intro excp child"},{"courses_title":"tchg st visl imp"},{"courses_title":"ed prg hghly abl"},{"courses_title":"augmt&alt comm"},{"courses_title":"tech for vis imp"},{"courses_title":"assess lrn diffi"},{"courses_title":"classroom mgmt"},{"courses_title":"surv bhvr dis ch"},{"courses_title":"educ stds autism"},{"courses_title":"intr stat rs edu"},{"courses_title":"hn dev: inf-adlt"},{"courses_title":"able&creatv lrnr"},{"courses_title":"dev el sk df&hrd"},{"courses_title":"cur dev e df&hrd"},{"courses_title":"specific lrn dis"},{"courses_title":"basic princ meas"},{"courses_title":"acad assess schl"},{"courses_title":"sem in autism"},{"courses_title":"thy cognt assess"},{"courses_title":"dev neuropsych"},{"courses_title":"exp des anl ed"},{"courses_title":"cor des ed res"},{"courses_title":"coll&uni teachng"},{"courses_title":"indig, tech&ed"},{"courses_title":"curric issu"},{"courses_title":"tech math sci"},{"courses_title":"mo pict prod i"},{"courses_title":"ds intl forstry"},{"courses_title":"islnd wild mgmt"},{"courses_title":"kin project"},{"courses_title":"phyl asp phy act"},{"courses_title":"acad libraries"},{"courses_title":"algebra ii"},{"courses_title":"functional analy"},{"courses_title":"prt diff equa i"},{"courses_title":"diff geometry i"},{"courses_title":"algb topology i"},{"courses_title":"algb geometry i"},{"courses_title":"lie theory i"},{"courses_title":"harmonic anal i"},{"courses_title":"probability ii"},{"courses_title":"msc major essay"},{"courses_title":"cnsl mat cr prov"},{"courses_title":"seminar"},{"courses_title":"mgmt sc meth"},{"courses_title":"hydrmtllgcl rctr"},{"courses_title":"orch repertoire"},{"courses_title":"ubc chamb string"},{"courses_title":"cl pro prim care"},{"courses_title":"fam nrs pract"},{"courses_title":"eth&profl issues"},{"courses_title":"ms thesis"},{"courses_title":"admn of injectns"},{"courses_title":"log & crit think"},{"courses_title":"clin make iv"},{"courses_title":"quant fld theory"},{"courses_title":"nat resrce mngmt"},{"courses_title":"health psych"},{"courses_title":"eth & prof clin"},{"courses_title":"intro psychthrpy"},{"courses_title":"masters thesis"},{"courses_title":"social analysis"},{"courses_title":"hlth & soc care"},{"courses_title":"sociocult determ"},{"courses_title":"work int health"},{"courses_title":"an meth epid res"},{"courses_title":"survlnc&monitrng"},{"courses_title":"math mdl com dis"},{"courses_title":"com hlth prom"},{"courses_title":"scenery prod i"}]
+}

@@ -1,0 +1,19 @@
+{
+    "title": "Q56 EMPTY COLUMN",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+            ]}
+
+    },
+    "isQueryValid": false,
+    "result": "Q56 EMPTY COLUMN"
+
+}

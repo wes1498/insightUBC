@@ -1,0 +1,20 @@
+{
+    "title": "Q58 GT LT EXCLUDE ALL RESULTS: AVG < 70 && AVG >69",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {"GT": {"courses_avg": 70}}
+            ,
+                {"LT": {"courses_avg": 70}}
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]}
+
+    },
+    "isQueryValid": true,
+    "result":[]
+
+}

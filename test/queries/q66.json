@@ -1,0 +1,25 @@
+{
+    "title": "Q66 IS WITH AVG",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {"courses_avg": 98}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 85
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q66 IS WITH AVG"
+
+}

@@ -1,0 +1,23 @@
+{
+    "title": "Q50 FILTER INVALID COMPARATOR NAME",
+    "query": {
+        "WHERE": {
+            "NO": {
+                "LT": {
+                    "courses_audit": 20
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+            ],
+            "ORDER":"courses_avg"}
+
+    },
+    "isQueryValid": false,
+    "result": "Q50 FILTER INVALID COMPARATOR NAME"
+
+}

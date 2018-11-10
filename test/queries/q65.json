@@ -1,0 +1,25 @@
+{
+    "title": "Q65 IS WITH ID",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {"courses_id": "213"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 85
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_id":"213"},{"courses_id":"213"},{"courses_id":"213"}]
+
+}

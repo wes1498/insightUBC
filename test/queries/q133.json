@@ -1,0 +1,26 @@
+{
+    "title": "1234*",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_uuid": "1234*"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": true,
+     "result":[{"courses_dept":"japn","courses_avg":66.64,"courses_id":"301","courses_instructor":"","courses_title":"adv read&writ ii","courses_pass":21,"courses_fail":1,"courses_audit":0,"courses_uuid":"12340"},{"courses_dept":"japn","courses_avg":70.56,"courses_id":"302","courses_instructor":"koizumi, keiko","courses_title":"adv conv&comp i","courses_pass":18,"courses_fail":0,"courses_audit":0,"courses_uuid":"12341"},{"courses_dept":"japn","courses_avg":70.56,"courses_id":"302","courses_instructor":"","courses_title":"adv conv&comp i","courses_pass":18,"courses_fail":0,"courses_audit":0,"courses_uuid":"12342"},{"courses_dept":"japn","courses_avg":72.85,"courses_id":"303","courses_instructor":"koizumi, keiko","courses_title":"adv conv&comp ii","courses_pass":13,"courses_fail":0,"courses_audit":0,"courses_uuid":"12343"},{"courses_dept":"japn","courses_avg":72.85,"courses_id":"303","courses_instructor":"","courses_title":"adv conv&comp ii","courses_pass":13,"courses_fail":0,"courses_audit":0,"courses_uuid":"12344"},{"courses_dept":"japn","courses_avg":79.83,"courses_id":"311","courses_instructor":"mostow, joshua scott","courses_title":"class japn i (a)","courses_pass":17,"courses_fail":1,"courses_audit":0,"courses_uuid":"12345"},{"courses_dept":"japn","courses_avg":79.83,"courses_id":"311","courses_instructor":"","courses_title":"class japn i (a)","courses_pass":17,"courses_fail":1,"courses_audit":0,"courses_uuid":"12346"},{"courses_dept":"japn","courses_avg":73.54,"courses_id":"314","courses_instructor":"tsuda, asami","courses_title":"japn prof life i","courses_pass":13,"courses_fail":0,"courses_audit":0,"courses_uuid":"12347"},{"courses_dept":"japn","courses_avg":73.54,"courses_id":"314","courses_instructor":"","courses_title":"japn prof life i","courses_pass":13,"courses_fail":0,"courses_audit":0,"courses_uuid":"12348"},{"courses_dept":"japn","courses_avg":76.5,"courses_id":"315","courses_instructor":"tsuda, asami","courses_title":"japn prof lif ii","courses_pass":6,"courses_fail":0,"courses_audit":0,"courses_uuid":"12349"}]
+
+}

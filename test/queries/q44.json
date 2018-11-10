@@ -1,0 +1,18 @@
+{
+    "title": "FILTER -> SCOMPARISON:IS",
+    "query": {
+        "WHERE": {
+            "IS": {"courses_uuid": "50"}
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"japn","courses_avg":73.36,"courses_id":"101"}]
+}

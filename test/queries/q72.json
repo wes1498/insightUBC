@@ -1,0 +1,24 @@
+{
+    "title": "Q72 IS WITH UUID",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {"courses_uuid": "100"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_id":"302"}]
+}

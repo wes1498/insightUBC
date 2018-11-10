@@ -1,0 +1,54 @@
+{
+    "title": "Ordered by pass",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "LT": {
+                        "courses_avg": 90
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 65
+                    }
+                },
+                {
+                    "OR": [
+                        {
+                            "IS": {
+                                "courses_dept": "comm"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept": "cpsc"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "courses_pass": 100
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ],
+            "ORDER": "courses_pass"
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"comm","courses_avg":70.27,"courses_id":"393","courses_instructor":"mcintosh, ellen jane","courses_title":"commercial law","courses_pass":100,"courses_fail":2,"courses_audit":0,"courses_uuid":"918"},{"courses_dept":"comm","courses_avg":70.76,"courses_id":"101","courses_instructor":"cubbon, paul;kroeker, jeff","courses_title":"busn fundamental","courses_pass":100,"courses_fail":3,"courses_audit":0,"courses_uuid":"43893"},{"courses_dept":"comm","courses_avg":72.06,"courses_id":"298","courses_instructor":"freedman, ruth","courses_title":"intro to finance","courses_pass":100,"courses_fail":5,"courses_audit":0,"courses_uuid":"43967"},{"courses_dept":"comm","courses_avg":75.2,"courses_id":"298","courses_instructor":"graham, brian","courses_title":"intro to finance","courses_pass":100,"courses_fail":2,"courses_audit":0,"courses_uuid":"71242"},{"courses_dept":"comm","courses_avg":83.52,"courses_id":"298","courses_instructor":"zeng, lulu","courses_title":"intro to finance","courses_pass":100,"courses_fail":1,"courses_audit":0,"courses_uuid":"83678"},{"courses_dept":"comm","courses_avg":81.33,"courses_id":"298","courses_instructor":"zeng, lulu","courses_title":"intro to finance","courses_pass":100,"courses_fail":2,"courses_audit":0,"courses_uuid":"83679"},{"courses_dept":"comm","courses_avg":75.93,"courses_id":"298","courses_instructor":"kullmann, cornelia","courses_title":"intro to finance","courses_pass":100,"courses_fail":4,"courses_audit":0,"courses_uuid":"43965"},{"courses_dept":"comm","courses_avg":71.61,"courses_id":"393","courses_instructor":"mcintosh, ellen jane","courses_title":"commercial law","courses_pass":100,"courses_fail":2,"courses_audit":0,"courses_uuid":"71365"},{"courses_dept":"cpsc","courses_avg":73.83,"courses_id":"110","courses_instructor":"little, james joseph","courses_title":"comptn, progrmng","courses_pass":100,"courses_fail":15,"courses_audit":0,"courses_uuid":"49853"},{"courses_dept":"cpsc","courses_avg":74.97,"courses_id":"213","courses_instructor":"feeley, michael","courses_title":"intro comp sys","courses_pass":100,"courses_fail":3,"courses_audit":0,"courses_uuid":"1272"},{"courses_dept":"cpsc","courses_avg":70.92,"courses_id":"313","courses_instructor":"belleville, patrice","courses_title":"comp hard&os","courses_pass":100,"courses_fail":6,"courses_audit":0,"courses_uuid":"83439"},{"courses_dept":"cpsc","courses_avg":71.66,"courses_id":"317","courses_instructor":"","courses_title":"internet comp","courses_pass":100,"courses_fail":6,"courses_audit":0,"courses_uuid":"46709"}]
+}

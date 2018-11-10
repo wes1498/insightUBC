@@ -1,0 +1,32 @@
+{
+    "title": "Q130 c*c asteriks between",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": "c*c"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q130 c*c asteriks between"
+}
+
+
+
+
+
+
+

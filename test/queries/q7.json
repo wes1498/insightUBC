@@ -1,0 +1,19 @@
+{
+    "title": "Search for kiczales, gregor",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_instructor": "kiczales, gregor"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_dept"
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"cpsc","courses_avg":77.69},{"courses_dept":"cpsc","courses_avg":71.07},{"courses_dept":"cpsc","courses_avg":85.11},{"courses_dept":"cpsc","courses_avg":77.43},{"courses_dept":"cpsc","courses_avg":71.4},{"courses_dept":"cpsc","courses_avg":72.58},{"courses_dept":"cpsc","courses_avg":70.11},{"courses_dept":"cpsc","courses_avg":73.13},{"courses_dept":"cpsc","courses_avg":73.53},{"courses_dept":"cpsc","courses_avg":70.78},{"courses_dept":"cpsc","courses_avg":84.91},{"courses_dept":"cpsc","courses_avg":77.11},{"courses_dept":"cpsc","courses_avg":70.75},{"courses_dept":"cpsc","courses_avg":76.98},{"courses_dept":"cpsc","courses_avg":74.24}]
+}

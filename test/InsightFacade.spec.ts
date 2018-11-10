@@ -35,6 +35,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         coursesBroken: "./test/data/courses_broken.zip",
         coursesTwo: "./test/data/courses_two.zip",
         coursesDouble: "./test/data/courses_double.zip",
+        rooms:  "./test/data/rooms.zip",
     };
     let insightFacade: InsightFacade;
     let datasets: { [id: string]: string };
@@ -76,7 +77,42 @@ describe("InsightFacade Add/Remove Dataset", function () {
     afterEach(function () {
         Log.test(`AfterTest: ${this.currentTest.title}`);
     });
-  /*  it("Should list 0 datasets before add uno", async () => {
+    it("Should add rooms", async () => {
+        const id: string = "rooms";
+        let response: string[];
+
+        try {
+            response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.deep.equal([id]);
+        }
+    });
+    // it("Should remove rooms dataset", async () => {
+    //     const id: string = "rooms";
+    //     let response: string;
+    //     try {
+    //         response = await insightFacade.removeDataset(id);
+    //     } catch (err) {
+    //         response = err;
+    //     } finally {
+    //         expect(response).to.equal(id);
+    //     }
+    // });
+    // it("Should add rooms 2", async () => {
+    //     const id: string = "rooms";
+    //     let response: string[];
+    //
+    //     try {
+    //         response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms);
+    //     } catch (err) {
+    //         response = err;
+    //     } finally {
+    //         expect(response).to.deep.equal([id]);
+    //     }
+    // });
+    it("Should list 0 datasets before add uno", async () => {
         let response: InsightDataset[];
 
         try {
@@ -85,7 +121,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail("Should not fail");
         }
         expect(response).to.have.lengthOf(0);
-    });*/
+    });
     it("Should add a valid dataset", async () => {
         const id: string = "courses";
         let response: string[];
@@ -172,7 +208,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             expect.fail("Should not fail");
         }
-        expect(response).to.have.lengthOf(1);
+        expect(response).to.have.lengthOf(2);
     });
     it("Should add a valid dataset dos tres", async () => {
         const id: string = "courses";
@@ -194,7 +230,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             expect.fail("Should not fail");
         }
-        expect(response).to.have.lengthOf(1);
+        expect(response).to.have.lengthOf(3);
     });
     it("Should remove the courses dataset uno", async () => {
         const id: string = "courses";
@@ -470,7 +506,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             response = err;
         } finally {
-            expect(response).to.deep.equal([id]);
+            // expect(response).to.deep.equal([id]);
+            expect(response).to.contain("coursesOnevalid");
         }
     });
 
@@ -600,31 +637,31 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(response).to.be.instanceOf(InsightError);
         }
     });
-    it("Should add a valid bool", async () => {
-        const id: boolean = false;
-        let response: string[];
-
-        try {
-            response = await insightFacade.addDataset("", "", InsightDatasetKind.Courses);
-        } catch (err) {
-            response = err;
-        } finally {
-            expect(response).to.be.instanceOf(InsightFacade);
-        }
-    });
-    it("Should add a valid bool", async () => {
-        const id: boolean = true;
-        let response: string[];
-
-        try {
-            response = await insightFacade.addDataset("", "", InsightDatasetKind.Courses);
-        } catch (err) {
-            response = err;
-        } finally {
-            expect(response).to.be.instanceOf(InsightFacade);
-        }
-    });
-    it("Should add a valid broken", async () => {
+    // it("Should add a valid bool", async () => {
+    //     const id: boolean = false;
+    //     let response: string[];
+    //
+    //     try {
+    //         response = await insightFacade.addDataset("", "", InsightDatasetKind.Courses);
+    //     } catch (err) {
+    //         response = err;
+    //     } finally {
+    //         expect(response).to.be.instanceOf(InsightFacade);
+    //     }
+    // });
+    // it("Should add a valid bool", async () => {
+    //     const id: boolean = true;
+    //     let response: string[];
+    //
+    //     try {
+    //         response = await insightFacade.addDataset("", "", InsightDatasetKind.Courses);
+    //     } catch (err) {
+    //         response = err;
+    //     } finally {
+    //         expect(response).to.be.instanceOf(InsightFacade);
+    //     }
+    // });
+    it("Should not add a valid broken", async () => {
         const id: string = "coursesBroken";
         let response: string[];
 
@@ -717,18 +754,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     //         expect(response).to.be.instanceOf(InsightError);
     //     }
     // });
-    it("Should add test smaller sets valid ", async () => {
-        const id: string = "coursesOnevalid";
-        let response: string[];
 
-        try {
-            response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-        } catch (err) {
-            response = err;
-        } finally {
-            expect(response).to.deep.equal([id]);
-        }
-    });
     it("Should add test smaller sets ", async () => {
         const id: string = "coursesOne";
         let response: string[];
@@ -738,7 +764,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } catch (err) {
             response = err;
         } finally {
-            expect(response).to.deep.equal([id]);
+            // expect(response).to.deep.equal([id]);
+            expect(response).to.contain("coursesOne");
         }
     });
 });
@@ -748,9 +775,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
 describe("InsightFacade PerformQuery", () => {
     const datasetsQuery: { [id: string]: string } = {
         courses: "./test/data/courses.zip",
-        coursesOnevalid: "./test/data/courses_onevalid.zip",
-        coursesOne: "./test/data/courses_one.zip",
-        rooms: "./test/data/courses.zip",
+        rooms: "./test/data/rooms.zip",
     };
     let insightFacade: InsightFacade;
     let testQueries: ITestQuery[] = [];
@@ -791,9 +816,13 @@ describe("InsightFacade PerformQuery", () => {
 
             const responsePromises: Array<Promise<string[]>> = [];
             const datasets: { [id: string]: string } = Object.assign({}, ...loadedDatasets);
-            for (const [id, content] of Object.entries(datasets)) {
-                responsePromises.push(insightFacade.addDataset(id, content, InsightDatasetKind.Courses));
-            }
+            // for (const [id, content] of Object.entries(datasets)) {
+            //     responsePromises.push(insightFacade.addDataset(id, content, InsightDatasetKind.Courses));
+            // }
+            responsePromises.push(
+                insightFacade.addDataset("courses", datasets["courses"], InsightDatasetKind.Courses));
+            responsePromises.push(
+                insightFacade.addDataset("rooms", datasets["rooms"], InsightDatasetKind.Rooms));
 
             // This try/catch is a hack to let your dynamic tests execute even if the addDataset method fails.
             // In D1, you should remove this try/catch to ensure your datasets load successfully before trying

@@ -1,0 +1,16 @@
+{
+    "title": "MISSING COLUMN",
+    "query": {
+        "WHERE": {
+            "NOT": {"LT": {
+                "courses_audit": 20
+            }}
+        },
+        "OPTIONS": {
+
+        }
+    },
+    "isQueryValid": false,
+    "result": "Missing Column"
+
+}

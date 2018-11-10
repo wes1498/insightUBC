@@ -1,0 +1,30 @@
+{
+    "title": "MIN NUMERIC",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "courses_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title",
+                "overallMin"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY": [
+                {
+                    "overallMin": {
+                        "MIN": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_title":"dev wkshp/sem","overallMin":96.11},{"courses_title":"eng mtls lab","overallMin":95.05},{"courses_title":"aud&non-txt arch","overallMin":96.94},{"courses_title":"audi prctcm iv","overallMin":96.9},{"courses_title":"med tech project","overallMin":95.15},{"courses_title":"thermodynamics","overallMin":95.54},{"courses_title":"math operations","overallMin":95.31},{"courses_title":"dynam struct 2","overallMin":96.27},{"courses_title":"schl counselling","overallMin":95.78},{"courses_title":"counsl adolescnt","overallMin":95.36},{"courses_title":"career planning","overallMin":97.47},{"courses_title":"prgm devl cnsl","overallMin":96},{"courses_title":"","overallMin":95.36},{"courses_title":"prep writ career","overallMin":95.7},{"courses_title":"thesis","overallMin":96},{"courses_title":"ds tec ii sc c&p","overallMin":95.58},{"courses_title":"fn & educ change","overallMin":95.78},{"courses_title":"adlt edu pract","overallMin":96.46},{"courses_title":"res mthd in educ","overallMin":95.16},{"courses_title":"multimedia sys","overallMin":98.75},{"courses_title":"tch'g hghly able","overallMin":96},{"courses_title":"intro excp child","overallMin":95.15},{"courses_title":"tchg st visl imp","overallMin":95.27},{"courses_title":"ed prg hghly abl","overallMin":95.22},{"courses_title":"augmt&alt comm","overallMin":95.5},{"courses_title":"tech for vis imp","overallMin":95.67},{"courses_title":"assess lrn diffi","overallMin":96.21},{"courses_title":"classroom mgmt","overallMin":95.13},{"courses_title":"surv bhvr dis ch","overallMin":95.47},{"courses_title":"educ stds autism","overallMin":95.47},{"courses_title":"intr stat rs edu","overallMin":95.11},{"courses_title":"hn dev: inf-adlt","overallMin":96.23},{"courses_title":"able&creatv lrnr","overallMin":95.3},{"courses_title":"dev el sk df&hrd","overallMin":98.45},{"courses_title":"cur dev e df&hrd","overallMin":95.83},{"courses_title":"specific lrn dis","overallMin":96.33},{"courses_title":"basic princ meas","overallMin":95.14},{"courses_title":"acad assess schl","overallMin":97},{"courses_title":"sem in autism","overallMin":97.69},{"courses_title":"thy cognt assess","overallMin":95.31},{"courses_title":"dev neuropsych","overallMin":95.17},{"courses_title":"exp des anl ed","overallMin":95.13},{"courses_title":"cor des ed res","overallMin":95.33},{"courses_title":"coll&uni teachng","overallMin":97.67},{"courses_title":"indig, tech&ed","overallMin":95.1},{"courses_title":"curric issu","overallMin":95.33},{"courses_title":"tech math sci","overallMin":95.19},{"courses_title":"mo pict prod i","overallMin":96.4},{"courses_title":"ds intl forstry","overallMin":96.36},{"courses_title":"islnd wild mgmt","overallMin":95.26},{"courses_title":"kin project","overallMin":96},{"courses_title":"phyl asp phy act","overallMin":95.36},{"courses_title":"acad libraries","overallMin":96.1},{"courses_title":"algebra ii","overallMin":96.44},{"courses_title":"functional analy","overallMin":95.67},{"courses_title":"prt diff equa i","overallMin":96.25},{"courses_title":"diff geometry i","overallMin":97.25},{"courses_title":"algb topology i","overallMin":99.78},{"courses_title":"algb geometry i","overallMin":97.48},{"courses_title":"lie theory i","overallMin":95.56},{"courses_title":"harmonic anal i","overallMin":97.09},{"courses_title":"probability ii","overallMin":96.83},{"courses_title":"msc major essay","overallMin":96.33},{"courses_title":"cnsl mat cr prov","overallMin":96.5},{"courses_title":"seminar","overallMin":95.18},{"courses_title":"mgmt sc meth","overallMin":95.43},{"courses_title":"hydrmtllgcl rctr","overallMin":96.25},{"courses_title":"orch repertoire","overallMin":95.38},{"courses_title":"ubc chamb string","overallMin":96.5},{"courses_title":"cl pro prim care","overallMin":95.13},{"courses_title":"fam nrs pract","overallMin":96.64},{"courses_title":"eth&profl issues","overallMin":96.73},{"courses_title":"ms thesis","overallMin":96},{"courses_title":"admn of injectns","overallMin":95.07},{"courses_title":"log & crit think","overallMin":96},{"courses_title":"clin make iv","overallMin":95.37},{"courses_title":"quant fld theory","overallMin":95.43},{"courses_title":"nat resrce mngmt","overallMin":96.47},{"courses_title":"health psych","overallMin":96},{"courses_title":"eth & prof clin","overallMin":95.75},{"courses_title":"intro psychthrpy","overallMin":95.25},{"courses_title":"masters thesis","overallMin":96},{"courses_title":"social analysis","overallMin":95.93},{"courses_title":"hlth & soc care","overallMin":96.09},{"courses_title":"sociocult determ","overallMin":95.76},{"courses_title":"work int health","overallMin":98.98},{"courses_title":"an meth epid res","overallMin":95.11},{"courses_title":"survlnc&monitrng","overallMin":96.8},{"courses_title":"math mdl com dis","overallMin":95.75},{"courses_title":"com hlth prom","overallMin":95.09},{"courses_title":"scenery prod i","overallMin":95.2}]
+}

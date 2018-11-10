@@ -1,0 +1,23 @@
+{
+    "title": "Q53 COLUMNS MISSPELLED",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMN": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+            ],
+            "ORDER":"courses_avg"}
+
+    },
+    "isQueryValid": false,
+    "result": "Q53 COLUMNS MISSPELLED"
+
+}

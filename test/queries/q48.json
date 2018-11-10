@@ -1,0 +1,23 @@
+{
+    "title": "COLUMNS Invalid keys",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "invalid",
+                "couses_avg",
+                "courss_i"
+            ],
+            "ORDER":"courses_avg"}
+
+    },
+    "isQueryValid": false,
+    "result": "COLUMNS Invalid keys"
+
+}

@@ -1,0 +1,55 @@
+ {
+    "title": "Error: course_avg of of type string",
+    "query": {
+            "WHERE": {
+                "AND": [
+                    {
+                        "LT": {
+                            "courses_avg": "90"
+                        }
+                    },
+                    {
+                        "GT": {
+                            "courses_avg": 65
+                        }
+                    },
+                    {
+                        "OR": [
+                            {
+                                "IS": {
+                                    "courses_dept": "*"
+                                }
+                            },
+                            {
+                                "IS": {
+                                    "courses_dept": "*"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "EQ": {
+                            "courses_pass": 100
+                        }
+                    }
+                ]
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "courses_dept",
+                    "courses_avg",
+                    "courses_id",
+                    "courses_instructor",
+                    "courses_title",
+                    "courses_pass",
+                    "courses_fail",
+                    "courses_audit",
+                    "courses_uuid"
+                ],
+                "ORDER": "courses_uuid"
+            }
+        },
+
+    "isQueryValid": false,
+     "result": "course_avg of type string"
+ }

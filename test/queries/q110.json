@@ -1,0 +1,34 @@
+{
+    "title": "Q110 EQ with true",
+    "query": {
+        "WHERE": {
+            "EQ": true
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q109 EQ with true"
+}
+
+
+
+
+
+
+
+
+
+
+

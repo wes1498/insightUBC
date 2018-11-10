@@ -1,0 +1,23 @@
+{
+    "title": "FILTER INVALID KEY",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_aud": 20
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+            ],
+            "ORDER":"courses_avg"}
+
+    },
+    "isQueryValid": false,
+    "result": "FILTER INVALID KEY"
+
+}

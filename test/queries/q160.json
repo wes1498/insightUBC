@@ -1,0 +1,23 @@
+{
+    "title": "GROUP must be a non-empty array",
+    "query":{
+        "WHERE": {
+            "IS": {
+                "courses_instructor": "kiczales, gregor"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+            ],
+            "APPLY": []
+        }
+    },
+    "isQueryValid":false,
+    "result": "GROUP must be a non-empty array"
+
+}

@@ -1,0 +1,35 @@
+{
+    "title": "Filter -> LOGICCOMPARISON:or",
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "EQ": {
+                        "courses_avg": 64
+                    }
+                },
+                {
+                    "EQ": {
+                        "courses_avg": 40
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"apbi","courses_avg":64,"courses_id":"324","courses_instructor":"","courses_title":"intr sd plnt tax","courses_pass":2,"courses_fail":0,"courses_audit":0,"courses_uuid":"61528"},{"courses_dept":"busi","courses_avg":64,"courses_id":"455","courses_instructor":"sinclair, scott","courses_title":"prin audit","courses_pass":7,"courses_fail":0,"courses_audit":0,"courses_uuid":"74246"},{"courses_dept":"cpsc","courses_avg":64,"courses_id":"513","courses_instructor":"mitchell, ian","courses_title":"intgrt sys desgn","courses_pass":3,"courses_fail":1,"courses_audit":0,"courses_uuid":"46774"},{"courses_dept":"cpsc","courses_avg":64,"courses_id":"513","courses_instructor":"","courses_title":"intgrt sys desgn","courses_pass":3,"courses_fail":1,"courses_audit":0,"courses_uuid":"46775"},{"courses_dept":"fopr","courses_avg":64,"courses_id":"464","courses_instructor":"lyons, charles","courses_title":"forest tran sys","courses_pass":4,"courses_fail":0,"courses_audit":0,"courses_uuid":"22971"},{"courses_dept":"fopr","courses_avg":64,"courses_id":"464","courses_instructor":"","courses_title":"forest tran sys","courses_pass":4,"courses_fail":0,"courses_audit":0,"courses_uuid":"22972"},{"courses_dept":"psyc","courses_avg":64,"courses_id":"315","courses_instructor":"king, mary ann","courses_title":"childhood & adol","courses_pass":2,"courses_fail":1,"courses_audit":0,"courses_uuid":"66506"}]
+
+}

@@ -1,0 +1,30 @@
+{
+    "title": "Apply MAX",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "courses_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title",
+                "maxAvg"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY": [
+                {
+                    "maxAvg": {
+                        "MAX": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_title":"dev wkshp/sem","maxAvg":96.11},{"courses_title":"eng mtls lab","maxAvg":96},{"courses_title":"aud&non-txt arch","maxAvg":96.94},{"courses_title":"audi prctcm iv","maxAvg":96.9},{"courses_title":"med tech project","maxAvg":95.15},{"courses_title":"thermodynamics","maxAvg":95.54},{"courses_title":"math operations","maxAvg":95.31},{"courses_title":"dynam struct 2","maxAvg":96.27},{"courses_title":"schl counselling","maxAvg":95.78},{"courses_title":"counsl adolescnt","maxAvg":95.36},{"courses_title":"career planning","maxAvg":99.19},{"courses_title":"prgm devl cnsl","maxAvg":96.33},{"courses_title":"","maxAvg":95.36},{"courses_title":"prep writ career","maxAvg":95.7},{"courses_title":"thesis","maxAvg":98},{"courses_title":"ds tec ii sc c&p","maxAvg":95.58},{"courses_title":"fn & educ change","maxAvg":95.78},{"courses_title":"adlt edu pract","maxAvg":96.46},{"courses_title":"res mthd in educ","maxAvg":97.5},{"courses_title":"multimedia sys","maxAvg":98.75},{"courses_title":"tch'g hghly able","maxAvg":96},{"courses_title":"intro excp child","maxAvg":96.9},{"courses_title":"tchg st visl imp","maxAvg":95.27},{"courses_title":"ed prg hghly abl","maxAvg":95.22},{"courses_title":"augmt&alt comm","maxAvg":95.5},{"courses_title":"tech for vis imp","maxAvg":95.67},{"courses_title":"assess lrn diffi","maxAvg":98.7},{"courses_title":"classroom mgmt","maxAvg":96.21},{"courses_title":"surv bhvr dis ch","maxAvg":95.47},{"courses_title":"educ stds autism","maxAvg":98.8},{"courses_title":"intr stat rs edu","maxAvg":95.11},{"courses_title":"hn dev: inf-adlt","maxAvg":96.23},{"courses_title":"able&creatv lrnr","maxAvg":95.41},{"courses_title":"dev el sk df&hrd","maxAvg":98.45},{"courses_title":"cur dev e df&hrd","maxAvg":95.83},{"courses_title":"specific lrn dis","maxAvg":96.33},{"courses_title":"basic princ meas","maxAvg":96},{"courses_title":"acad assess schl","maxAvg":97.78},{"courses_title":"sem in autism","maxAvg":97.69},{"courses_title":"thy cognt assess","maxAvg":95.31},{"courses_title":"dev neuropsych","maxAvg":95.17},{"courses_title":"exp des anl ed","maxAvg":95.9},{"courses_title":"cor des ed res","maxAvg":97.09},{"courses_title":"coll&uni teachng","maxAvg":97.67},{"courses_title":"indig, tech&ed","maxAvg":96.47},{"courses_title":"curric issu","maxAvg":95.63},{"courses_title":"tech math sci","maxAvg":95.96},{"courses_title":"mo pict prod i","maxAvg":96.4},{"courses_title":"ds intl forstry","maxAvg":96.36},{"courses_title":"islnd wild mgmt","maxAvg":95.29},{"courses_title":"kin project","maxAvg":96},{"courses_title":"phyl asp phy act","maxAvg":96.06},{"courses_title":"acad libraries","maxAvg":96.1},{"courses_title":"algebra ii","maxAvg":96.44},{"courses_title":"functional analy","maxAvg":95.67},{"courses_title":"prt diff equa i","maxAvg":96.25},{"courses_title":"diff geometry i","maxAvg":97.25},{"courses_title":"algb topology i","maxAvg":99.78},{"courses_title":"algb geometry i","maxAvg":97.48},{"courses_title":"lie theory i","maxAvg":95.56},{"courses_title":"harmonic anal i","maxAvg":97.09},{"courses_title":"probability ii","maxAvg":96.83},{"courses_title":"msc major essay","maxAvg":96.33},{"courses_title":"cnsl mat cr prov","maxAvg":96.5},{"courses_title":"seminar","maxAvg":96.59},{"courses_title":"mgmt sc meth","maxAvg":95.6},{"courses_title":"hydrmtllgcl rctr","maxAvg":96.25},{"courses_title":"orch repertoire","maxAvg":95.67},{"courses_title":"ubc chamb string","maxAvg":96.5},{"courses_title":"cl pro prim care","maxAvg":98.71},{"courses_title":"fam nrs pract","maxAvg":98.58},{"courses_title":"eth&profl issues","maxAvg":97.33},{"courses_title":"ms thesis","maxAvg":96},{"courses_title":"admn of injectns","maxAvg":95.07},{"courses_title":"log & crit think","maxAvg":96},{"courses_title":"clin make iv","maxAvg":95.37},{"courses_title":"quant fld theory","maxAvg":95.43},{"courses_title":"nat resrce mngmt","maxAvg":96.47},{"courses_title":"health psych","maxAvg":96},{"courses_title":"eth & prof clin","maxAvg":95.75},{"courses_title":"intro psychthrpy","maxAvg":95.25},{"courses_title":"masters thesis","maxAvg":97},{"courses_title":"social analysis","maxAvg":96.15},{"courses_title":"hlth & soc care","maxAvg":96.09},{"courses_title":"sociocult determ","maxAvg":96.96},{"courses_title":"work int health","maxAvg":98.98},{"courses_title":"an meth epid res","maxAvg":95.11},{"courses_title":"survlnc&monitrng","maxAvg":96.8},{"courses_title":"math mdl com dis","maxAvg":95.75},{"courses_title":"com hlth prom","maxAvg":95.09},{"courses_title":"scenery prod i","maxAvg":95.2}]
+}

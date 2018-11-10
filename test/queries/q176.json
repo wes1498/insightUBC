@@ -1,0 +1,30 @@
+{
+    "title": "COUNT Numeric",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "courses_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title",
+                "overallCount"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY": [
+                {
+                    "overallCount": {
+                        "COUNT": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_title":"dev wkshp/sem","overallCount":1},{"courses_title":"eng mtls lab","overallCount":4},{"courses_title":"aud&non-txt arch","overallCount":1},{"courses_title":"audi prctcm iv","overallCount":1},{"courses_title":"med tech project","overallCount":1},{"courses_title":"thermodynamics","overallCount":1},{"courses_title":"math operations","overallCount":1},{"courses_title":"dynam struct 2","overallCount":1},{"courses_title":"schl counselling","overallCount":1},{"courses_title":"counsl adolescnt","overallCount":1},{"courses_title":"career planning","overallCount":2},{"courses_title":"prgm devl cnsl","overallCount":3},{"courses_title":"","overallCount":1},{"courses_title":"prep writ career","overallCount":1},{"courses_title":"thesis","overallCount":3},{"courses_title":"ds tec ii sc c&p","overallCount":1},{"courses_title":"fn & educ change","overallCount":1},{"courses_title":"adlt edu pract","overallCount":1},{"courses_title":"res mthd in educ","overallCount":2},{"courses_title":"multimedia sys","overallCount":1},{"courses_title":"tch'g hghly able","overallCount":1},{"courses_title":"intro excp child","overallCount":3},{"courses_title":"tchg st visl imp","overallCount":1},{"courses_title":"ed prg hghly abl","overallCount":1},{"courses_title":"augmt&alt comm","overallCount":1},{"courses_title":"tech for vis imp","overallCount":1},{"courses_title":"assess lrn diffi","overallCount":5},{"courses_title":"classroom mgmt","overallCount":2},{"courses_title":"surv bhvr dis ch","overallCount":1},{"courses_title":"educ stds autism","overallCount":7},{"courses_title":"intr stat rs edu","overallCount":1},{"courses_title":"hn dev: inf-adlt","overallCount":1},{"courses_title":"able&creatv lrnr","overallCount":2},{"courses_title":"dev el sk df&hrd","overallCount":1},{"courses_title":"cur dev e df&hrd","overallCount":1},{"courses_title":"specific lrn dis","overallCount":1},{"courses_title":"basic princ meas","overallCount":3},{"courses_title":"acad assess schl","overallCount":3},{"courses_title":"sem in autism","overallCount":1},{"courses_title":"thy cognt assess","overallCount":1},{"courses_title":"dev neuropsych","overallCount":1},{"courses_title":"exp des anl ed","overallCount":4},{"courses_title":"cor des ed res","overallCount":2},{"courses_title":"coll&uni teachng","overallCount":1},{"courses_title":"indig, tech&ed","overallCount":3},{"courses_title":"curric issu","overallCount":2},{"courses_title":"tech math sci","overallCount":2},{"courses_title":"mo pict prod i","overallCount":1},{"courses_title":"ds intl forstry","overallCount":1},{"courses_title":"islnd wild mgmt","overallCount":2},{"courses_title":"kin project","overallCount":1},{"courses_title":"phyl asp phy act","overallCount":2},{"courses_title":"acad libraries","overallCount":1},{"courses_title":"algebra ii","overallCount":1},{"courses_title":"functional analy","overallCount":1},{"courses_title":"prt diff equa i","overallCount":1},{"courses_title":"diff geometry i","overallCount":1},{"courses_title":"algb topology i","overallCount":1},{"courses_title":"algb geometry i","overallCount":1},{"courses_title":"lie theory i","overallCount":1},{"courses_title":"harmonic anal i","overallCount":1},{"courses_title":"probability ii","overallCount":1},{"courses_title":"msc major essay","overallCount":1},{"courses_title":"cnsl mat cr prov","overallCount":1},{"courses_title":"seminar","overallCount":2},{"courses_title":"mgmt sc meth","overallCount":3},{"courses_title":"hydrmtllgcl rctr","overallCount":1},{"courses_title":"orch repertoire","overallCount":2},{"courses_title":"ubc chamb string","overallCount":1},{"courses_title":"cl pro prim care","overallCount":5},{"courses_title":"fam nrs pract","overallCount":4},{"courses_title":"eth&profl issues","overallCount":2},{"courses_title":"ms thesis","overallCount":1},{"courses_title":"admn of injectns","overallCount":1},{"courses_title":"log & crit think","overallCount":1},{"courses_title":"clin make iv","overallCount":1},{"courses_title":"quant fld theory","overallCount":1},{"courses_title":"nat resrce mngmt","overallCount":1},{"courses_title":"health psych","overallCount":1},{"courses_title":"eth & prof clin","overallCount":1},{"courses_title":"intro psychthrpy","overallCount":1},{"courses_title":"masters thesis","overallCount":2},{"courses_title":"social analysis","overallCount":2},{"courses_title":"hlth & soc care","overallCount":1},{"courses_title":"sociocult determ","overallCount":2},{"courses_title":"work int health","overallCount":1},{"courses_title":"an meth epid res","overallCount":1},{"courses_title":"survlnc&monitrng","overallCount":1},{"courses_title":"math mdl com dis","overallCount":1},{"courses_title":"com hlth prom","overallCount":1},{"courses_title":"scenery prod i","overallCount":1}]
+}

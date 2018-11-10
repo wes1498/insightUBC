@@ -1,0 +1,42 @@
+{
+    "title": "LONG apply rooms",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "rooms_seats": 90
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "rooms_type",
+                "overallSeats",
+                "overallCount",
+                "maxFail"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "rooms_type"
+            ],
+            "APPLY": [
+                {
+                    "overallSeats": {
+                        "AVG": "rooms_seats"
+                    }
+                },
+                {
+                    "overallCount": {
+                        "COUNT": "rooms_lat"
+                    }
+                },
+                {
+                    "maxFail": {
+                        "MAX": "rooms_lon"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"rooms_type":"Case Style","overallSeats":102.5,"overallCount":3,"maxFail":-123.25042},{"rooms_type":"Tiered Large Group","overallSeats":196.02,"overallCount":29,"maxFail":-123.24342},{"rooms_type":"Open Design General Purpose","overallSeats":218,"overallCount":3,"maxFail":-123.24467},{"rooms_type":"TBD","overallSeats":299,"overallCount":1,"maxFail":-123.24894}]
+}

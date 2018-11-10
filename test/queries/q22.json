@@ -1,0 +1,24 @@
+{
+    "title": "Nested NOT",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "NOT": {
+                    "LT": {
+                        "courses_avg": 1
+                    }
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"frst","courses_id":"202","courses_avg":0},{"courses_dept":"lfs","courses_id":"100","courses_avg":0},{"courses_dept":"lfs","courses_id":"100","courses_avg":0}]
+}

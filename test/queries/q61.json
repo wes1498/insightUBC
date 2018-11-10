@@ -1,0 +1,102 @@
+{
+    "title": "Q61 NOT WITH MCOMPARISON:EQ",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "NOT": {
+                        "EQ": {"courses_avg": 90}
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_avg": 98
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]}
+
+    },
+    "isQueryValid": true,
+    "result": [
+        {
+            "courses_id": "574"
+        },
+        {
+            "courses_id": "541"
+        },
+        {
+            "courses_id": "541"
+        },
+        {
+            "courses_id": "421"
+        },
+        {
+            "courses_id": "421"
+        },
+        {
+            "courses_id": "421"
+        },
+        {
+            "courses_id": "449"
+        },
+        {
+            "courses_id": "449"
+        },
+        {
+            "courses_id": "449"
+        },
+        {
+            "courses_id": "449"
+        },
+        {
+            "courses_id": "449"
+        },
+        {
+            "courses_id": "519"
+        },
+        {
+            "courses_id": "519"
+        },
+        {
+            "courses_id": "527"
+        },
+        {
+            "courses_id": "527"
+        },
+        {
+            "courses_id": "509"
+        },
+        {
+            "courses_id": "509"
+        },
+        {
+            "courses_id": "509"
+        },
+        {
+            "courses_id": "509"
+        },
+        {
+            "courses_id": "578"
+        },
+        {
+            "courses_id": "578"
+        },
+        {
+            "courses_id": "578"
+        },
+        {
+            "courses_id": "578"
+        },
+        {
+            "courses_id": "300"
+        },
+        {
+            "courses_id": "300"
+        }
+    ]
+}

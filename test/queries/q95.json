@@ -1,0 +1,30 @@
+{
+    "title": "Q95 LT pass []",
+    "query": {
+        "WHERE": {
+            "LT": {
+                "courses_pass": []
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q95 LT pass []"
+}
+
+
+
+
+

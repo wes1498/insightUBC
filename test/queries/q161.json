@@ -1,0 +1,31 @@
+{
+    "title": "group by title and compute average for group",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "courses_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title",
+                "overallAvg"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY": [
+                {
+                    "overallAvg": {
+                        "AVG": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid":true,
+    "result": [{"courses_title":"dev wkshp/sem","overallAvg":96.11},{"courses_title":"eng mtls lab","overallAvg":95.73},{"courses_title":"aud&non-txt arch","overallAvg":96.94},{"courses_title":"audi prctcm iv","overallAvg":96.9},{"courses_title":"med tech project","overallAvg":95.15},{"courses_title":"thermodynamics","overallAvg":95.54},{"courses_title":"math operations","overallAvg":95.31},{"courses_title":"dynam struct 2","overallAvg":96.27},{"courses_title":"schl counselling","overallAvg":95.78},{"courses_title":"counsl adolescnt","overallAvg":95.36},{"courses_title":"career planning","overallAvg":98.04},{"courses_title":"prgm devl cnsl","overallAvg":96.16},{"courses_title":"","overallAvg":95.36},{"courses_title":"prep writ career","overallAvg":95.7},{"courses_title":"thesis","overallAvg":96.63},{"courses_title":"ds tec ii sc c&p","overallAvg":95.58},{"courses_title":"fn & educ change","overallAvg":95.78},{"courses_title":"adlt edu pract","overallAvg":96.46},{"courses_title":"res mthd in educ","overallAvg":96.33},{"courses_title":"multimedia sys","overallAvg":98.75},{"courses_title":"tch'g hghly able","overallAvg":96},{"courses_title":"intro excp child","overallAvg":96.03},{"courses_title":"tchg st visl imp","overallAvg":95.27},{"courses_title":"ed prg hghly abl","overallAvg":95.22},{"courses_title":"augmt&alt comm","overallAvg":95.5},{"courses_title":"tech for vis imp","overallAvg":95.67},{"courses_title":"assess lrn diffi","overallAvg":97.65},{"courses_title":"classroom mgmt","overallAvg":95.67},{"courses_title":"surv bhvr dis ch","overallAvg":95.47},{"courses_title":"educ stds autism","overallAvg":97.59},{"courses_title":"intr stat rs edu","overallAvg":95.11},{"courses_title":"hn dev: inf-adlt","overallAvg":96.23},{"courses_title":"able&creatv lrnr","overallAvg":95.36},{"courses_title":"dev el sk df&hrd","overallAvg":98.45},{"courses_title":"cur dev e df&hrd","overallAvg":95.83},{"courses_title":"specific lrn dis","overallAvg":96.33},{"courses_title":"basic princ meas","overallAvg":95.72},{"courses_title":"acad assess schl","overallAvg":97.4},{"courses_title":"sem in autism","overallAvg":97.69},{"courses_title":"thy cognt assess","overallAvg":95.31},{"courses_title":"dev neuropsych","overallAvg":95.17},{"courses_title":"exp des anl ed","overallAvg":95.41},{"courses_title":"cor des ed res","overallAvg":96.5},{"courses_title":"coll&uni teachng","overallAvg":97.67},{"courses_title":"indig, tech&ed","overallAvg":95.63},{"courses_title":"curric issu","overallAvg":95.48},{"courses_title":"tech math sci","overallAvg":95.58},{"courses_title":"mo pict prod i","overallAvg":96.4},{"courses_title":"ds intl forstry","overallAvg":96.36},{"courses_title":"islnd wild mgmt","overallAvg":95.28},{"courses_title":"kin project","overallAvg":96},{"courses_title":"phyl asp phy act","overallAvg":95.71},{"courses_title":"acad libraries","overallAvg":96.1},{"courses_title":"algebra ii","overallAvg":96.44},{"courses_title":"functional analy","overallAvg":95.67},{"courses_title":"prt diff equa i","overallAvg":96.25},{"courses_title":"diff geometry i","overallAvg":97.25},{"courses_title":"algb topology i","overallAvg":99.78},{"courses_title":"algb geometry i","overallAvg":97.48},{"courses_title":"lie theory i","overallAvg":95.56},{"courses_title":"harmonic anal i","overallAvg":97.09},{"courses_title":"probability ii","overallAvg":96.83},{"courses_title":"msc major essay","overallAvg":96.33},{"courses_title":"cnsl mat cr prov","overallAvg":96.5},{"courses_title":"seminar","overallAvg":95.89},{"courses_title":"mgmt sc meth","overallAvg":95.49},{"courses_title":"hydrmtllgcl rctr","overallAvg":96.25},{"courses_title":"orch repertoire","overallAvg":95.53},{"courses_title":"ubc chamb string","overallAvg":96.5},{"courses_title":"cl pro prim care","overallAvg":96.55},{"courses_title":"fam nrs pract","overallAvg":97.81},{"courses_title":"eth&profl issues","overallAvg":97.03},{"courses_title":"ms thesis","overallAvg":96},{"courses_title":"admn of injectns","overallAvg":95.07},{"courses_title":"log & crit think","overallAvg":96},{"courses_title":"clin make iv","overallAvg":95.37},{"courses_title":"quant fld theory","overallAvg":95.43},{"courses_title":"nat resrce mngmt","overallAvg":96.47},{"courses_title":"health psych","overallAvg":96},{"courses_title":"eth & prof clin","overallAvg":95.75},{"courses_title":"intro psychthrpy","overallAvg":95.25},{"courses_title":"masters thesis","overallAvg":96.5},{"courses_title":"social analysis","overallAvg":96.04},{"courses_title":"hlth & soc care","overallAvg":96.09},{"courses_title":"sociocult determ","overallAvg":96.36},{"courses_title":"work int health","overallAvg":98.98},{"courses_title":"an meth epid res","overallAvg":95.11},{"courses_title":"survlnc&monitrng","overallAvg":96.8},{"courses_title":"math mdl com dis","overallAvg":95.75},{"courses_title":"com hlth prom","overallAvg":95.09},{"courses_title":"scenery prod i","overallAvg":95.2}]
+
+}

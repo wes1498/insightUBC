@@ -1,0 +1,18 @@
+{
+    "title": "Q64 NOT EMPTY INSIDE",
+    "query": {
+        "WHERE": {
+            "NOT": {
+
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q64 NOT EMPTY INSIDE"
+
+}

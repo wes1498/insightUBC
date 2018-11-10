@@ -1,0 +1,26 @@
+{
+    "title": "Keys in COLUMNS must be in GROUP or APPLY when TRANSFORMATIONS is present",
+    "query":{
+        "WHERE": {
+            "IS": {
+                "courses_instructor": "kiczales, gregor"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title",
+                "courses_year"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title",
+                "courses_avg"
+            ],
+            "APPLY": []
+        }
+    },
+    "isQueryValid":false,
+    "result": "Keys in COLUMNS must be in GROUP or APPLY when TRANSFORMATIONS is present"
+
+}

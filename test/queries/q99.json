@@ -1,0 +1,31 @@
+{
+    "title": "Q99 IS title true",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_title": true
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q100 IS title true"
+}
+
+
+
+
+
+

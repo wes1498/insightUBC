@@ -1,0 +1,40 @@
+{
+    "title": "Q116 AND with []",
+    "query": {
+        "WHERE": {
+            "AND": false
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q116 AND with false"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

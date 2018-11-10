@@ -1,0 +1,26 @@
+{
+    "title": "*1234",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_uuid": "*1234"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"arch","courses_avg":81.03,"courses_id":"517","courses_instructor":"mcdonald, ian ross","courses_title":"design media 2","courses_pass":38,"courses_fail":0,"courses_audit":0,"courses_uuid":"11234"},{"courses_dept":"chem","courses_avg":75.69,"courses_id":"235","courses_instructor":"zendrowski, dana","courses_title":"org chem lab","courses_pass":87,"courses_fail":0,"courses_audit":0,"courses_uuid":"31234"},{"courses_dept":"comm","courses_avg":76.08,"courses_id":"296","courses_instructor":"milne, tamar","courses_title":"intro marketing","courses_pass":49,"courses_fail":0,"courses_audit":0,"courses_uuid":"71234"},{"courses_dept":"cpen","courses_avg":73.42,"courses_id":"421","courses_instructor":"","courses_title":"soft proj mgmt","courses_pass":66,"courses_fail":1,"courses_audit":0,"courses_uuid":"81234"},{"courses_dept":"frst","courses_avg":68.89,"courses_id":"231","courses_instructor":"watts, susan","courses_title":"intr biometrics","courses_pass":7,"courses_fail":2,"courses_audit":0,"courses_uuid":"21234"},{"courses_dept":"phys","courses_avg":87.06,"courses_id":"319","courses_instructor":"kotlicki, andrzej","courses_title":"electrical lab","courses_pass":17,"courses_fail":0,"courses_audit":0,"courses_uuid":"41234"}]
+
+}

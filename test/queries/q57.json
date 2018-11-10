@@ -1,0 +1,20 @@
+{
+    "title": "Q57 REPEATED COLUMN KEYS",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id",
+                "courses_id"
+            ]}
+
+    },
+    "isQueryValid": true,
+    "result":[{"courses_id":"540"},{"courses_id":"501"},{"courses_id":"501"},{"courses_id":"507"}]
+}

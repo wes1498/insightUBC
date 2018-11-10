@@ -1,0 +1,27 @@
+{
+    "title": "Q86 INPUTSTRING NULL and courses_uuid null",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_uuid": null
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_uuid"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q83 INPUTSTRING NULL and courses_dept null"
+}
+
+

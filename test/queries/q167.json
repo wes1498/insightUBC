@@ -1,0 +1,17 @@
+{
+    "title": "Attempt to query courses as rooms",
+    "query":{
+        "WHERE": {
+            "IS": {
+                "courses_type": "Small Group"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_type"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Err: can't query courses as rooms"
+}

@@ -1,0 +1,17 @@
+{
+    "title": "Attempt to query rooms as courses",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "rooms_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "rooms_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Err: can't query rooms as courses"
+}

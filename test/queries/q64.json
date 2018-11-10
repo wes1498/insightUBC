@@ -1,0 +1,25 @@
+{
+    "title": "Q64 IS WITH DEPT",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {"courses_dept": "cpsc"}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 93
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_id":"449"},{"courses_id":"449"},{"courses_id":"449"},{"courses_id":"449"},{"courses_id":"501"},{"courses_id":"501"},{"courses_id":"503"},{"courses_id":"503"},{"courses_id":"589"},{"courses_id":"589"}]
+
+}

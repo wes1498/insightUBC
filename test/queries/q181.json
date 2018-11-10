@@ -1,0 +1,30 @@
+{
+    "title": "COUNT String",
+    "query":{
+        "WHERE": {
+            "GT": {
+                "courses_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title",
+                "overallMAX"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY": [
+                {
+                    "overallMAX": {
+                        "COUNT": "courses_title"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_title":"dev wkshp/sem","overallMAX":1},{"courses_title":"eng mtls lab","overallMAX":1},{"courses_title":"aud&non-txt arch","overallMAX":1},{"courses_title":"audi prctcm iv","overallMAX":1},{"courses_title":"med tech project","overallMAX":1},{"courses_title":"thermodynamics","overallMAX":1},{"courses_title":"math operations","overallMAX":1},{"courses_title":"dynam struct 2","overallMAX":1},{"courses_title":"schl counselling","overallMAX":1},{"courses_title":"counsl adolescnt","overallMAX":1},{"courses_title":"career planning","overallMAX":1},{"courses_title":"prgm devl cnsl","overallMAX":1},{"courses_title":"","overallMAX":1},{"courses_title":"prep writ career","overallMAX":1},{"courses_title":"thesis","overallMAX":1},{"courses_title":"ds tec ii sc c&p","overallMAX":1},{"courses_title":"fn & educ change","overallMAX":1},{"courses_title":"adlt edu pract","overallMAX":1},{"courses_title":"res mthd in educ","overallMAX":1},{"courses_title":"multimedia sys","overallMAX":1},{"courses_title":"tch'g hghly able","overallMAX":1},{"courses_title":"intro excp child","overallMAX":1},{"courses_title":"tchg st visl imp","overallMAX":1},{"courses_title":"ed prg hghly abl","overallMAX":1},{"courses_title":"augmt&alt comm","overallMAX":1},{"courses_title":"tech for vis imp","overallMAX":1},{"courses_title":"assess lrn diffi","overallMAX":1},{"courses_title":"classroom mgmt","overallMAX":1},{"courses_title":"surv bhvr dis ch","overallMAX":1},{"courses_title":"educ stds autism","overallMAX":1},{"courses_title":"intr stat rs edu","overallMAX":1},{"courses_title":"hn dev: inf-adlt","overallMAX":1},{"courses_title":"able&creatv lrnr","overallMAX":1},{"courses_title":"dev el sk df&hrd","overallMAX":1},{"courses_title":"cur dev e df&hrd","overallMAX":1},{"courses_title":"specific lrn dis","overallMAX":1},{"courses_title":"basic princ meas","overallMAX":1},{"courses_title":"acad assess schl","overallMAX":1},{"courses_title":"sem in autism","overallMAX":1},{"courses_title":"thy cognt assess","overallMAX":1},{"courses_title":"dev neuropsych","overallMAX":1},{"courses_title":"exp des anl ed","overallMAX":1},{"courses_title":"cor des ed res","overallMAX":1},{"courses_title":"coll&uni teachng","overallMAX":1},{"courses_title":"indig, tech&ed","overallMAX":1},{"courses_title":"curric issu","overallMAX":1},{"courses_title":"tech math sci","overallMAX":1},{"courses_title":"mo pict prod i","overallMAX":1},{"courses_title":"ds intl forstry","overallMAX":1},{"courses_title":"islnd wild mgmt","overallMAX":1},{"courses_title":"kin project","overallMAX":1},{"courses_title":"phyl asp phy act","overallMAX":1},{"courses_title":"acad libraries","overallMAX":1},{"courses_title":"algebra ii","overallMAX":1},{"courses_title":"functional analy","overallMAX":1},{"courses_title":"prt diff equa i","overallMAX":1},{"courses_title":"diff geometry i","overallMAX":1},{"courses_title":"algb topology i","overallMAX":1},{"courses_title":"algb geometry i","overallMAX":1},{"courses_title":"lie theory i","overallMAX":1},{"courses_title":"harmonic anal i","overallMAX":1},{"courses_title":"probability ii","overallMAX":1},{"courses_title":"msc major essay","overallMAX":1},{"courses_title":"cnsl mat cr prov","overallMAX":1},{"courses_title":"seminar","overallMAX":1},{"courses_title":"mgmt sc meth","overallMAX":1},{"courses_title":"hydrmtllgcl rctr","overallMAX":1},{"courses_title":"orch repertoire","overallMAX":1},{"courses_title":"ubc chamb string","overallMAX":1},{"courses_title":"cl pro prim care","overallMAX":1},{"courses_title":"fam nrs pract","overallMAX":1},{"courses_title":"eth&profl issues","overallMAX":1},{"courses_title":"ms thesis","overallMAX":1},{"courses_title":"admn of injectns","overallMAX":1},{"courses_title":"log & crit think","overallMAX":1},{"courses_title":"clin make iv","overallMAX":1},{"courses_title":"quant fld theory","overallMAX":1},{"courses_title":"nat resrce mngmt","overallMAX":1},{"courses_title":"health psych","overallMAX":1},{"courses_title":"eth & prof clin","overallMAX":1},{"courses_title":"intro psychthrpy","overallMAX":1},{"courses_title":"masters thesis","overallMAX":1},{"courses_title":"social analysis","overallMAX":1},{"courses_title":"hlth & soc care","overallMAX":1},{"courses_title":"sociocult determ","overallMAX":1},{"courses_title":"work int health","overallMAX":1},{"courses_title":"an meth epid res","overallMAX":1},{"courses_title":"survlnc&monitrng","overallMAX":1},{"courses_title":"math mdl com dis","overallMAX":1},{"courses_title":"com hlth prom","overallMAX":1},{"courses_title":"scenery prod i","overallMAX":1}]
+}

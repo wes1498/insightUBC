@@ -1,0 +1,22 @@
+{
+    "title": "Q55 MISSING ORDER",
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_audit": 20
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_id"
+            ]}
+
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"cpsc","courses_avg":90.53,"courses_id":"540"},{"courses_dept":"rhsc","courses_avg":88.79,"courses_id":"501"},{"courses_dept":"rhsc","courses_avg":86.89,"courses_id":"501"},{"courses_dept":"rhsc","courses_avg":87.26,"courses_id":"507"}]
+}
+

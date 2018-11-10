@@ -1,0 +1,25 @@
+{
+    "title": "Q70 IS WITH FAIL",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {"courses_fail": 90}
+                },
+                {
+                    "GT": {
+                        "courses_avg": 70
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_id"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "Q69 IS WITH FAIL"
+
+}

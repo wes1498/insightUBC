@@ -1,0 +1,29 @@
+{
+    "title": "Taurus Test",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": "math"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "OverallAvg"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": ["courses_dept"],
+            "APPLY": [{
+                "OverallAvg": {
+                    "AVG": "courses_avg"
+                }
+            }]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_dept":"math","OverallAvg":72.03}
+    ]
+}
+
