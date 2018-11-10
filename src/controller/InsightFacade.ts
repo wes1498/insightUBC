@@ -178,17 +178,21 @@ export default class InsightFacade implements IInsightFacade {
             });
             // Puting address and names together
             arr.forEach((data1: any, i) => {
+                // console.log(data1);
                 let full = data1.replace(/.*:/, "");
                 let short = data1.replace(/:.*/, "");
                 let adrarr: any[] = [];
                 uniq.forEach((x: any) => {
                     let sub = x.substring(0, 4);
                     let sub2 = x.substring(0, 3);
-                    if (short.includes(sub) || short.includes(sub2)) {
+                    if (short === sub || short === sub2) {
+                        // console.log(sub2 + "------" + sub);
                         mixarr3.push(data1 + " -- " + x);
+                       // console.log(data1 + " -- ");
                     }
                 });
             });
+            // console.log(mixarr3)
             that.putData(mixarr3, chunks, id).then((x: any) => {
                 // console.log(x);
                 return resolve(x);
@@ -223,7 +227,7 @@ export default class InsightFacade implements IInsightFacade {
                         rooms_seats: s2,
                         rooms_type: te,
                         rooms_furniture: fn,
-                        rooms_href: hf
+                        rooms_href: "http:" + hf
                     };
                     let roomsobj = JSON.parse(JSON.stringify(obj));
                     return resolve(roomsobj);
@@ -240,20 +244,47 @@ export default class InsightFacade implements IInsightFacade {
             let short = "";
             let full = "";
             let full2 = "";
+            console.log(mixarr3);
             mixarr3.forEach((data1: any) => {
+                // console.log(data1);
                 short = data1.replace(/:.*/, "");
-                // let adrarr: any[] = [];
-                full = data1.replace(/.*:/, "");
-                full2 = full.replace(/ --.*/, "");
-
                 let addrs = data1.replace(/.* --/, "");
                 let addrs2 = addrs.replace(/.*--/, "");
-
                 let addr = addrs2.replace(/ /g, "%20");
+                full = data1.replace(/.*:/, "");
+                full2 = full.replace(/ --.*/, "");
+                /*if (short === "MATX" || short === "MATH" || short === "WESB" || short === "ESB") {
+                    if (short === "MATX") {
+                        addrs2 = "1986 Mathematics Road";
+                        addr = addrs2.replace(/ /g, "%20");
+                    } else if (short === "MATH") {
+                        addrs2 = "1984 Mathematics Road";
+                        addr = addrs2.replace(/ /g, "%20");
+                    } else if (short === "WESB") {
+                        addrs2 = "6174 University Boulevard";
+                        addr = addrs2.replace(/ /g, "%20");
+                    } else if (short === "ESB") {
+                        addrs2 = "2207 Main Mall";
+                        addr = addrs2.replace(/ /g, "%20");
+                    }
+                }*/
+                // console.log(short + addrs2);
+         /*       if (addrs2 === "2207 Main Mall" || addrs2 === "1986 Mathematics Road") {
+                    // console.log(short);
+                    // let adrarr: any[] = [];
+                    if (addr === "2207 Main Mall") {
+                        short = "ESB";
+                    } else if (addr === "1986 Mathematics Road") {
+                        short = "MATX";
+                    }
+                }*/
                 let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
                 chunks.forEach((data2: any) => {
+                    let correctCode = data2[0].replace(/:.*/, "");
+                    // console.log(correctCode);
 
-                    if (data2[0].indexOf(short) === 0) {
+                    if (correctCode === short) {
+                       // console.log(data2[0] + addrs2);
                         let regex = /.*\//;
                         let roomname = data2[0].replace(regex, "");
                         let roomname2 = roomname.replace(/.*-/, "");
