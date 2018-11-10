@@ -51,25 +51,8 @@ export default class InsightFacade implements IInsightFacade {
         this.mixArray1 = [];
         this.latlonArray1 = [];
     }
-   private getGeo(url: string): Promise<IGeoResponse> {
-        return new Promise<IGeoResponse>((resolve, reject) => {
-            http.get(url, (result) => {
-                result.setEncoding("utf8");
-                let body = "";
-                result.on("data", (chunk) => {
-                    body += chunk;
-                }).on("error", (err) => {
-                     return reject(err);
-                });
-                result.on("end", () => {
-                    let resultVal: IGeoResponse = JSON.parse(body);
-                    return resolve(resultVal);
-                });
-            });
-        });
-    }
     // GETS LINKS FROM INDEX.HTM IT ALSO GETS SHORT NAME
-    private addRoom(data: any, code: string) {
+    private addRoomLinks(data: any, code: string) {
         // let doc: any = parse5.parse(data);
         // let data2 = data.async("text");
 
@@ -127,52 +110,9 @@ export default class InsightFacade implements IInsightFacade {
 
         // this.check();
     }
-
-    // ADDS ROOM DATA FURNITURE ADDRESS FULL NAME ETC
-   /* private roomData(content: any, id: string) {
-        let that = this;
-        return new Promise<any>((resolve, reject) => {
-            let resultsaver: any[] = [];
-            let codearr: any[] = [];
-            let roomCodes = Array.from(this.linksMap.keys());
-            JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
-                roomCodes.forEach((code: any) => {
-                    codearr.push(code);
-                    let value = this.linksMap.get(code);
-                    let subs = value[0].slice(2, 47);
-                    resultsaver.push(zipRooms.file(subs).async("text").then((data: any) => {
-                        this.getData(data, code);
-                        this.getDataRoomNum(data, code);
-                    }));
-                });
-
-                Promise.all(resultsaver).then(function () {
-                    that.placeData(id, codearr).then((x) => {
-                        let toSaveOnDisk: object[] = that.roomsMap.get(id);
-                        // if (toSaveOnDisk.length === 0) {
-                        //     that.coursesMap.delete(id);
-                        //     return reject(new InsightError("No sections were added"));
-                        // } else {
-                        fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
-                            return reject(new InsightError("Error Saving Files " + e));
-                        });
-
-                        let result: string[] = [];
-                        that.roomsMap.forEach(function (value, key) {
-                            result.push(key);
-                        });
-                        return resolve(result);
-                        // }
-                    });
-                }).catch((e) => {
-                    return reject(new InsightError("Error decoding contents: Invalid Zip " + e));
-                });
-            });
-            });
-    }*/
     private placeData(id: any, codearr: any): any {
+        return new Promise<any>((resolve, reject) => {
             let that = this;
-        // return new Promise<any>((resolve, reject) => {
             let arr: any[] = [];
             let numarr: any[] = [];
             let hrefarr: any[] = [];
@@ -244,122 +184,100 @@ export default class InsightFacade implements IInsightFacade {
                 uniq.forEach((x: any) => {
                     let sub = x.substring(0, 4);
                     let sub2 = x.substring(0, 3);
-                    if (short.includes(sub) || short.includes(sub2) ) {
+                    if (short.includes(sub) || short.includes(sub2)) {
                         mixarr3.push(data1 + " -- " + x);
                     }
                 });
             });
-      /*  mixarr3.forEach((data1: any) => {
-            console.log(data1);
-            // console.log(data1);
-        });*/
-            // console.log(mixarr3);
             that.putData(mixarr3, chunks, id).then((x: any) => {
-            let path = process.cwd() + "/data/rooms.json";
-            let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
-            that.roomsMap.get(id).push(json);
+                // console.log(x);
+                return resolve(x);
+               // console.log(x);
             });
-        /*      Promise.all(latlonprom).then((x: any) => {
-              that.latlonArray1.forEach((t: any) => {
-                 t.rooms_lat = "null";
-                 console.log(t);
-              });
-            });*/
-      //  });
+        });
+    }
+    private getGeo(url: string, fu2: any, st: any, r2: any, r3: any, a2: any, s2: any, te: any, fn: any, hf: any):
+        Promise<IGeoResponse> {
+        return new Promise<IGeoResponse>((resolve, reject) => {
+            http.get(url, (result) => {
+                result.setEncoding("utf8");
+                let body = "";
+                result.on("data", (chunk) => {
+                    body += chunk;
+                }).on("error", (err) => {
+                    return reject(err);
+                });
+                result.on("end", () => {
+                    let resultVal: IGeoResponse = JSON.parse(body);
+                    let latlon = JSON.parse(JSON.stringify(resultVal));
+                    let lati = latlon.lat;
+                    let longi = latlon.lon;
+                    let obj = {
+                        rooms_fullname: fu2,
+                        rooms_shortname: st,
+                        rooms_number: r2,
+                        rooms_name: r3,
+                        rooms_address: a2,
+                        rooms_lat: lati,
+                        rooms_lon: longi,
+                        rooms_seats: s2,
+                        rooms_type: te,
+                        rooms_furniture: fn,
+                        rooms_href: hf
+                    };
+                    let roomsobj = JSON.parse(JSON.stringify(obj));
+                    return resolve(roomsobj);
+                });
+            });
+        });
     }
     private putData(mixarr3: any, chunks: any, id: any): any {
         return new Promise<any>((resolve, reject) => {
             let that = this;
             let latlonarr: any[] = [];
             let latlonarr2: any[] = [];
+            let fx: any[] = [];
+            let short = "";
+            let full = "";
+            let full2 = "";
             mixarr3.forEach((data1: any) => {
-                let short = data1.replace(/:.*/, "");
-                let adrarr: any[] = [];
-                let full = data1.replace(/.*:/, "");
-                let full2 = full.replace(/ --.*/, "");
+                short = data1.replace(/:.*/, "");
+                // let adrarr: any[] = [];
+                full = data1.replace(/.*:/, "");
+                full2 = full.replace(/ --.*/, "");
 
                 let addrs = data1.replace(/.* --/, "");
                 let addrs2 = addrs.replace(/.*--/, "");
 
                 let addr = addrs2.replace(/ /g, "%20");
                 let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
-                let fx = that.getGeo(url);
-                Promise.all([fx]).then((j: any) => {
-                    // console.log(j);
-                    // let rest = await  that.getGeo(url);
-                    let latlon = JSON.parse(JSON.stringify(j[0]));
-                    let lati = latlon.lat;
-                    let longi = latlon.lon;
-                    // console.log(latlonarr2);
-                    // this.getGeo(url).then((data4: any) => {
-                    //  let latlon = JSON.parse(JSON.stringify(data4));
-                    // let lati = latlon.lat;
-                    // let longi = latlon.lon;
-                    chunks.forEach((data2: any) => {
+                chunks.forEach((data2: any) => {
 
-                        if (data2[0].indexOf(short) === 0) {
-                            let regex = /.*\//;
-                            let roomname = data2[0].replace(regex, "");
-                            let roomname2 = roomname.replace(/.*-/, "");
-                            let roomname3 = short + "_" + roomname2;
-                            let seats = data2[1].replace(/.*:/, "");
-                            let seats2 = Number(seats);
-                            let type = data2[3].replace(/.*:/, "");
-                            let furn = data2[2].replace(/.*:/, "");
-                            let href = data2[0].replace(/.*:/, "");
-
-                            let obj = {
-                                rooms_fullname: full2,
-                                rooms_shortname: short,
-                                rooms_number: roomname2,
-                                rooms_name: roomname3,
-                                rooms_address: addrs2,
-                                rooms_lat: lati,
-                                rooms_lon: longi,
-                                rooms_seats: seats2,
-                                rooms_type: type,
-                                rooms_furniture: furn,
-                                rooms_href: href
-                            };
-
-                            let roomsobj = JSON.parse(JSON.stringify(obj));
-                            // resul.push(roomsobj);
-                            that.roomsMap.get(id).push(roomsobj);
-                            // console.log(roomsobj);
-                            // that.latlonArray1.push(roomsobj);
-                            that.mydatasets.set(id, roomsobj);
-                        }
-                    });
-                    let toSaveOnDisk: object[] = that.roomsMap.get(id);
-                    // if (toSaveOnDisk.length === 0) {
-                    //     that.coursesMap.delete(id);
-                    //     return reject(new InsightError("No sections were added"));
-                    // } else {
-                    let str5 = "test";
-                    fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
-                        // c
-                    });
-                    // return that.roomsMap;
-                    // console.log(that.roomsMap);
+                    if (data2[0].indexOf(short) === 0) {
+                        let regex = /.*\//;
+                        let roomname = data2[0].replace(regex, "");
+                        let roomname2 = roomname.replace(/.*-/, "");
+                        let roomname3 = short + "_" + roomname2;
+                        let seats = data2[1].replace(/.*:/, "");
+                        let seats2 = Number(seats);
+                        let type = data2[3].replace(/.*:/, "");
+                        let furn = data2[2].replace(/.*:/, "");
+                        let href = data2[0].replace(/.*:/, "");
+                        fx.push(that.getGeo(url, full2, short, roomname2, roomname3, addrs2, seats2, type, furn, href));
+                    }
                 });
             });
-            // console.log(that.roomsMap);
-            /*   fs.readFile(path, function read(err, data) {
-                   if (err) {
-                       throw err;
-                   }
-                   let content = data;
-                   console.log(content);
-               });*/
-            // console.log(latlonarr2);
-            // return latlonarr;
-            // let b = await that.roomsMap;
-            // console.log()
-            return resolve("whatevr");
+            let fxarray: any[] = [];
+            Promise.all(fx).then((j: any) => {
+                    fxarray.push(j);
+                    return resolve(fxarray);
+                // console.log(that.roomsMap);
+            });
+            // return resolve("ee");
         });
     }
     // GET DATA FROM THE ROOMS FROM THE LINKS
-    private getData(data: any, code: string) {
+    private getDataNames(data: any, code: string) {
         // return new Promise<any[]>((resolve, reject) => {
         let promises: any[] = [];
         let document: any = parse5.parse(data);
@@ -467,7 +385,7 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
     // GET DATA FROM ROOM NUMBER
-    private getDataRoomNum(data: any, code: string) {
+    private getDataRoomNumInfo(data: any, code: string) {
         let document: any = parse5.parse(data);
         let dataNodes: any[] = document.childNodes;
         dataNodes.forEach((childnode: any) => {
@@ -611,6 +529,11 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
+    private addRooms(data: any, code: any, shortCodeArray: any, id: any) {
+        let that = this;
+        that.getDataNames(data, code);
+        that.getDataRoomNumInfo(data, code);
+    }
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         let that = this;
         let promises: any[] = [];
@@ -627,42 +550,71 @@ export default class InsightFacade implements IInsightFacade {
             }
             // add room -----------------------
             if (kind === InsightDatasetKind.Rooms) {
-                JSZip.loadAsync(content, {base64: true}).then((zipRooms: JSZip) => {
-                    promises.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
-                        that.roomsMap.set(id, []);
-                        that.addRoom(data, id);
-                        let resultsaver: any[] = [];
-                        let codearr: any[] = [];
+                that.roomsMap.set(id, []);
+                JSZip.loadAsync(content, {base64: true}).then(async (zipRooms: JSZip) => {
+                    // promises.push(zipRooms.file("index.htm").async("text").then( (data: any) => {
+                        let promiseRooms = await zipRooms.file("index.htm").async("text");
+                        // console.log(promiseRooms);
+                        that.addRoomLinks(promiseRooms, id);
+                        let resultSaver: any[] = [];
+                        let shortCodeArray: any[] = [];
                         let roomCodes = Array.from(that.linksMap.keys());
                         roomCodes.forEach((code: any) => {
-                            codearr.push(code);
-
+                            shortCodeArray.push(code);
                             let value = that.linksMap.get(code);
                             let subs = value[0].slice(2, 47);
-                            resultsaver.push(zipRooms.file(subs).async("text").then((datax: any) => {
-                                that.getData(datax, code);
-                                that.getDataRoomNum(datax, code);
+                            resultSaver.push(zipRooms.file(subs).async("text").then((datax: any) => {
+                                that.addRooms(datax, code, shortCodeArray, id);
+                                // that.placeData(id, shortCodeArray);
                             }));
                         });
-                        Promise.all(resultsaver).then(function () {
-                            that.placeData(id, codearr);
+                        // console.log(that.roomsMap);
+                        // console.log(resultSaver);
+                        Promise.all(resultSaver).then( async (t: any) => {
+                            let res = await that.placeData(id, shortCodeArray);
+                            // console.log("new -------------------------------------------");
+                            // console.log(res);
+                            res.forEach((x: any) => {
+                               // that.roomsMap.get(id).push(x[0]);
+                               // that.roomsMap.get(id).push(JSON.stringify(x));
+                                x.forEach((y: any) => {
+                                    // console.log(y);
+                                    that.roomsMap.get(id).push(y);
+                                });
+                           });
+                                // that.roomsMap.get(id).push(x);
                             let toSaveOnDisk: object[] = that.roomsMap.get(id);
-                            // if (toSaveOnDisk.length === 0) {
-                            //     that.coursesMap.delete(id);
-                            //     return reject(new InsightError("No sections were added"));
-                            // } else {
+                           // console.log(toSaveOnDisk);
+                            fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
+                                    return reject(new InsightError("Error Saving Files " + e));
+                                });
+                                /*  let path = process.cwd() + "/data/rooms.json";
+                                  let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
+                                  that.roomsMap.get(id).push(json);*/
+                            let result: string[] = [];
+                            that.roomsMap.forEach(function (value, key) {
+                                // console.log(key);
+                                result.push(key);
+                            });
+                            // console.log(that.roomsMap);
+                            // console.log(result);
+                            return resolve(result);
+                       /*     let toSaveOnDisk: object[] = that.roomsMap.get(id);
                             fs.writeFile("data/" + id + ".json", JSON.stringify(toSaveOnDisk), function (e) {
                                 return reject(new InsightError("Error Saving Files " + e));
                             });
+                          /!*  let path = process.cwd() + "/data/rooms.json";
+                            let json = JSON.parse(require("fs").readFileSync(path, "utf8"));
+                            that.roomsMap.get(id).push(json);*!/
 
                             let result: string[] = [];
                             that.roomsMap.forEach(function (value, key) {
                                 result.push(key);
                             });
-                            return resolve(result);
+                            return resolve(result);*/
                             // }
                         });
-                    }));
+                   // }));
                 });
             } else if (kind === InsightDatasetKind.Courses) {
                 // ---------------------------------
@@ -718,7 +670,6 @@ export default class InsightFacade implements IInsightFacade {
                                         that.coursesMap.get(id).push(validCourse);
                                         that.mydatasets.set(id, validCourse);
                                     });
-
                                 } catch (e) {
                                     // not in JSON format or some fields of different type/missing-> skip this course
                                 }
@@ -792,14 +743,14 @@ export default class InsightFacade implements IInsightFacade {
                 // check map is here
                  // console.log(that.roomsMap);
 
-                if (that.coursesMap.get(id)) {
-                    dataset = that.coursesMap.get(id);
-                } else if (that.roomsMap.get(id)) {
-                    dataset = that.roomsMap.get(id);
-                   // console.log(dataset);
-                } else {
-                    throw new Error("Can't find dataset with id: " + id);
-                }
+                // if (that.coursesMap.get(id)) {
+                //     dataset = that.coursesMap.get(id);
+                // } else if (that.roomsMap.get(id)) {
+                //     dataset = that.roomsMap.get(id);
+                //    // console.log(dataset);
+                // } else {
+                //     throw new Error("Can't find dataset with id: " + id);
+                // }
                 // if (that.coursesMap.get(id) === undefined) {
                 //     reject(new InsightError("noot"));
                 // }
@@ -841,6 +792,7 @@ export default class InsightFacade implements IInsightFacade {
                     } else {
                         let thisResult: any[] = [];
                         for (let room of that.roomsMap.get(id)) {
+                           // console.log(room);
                             // check if you can apply filter to the key
                             if (InsightFacade.isSectionValid(filter, room, id)) {
                                 thisResult.push(room);
