@@ -995,7 +995,7 @@ export default class InsightFacade implements IInsightFacade {
                                 return -1;
                             }
                         });
-                    } else if (order.dir) {
+                    } else if (columns.includes(order) && order.dir) {
                         if (order.keys !== undefined) {
                             for (let c of order.keys) {
                                 if (!columns.includes(c)) {
