@@ -149,7 +149,6 @@ export default class InsightFacade implements IInsightFacade {
                 });
             });
             // getting only the correct addresses
-           // console.log(this.addressArray1);
             let uniq = this.addressArray1.reduce((a, b) => {
                 if (a.indexOf(b) < 0) {
                     a.push(b);
@@ -185,7 +184,7 @@ export default class InsightFacade implements IInsightFacade {
                 let full = data1.replace(/.*:/, "");
                 let short = data1.replace(/:.*/, "");
                 let adrarr: any[] = [];
-                adr.forEach((x: any) => {
+                uniq.forEach((x: any) => {
                     let sub = x.substring(0, 4);
                     let sub2 = x.substring(0, 3);
                     if (short === sub || short === sub2) {
@@ -280,6 +279,31 @@ export default class InsightFacade implements IInsightFacade {
                 let addr = addrs2.replace(/ /g, "%20");
                 full = data1.replace(/.*:/, "");
                 full2 = full.replace(/ --.*/, "");
+                /*if (short === "MATX" || short === "MATH" || short === "WESB" || short === "ESB") {
+                    if (short === "MATX") {
+                        addrs2 = "1986 Mathematics Road";
+                        addr = addrs2.replace(/ /g, "%20");
+                    } else if (short === "MATH") {
+                        addrs2 = "1984 Mathematics Road";
+                        addr = addrs2.replace(/ /g, "%20");
+                    } else if (short === "WESB") {
+                        addrs2 = "6174 University Boulevard";
+                        addr = addrs2.replace(/ /g, "%20");
+                    } else if (short === "ESB") {
+                        addrs2 = "2207 Main Mall";
+                        addr = addrs2.replace(/ /g, "%20");
+                    }
+                }*/
+                // console.log(short + addrs2);
+         /*       if (addrs2 === "2207 Main Mall" || addrs2 === "1986 Mathematics Road") {
+                    // console.log(short);
+                    // let adrarr: any[] = [];
+                    if (addr === "2207 Main Mall") {
+                        short = "ESB";
+                    } else if (addr === "1986 Mathematics Road") {
+                        short = "MATX";
+                    }
+                }*/
                 let url = "http://cs310.ugrad.cs.ubc.ca:11316/api/v1/project_e6y0b_s5c1b/" + addr;
                 chunks.forEach((data2: any) => {
                     let correctCode = data2[0].replace(/:.*/, "");
@@ -651,61 +675,33 @@ export default class InsightFacade implements IInsightFacade {
                                         let audit: number = section.Audit;
                                         let uuid: string = section.id.toString();
                                         let year: number = Number(section.Year);
-                                        let sec: string = section.Section;
 
                                         // let validCourse: CourseSaver = new CourseSaver(dept, id,
                                         //     avg, instructor, title, pass, fail, audit, uuid, year);
-                                        if (sec === "overall") {
-                                            let validCourse: any = {
-                                                dept: String,
-                                                id: String,
-                                                avg: Number,
-                                                instructor: String,
-                                                title: String,
-                                                pass: Number,
-                                                fail: Number,
-                                                audit: Number,
-                                                uuid: String,
-                                                year: Number
-                                            };
-                                            validCourse.dept = dept;
-                                            validCourse.id = iid;
-                                            validCourse.avg = avg;
-                                            validCourse.instructor = instructor;
-                                            validCourse.title = title;
-                                            validCourse.pass = pass;
-                                            validCourse.fail = fail;
-                                            validCourse.audit = audit;
-                                            validCourse.uuid = uuid;
-                                            validCourse.year = 1900;
-                                            that.coursesMap.get(id).push(validCourse);
-                                            that.mydatasets.set(id, validCourse);
-                                        } else {
-                                            let validCourse: any = {
-                                                dept: String,
-                                                id: String,
-                                                avg: Number,
-                                                instructor: String,
-                                                title: String,
-                                                pass: Number,
-                                                fail: Number,
-                                                audit: Number,
-                                                uuid: String,
-                                                year: Number
-                                            };
-                                            validCourse.dept = dept;
-                                            validCourse.id = iid;
-                                            validCourse.avg = avg;
-                                            validCourse.instructor = instructor;
-                                            validCourse.title = title;
-                                            validCourse.pass = pass;
-                                            validCourse.fail = fail;
-                                            validCourse.audit = audit;
-                                            validCourse.uuid = uuid;
-                                            validCourse.year = year;
-                                            that.coursesMap.get(id).push(validCourse);
-                                            that.mydatasets.set(id, validCourse);
-                                        }
+                                        let validCourse: any = {
+                                            dept: String,
+                                            id: String,
+                                            avg: Number,
+                                            instructor: String,
+                                            title: String,
+                                            pass: Number,
+                                            fail: Number,
+                                            audit: Number,
+                                            uuid: String,
+                                            year: Number
+                                        };
+                                        validCourse.dept = dept;
+                                        validCourse.id = iid;
+                                        validCourse.avg = avg;
+                                        validCourse.instructor = instructor;
+                                        validCourse.title = title;
+                                        validCourse.pass = pass;
+                                        validCourse.fail = fail;
+                                        validCourse.audit = audit;
+                                        validCourse.uuid = uuid;
+                                        validCourse.year = year;
+                                        that.coursesMap.get(id).push(validCourse);
+                                        that.mydatasets.set(id, validCourse);
                                     });
                                 } catch (e) {
                                     // not in JSON format or some fields of different type/missing-> skip this course
