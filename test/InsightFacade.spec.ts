@@ -768,6 +768,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(response).to.contain("coursesOne");
         }
     });
+
 });
 
 // This test suite dynamically generates tests from the JSONe files in test/queries.

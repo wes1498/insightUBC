@@ -219,19 +219,43 @@ export default class InsightFacade implements IInsightFacade {
                     let latlon = JSON.parse(JSON.stringify(resultVal));
                     let lati = latlon.lat;
                     let longi = latlon.lon;
+                    // let obj = {
+                    //     rooms_fullname: fu2,
+                    //     rooms_shortname: st,
+                    //     rooms_number: r2,
+                    //     rooms_name: r3,
+                    //     rooms_address: a2,
+                    //     rooms_lat: lati,
+                    //     rooms_lon: longi,
+                    //     rooms_seats: s2,
+                    //     rooms_type: te,
+                    //     rooms_furniture: fn,
+                    //     rooms_href: "http:" + hf
+                    // };
                     let obj = {
-                        rooms_fullname: fu2,
-                        rooms_shortname: st,
-                        rooms_number: r2,
-                        rooms_name: r3,
-                        rooms_address: a2,
-                        rooms_lat: lati,
-                        rooms_lon: longi,
-                        rooms_seats: s2,
-                        rooms_type: te,
-                        rooms_furniture: fn,
-                        rooms_href: "http:" + hf
+                        fullname: fu2,
+                        shortname: st,
+                        number: r2,
+                        name: r3,
+                        address: a2,
+                        lat: lati,
+                        lon: longi,
+                        seats: s2,
+                        type: te,
+                        furniture: fn,
+                        href: "http:" + hf
                     };
+                    obj.fullname = fu2;
+                    obj.shortname = st;
+                    obj.number = r2;
+                    obj.name = r2;
+                    obj.address = a2;
+                    obj.lat = lati;
+                    obj.lon = longi;
+                    obj.seats = s2;
+                    obj.type = te;
+                    obj.furniture = fn;
+                    obj.href = "http:" + hf;
                     let roomsobj = JSON.parse(JSON.stringify(obj));
                     return resolve(roomsobj);
                 });
@@ -725,40 +749,33 @@ export default class InsightFacade implements IInsightFacade {
                 return reject(new NotFoundError("Invalid ID"));
             } else if (id === null || !id) {
                 return reject(new InsightError("Invalid ID"));
-            } else if (id === "rooms") {
+            } else if (id === ROOMS) {
                 if ((!that.roomsMap.has(id))) {
                     return reject(new NotFoundError("Id not in Map"));
+                } else {
+                    that.roomsMap.delete(id);
+                    fs.readdir(InsightDatasetKind.Rooms.toString(), function (e, files) {
+                        if (e) {
+                            return reject(new InsightError("Dataset not added yet " + e));
+                        }
+                        return resolve (id);
+                    });
                 }
-            } else if (id === "courses") {
+            } else if (id === COURSES) {
                 if (!that.coursesMap.has(id)) {
                     return reject(new NotFoundError("Id not in Map"));
+                } else {
+                    that.coursesMap.delete(id);
+                    fs.readdir(InsightDatasetKind.Courses.toString(), function (e, files) {
+                        if (e) {
+                            return reject(new InsightError("Dataset not added yet " + e));
+                        }
+                        return resolve (id);
+                    });
                 }
-            }
-            if (that.roomsMap.has(id)) {
-                that.roomsMap.delete(id);
-                // console.log(InsightDatasetKind.Rooms.toString());
-             /*   fs.readdir(InsightDatasetKind.Courses.toString(), function (e, files) {
-                    if (e) {
-                        return reject(new InsightError("Dataset not added yet " + e));
-                    }*/
-                return resolve(id);
-               // });
-            } else if (that.coursesMap.has(id)) {
-                that.coursesMap.delete(id);
-                fs.readdir(InsightDatasetKind.Courses.toString(), function (e, files) {
-                    if (e) {
-                        return reject(new InsightError("Dataset not added yet " + e));
-                    }
-                    return resolve (id);
-                });
-            }
-      /*      if (id === "courses") {
-                that.coursesMap.delete(id);
-                return resolve (id);
             } else {
-                that.roomsMap.delete(id);
-                return resolve(id);
-            }*/
+                return reject(new NotFoundError("Dataset already removed"));
+            }
         });
     }
     public performQuery(query: any): Promise<any[]> {
@@ -774,22 +791,6 @@ export default class InsightFacade implements IInsightFacade {
                 let transformations = query.TRANSFORMATIONS;
                 let id: string = columns[0].split("_")[0];
                 let dataset;
-                // check map is here
-                 // console.log(that.roomsMap);
-
-                // if (that.coursesMap.get(id)) {
-                //     dataset = that.coursesMap.get(id);
-                // } else if (that.roomsMap.get(id)) {
-                //     dataset = that.roomsMap.get(id);
-                //    // console.log(dataset);
-                // } else {
-                //     throw new Error("Can't find dataset with id: " + id);
-                // }
-                // if (that.coursesMap.get(id) === undefined) {
-                //     reject(new InsightError("noot"));
-                // }
-
-                // let dataset = id === "courses" ? that.coursesMap.get(id) : that.roomsMap.get(id);
 
                 let result: any[];
                 if (id === COURSES) {
@@ -864,254 +865,140 @@ export default class InsightFacade implements IInsightFacade {
                     if (transformations.GROUP === undefined || transformations.GROUP.length === 0) {
                         throw new InsightError("GROUP must be non-empty array");
                     }
-
-                    if (id === COURSES) {
-                        for (let values of dataset) {
-                            let groupingVal: string = "";
-                            for (let pair of transformations.GROUP) {
-                                if (!query.OPTIONS.COLUMNS.includes(pair) &&
-                                    !InsightFacade.validCourseKeyHelper(pair, id)) {
-                                    throw new InsightError("invalid key in GROUP");
-                                }
-                                let key = pair.split("_")[1]; // key = title
-                                let value: string = values[key] as string; // grab value from values[title]
-
-                                if (values) {
-                                    groupingVal += value; // "" + "Career Planning"
-                                } else {
-                                    throw new InsightError("the pair was not a valid key");
-                                }
+                    for (let values of dataset) {
+                        let groupingVal: string = "";
+                        for (let pair of transformations.GROUP) {
+                            if (!query.OPTIONS.COLUMNS.includes(pair) &&
+                                !InsightFacade.validCourseKeyHelper(pair, id)) {
+                                throw new InsightError("invalid key in GROUP");
                             }
+                            let key = pair.split("_")[1]; // key = title
+                            let value: string = values[key] as string; // grab value from values[title]
 
-                            if (!groups.get(groupingVal)) {
-                                groups.set(groupingVal, []); // each grouptitle has its array of grouped items
+                            if (values) {
+                                groupingVal += value; // "" + "Career Planning"
+                            } else {
+                                throw new InsightError("the pair was not a valid key");
                             }
-                            groups.get(groupingVal).push(values); // push sections that group to Career Planning
                         }
-                        for (let group of groups.values()) { // group {title(1): ___} of title(n)
-                            let entry: {[key: string]: any } = {}; // initialize {[key: stirng]: any}
-                            for (let pair of transformations.GROUP) {
-                                let key = pair.split("_")[1]; // title
-                                entry[key] = group[0][key]; // [title: Career Planning]
-                            }
-                            let applyKeys: string[] = []; // array for keys to apply token on
-                            for (let object of transformations.APPLY) { // object: overallAvg: {<key>:<token>}
-                                let applyKey = Object.keys(object)[0]; // applyKey = overallAvg
-                                if (!applyKey.includes("_")) {
-                                    if (!applyKeys.includes(applyKey)) { // if token not in array
-                                        applyKeys.push(applyKey);
-                                    } else {
-                                        throw new InsightError("Duplicated apply key not allowed");
-                                    }
-                                } else {
-                                    throw new InsightError("applyKey cannot contain underscore");
-                                }
-                                let applyToken = Object.keys(object[applyKey])[0];
-                                let pair = object[applyKey][applyToken]; // what token performs on: courses_avg
-                                let key = pair.split("_")[1]; // avg
-                                let setVal: any[] = [];
-                                for (let element of group) {
-                                    setVal.push(element[key]); // setVal has courses_avg for each section
-                                }
-                                let value: number;
-                                if (applyToken === "MAX") {
-                                    value = setVal[0];
-                                    value = that.applyMaxHelper(value, setVal);
-                                } else if (applyToken === "MIN") {
-                                    value = setVal[0];
-                                    value = that.applyMinHelper(value, setVal);
-                                } else if (applyToken === "SUM") {
-                                    let total = new Decimal(0);
-                                    value = that.applySumHelper(total, setVal);
-                                } else if (applyToken === "AVG") {
-                                    let sum = new Decimal(0);
-                                    value = that.applyAverageHelper(sum, setVal);
-                                } else if (applyToken === "COUNT") {
-                                    let unique = setVal.filter((values, index, self) => {
-                                        return self.indexOf(values) === index;
-                                    });
-                                    value = unique.length;
-                                } else {
-                                    throw new InsightError("Token does not exist");
-                                }
-                                entry[applyKey] = value;
-                            }
-                            transformedDataset.push(entry);
-                        }
-                    } else if (id === ROOMS) {
-                        for (let values of dataset) {
-                            let groupingVal: string = "";
-                            for (let pair of transformations.GROUP) {
-                                if (!query.OPTIONS.COLUMNS.includes(pair) &&
-                                    !InsightFacade.validCourseKeyHelper(pair, id)) {
-                                    throw new InsightError("invalid key in GROUP");
-                                }
-                                // let key = pair.split("_")[1]; // key = title
-                                let value: string = values[pair] as string; // grab value from values[title]
 
-                                if (values) {
-                                    groupingVal += value; // "" + "Career Planning"
-                                } else {
-                                    throw new InsightError("the pair was not a valid key");
-                                }
-                            }
-
-                            if (!groups.get(groupingVal)) {
-                                groups.set(groupingVal, []); // each grouptitle has its array of grouped items
-                            }
-                            groups.get(groupingVal).push(values); // push sections that group to Career Planning
+                        if (!groups.get(groupingVal)) {
+                            groups.set(groupingVal, []); // each grouptitle has its array of grouped items
                         }
-                        for (let group of groups.values()) { // group {title(1): ___} of title(n)
-                            let entry: {[key: string]: any } = {}; // initialize {[key: stirng]: any}
-                            for (let pair of transformations.GROUP) {
-                                // let key = pair.split("_")[1]; // title
-                                entry[pair] = group[0][pair]; // [title: Career Planning]
-                            }
-                            let applyKeys: string[] = []; // array for keys to apply token on
-                            for (let object of transformations.APPLY) { // object: overallAvg: {<key>:<token>}
-                                let applyKey = Object.keys(object)[0]; // applyKey = overallAvg
-                                if (!applyKey.includes("_")) {
-                                    if (!applyKeys.includes(applyKey)) { // if token not in array
-                                        applyKeys.push(applyKey);
-                                    } else {
-                                        throw new InsightError("Duplicated apply key not allowed");
-                                    }
-                                } else {
-                                    throw new InsightError("applyKey cannot contain underscore");
-                                }
-                                let applyToken = Object.keys(object[applyKey])[0]; // Key of overallAvg[applyKey]
-                                let pair = object[applyKey][applyToken]; // what token performs on: courses_avg
-                                // let key = pair.split("_")[1]; // avg
-                                let setVal: any[] = [];
-                                for (let element of group) {
-                                    setVal.push(element[pair]); // setVal has courses_avg for each section { 90, 80, 70
-                                }
-                                let value: number;
-                                if (applyToken === "MAX") {
-                                    value = setVal[0];
-                                    value = that.applyMaxHelper(value, setVal);
-                                } else if (applyToken === "MIN") {
-                                    value = setVal[0];
-                                    value = that.applyMinHelper(value, setVal);
-                                } else if (applyToken === "SUM") {
-                                    let total = new Decimal(0);
-                                    value = that.applySumHelper(total, setVal);
-                                } else if (applyToken === "AVG") {
-                                    let sum = new Decimal(0);
-                                    value = that.applyAverageHelper(sum, setVal);
-                                } else if (applyToken === "COUNT") {
-                                    let unique = setVal.filter((values, index, self) => {
-                                        return self.indexOf(values) === index;
-                                    });
-                                    value = unique.length;
-                                } else {
-                                    throw new InsightError("Token does not exist");
-                                }
-                                entry[applyKey] = value;
-                            }
-                            transformedDataset.push(entry);
-                        }
+                        groups.get(groupingVal).push(values); // push sections that group to Career Planning
                     }
-
+                    for (let group of groups.values()) { // group {title(1): ___} of title(n)
+                        let entry: {[key: string]: any } = {}; // initialize {[key: stirng]: any}
+                        for (let pair of transformations.GROUP) {
+                            let key = pair.split("_")[1]; // title
+                            entry[key] = group[0][key]; // [title: Career Planning]
+                        }
+                        let applyKeys: string[] = []; // array for keys to apply token on
+                        for (let object of transformations.APPLY) { // object: overallAvg: {<key>:<token>}
+                            let applyKey = Object.keys(object)[0]; // applyKey = overallAvg
+                            if (!applyKey.includes("_")) {
+                                if (!applyKeys.includes(applyKey)) { // if token not in array
+                                    applyKeys.push(applyKey);
+                                } else {
+                                    throw new InsightError("Duplicated apply key not allowed");
+                                }
+                            } else {
+                                throw new InsightError("applyKey cannot contain underscore");
+                            }
+                            let applyToken = Object.keys(object[applyKey])[0];
+                            let pair = object[applyKey][applyToken]; // what token performs on: courses_avg
+                            let key = pair.split("_")[1]; // avg
+                            let setVal: any[] = [];
+                            for (let element of group) {
+                                setVal.push(element[key]); // setVal has courses_avg for each section
+                            }
+                            let value: number;
+                            if (applyToken === "MAX") {
+                                value = setVal[0];
+                                value = that.applyMaxHelper(value, setVal);
+                            } else if (applyToken === "MIN") {
+                                value = setVal[0];
+                                value = that.applyMinHelper(value, setVal);
+                            } else if (applyToken === "SUM") {
+                                let total = new Decimal(0);
+                                value = that.applySumHelper(total, setVal);
+                            } else if (applyToken === "AVG") {
+                                let sum = new Decimal(0);
+                                value = that.applyAverageHelper(sum, setVal);
+                            } else if (applyToken === "COUNT") {
+                                let unique = setVal.filter((values, index, self) => {
+                                    return self.indexOf(values) === index;
+                                });
+                                value = unique.length;
+                            } else {
+                                throw new InsightError("Token does not exist");
+                            }
+                            entry[applyKey] = value;
+                        }
+                        transformedDataset.push(entry);
+                    }
                     dataset = transformedDataset;
                 }
                 // keep only the desired columns in query
                 if (columns && columns.length !== 0) {
                     let columnResult: object[] = [];
-                    if (id === COURSES) {
-                        dataset.forEach(function (section: any) {
-                            let columnSection: any = {};
-                            columns.forEach(function (key: any) {
-                                let cols;
-                                if (query.TRANSFORMATIONS !== undefined) {
-                                    if (key.includes("_")) {
-                                        if (query.TRANSFORMATIONS.GROUP !== undefined) {
-                                            for (let b of query.TRANSFORMATIONS.GROUP) { // group has an array of keys
-                                                if (b === key) {
-                                                    cols = key.split("_")[1]; // cols = title
-                                                    break;
-                                                }
-                                            }
-                                            if (cols === undefined) {
-                                                throw  new InsightError("Columns didnt map to any GROUP key");
-                                            }
-                                        }
-                                    } else if (query.TRANSFORMATIONS.APPLY !== undefined) {
-                                        for (let a of query.TRANSFORMATIONS.APPLY) { // apply has an array of keys
-                                            if (Object.keys(a)[0] === key) {
-                                                cols = key;
+                    dataset.forEach(function (section: any) {
+                        let columnSection: any = {};
+                        columns.forEach(function (key: any) {
+                            let cols;
+                            if (query.TRANSFORMATIONS !== undefined) {
+                                if (key.includes("_")) {
+                                    if (query.TRANSFORMATIONS.GROUP !== undefined) {
+                                        for (let b of query.TRANSFORMATIONS.GROUP) { // group has an array of keys
+                                            if (b === key) {
+                                                cols = key.split("_")[1]; // cols = title
                                                 break;
                                             }
                                         }
-                                        if (cols !== key) {
-                                            throw  new InsightError("Columns didnt map to any apply key");
+                                        if (cols === undefined) {
+                                            throw  new InsightError("Columns didnt map to any GROUP key");
                                         }
-                                    } else {
-                                        throw new InsightError("Columns key not in apply");
+                                    }
+                                } else if (query.TRANSFORMATIONS.APPLY !== undefined) {
+                                    for (let a of query.TRANSFORMATIONS.APPLY) { // apply has an array of keys
+                                        if (Object.keys(a)[0] === key) {
+                                            cols = key;
+                                            break;
+                                        }
+                                    }
+                                    if (cols !== key) {
+                                        throw  new InsightError("Columns didnt map to any apply key");
                                     }
                                 } else {
-                                    if (key.includes("_")) {
-                                        cols = key.split("_")[1];
-                                    } else {
-                                        cols = key;
-                                    }
+                                    throw new InsightError("Columns key not in apply");
                                 }
-                                columnSection[key] = section[cols];
-                            });
-                            columnResult.push(columnSection);
-                        });
-                        result = columnResult;
-                    } else if (id === ROOMS) {
-                        dataset.forEach(function (room: any) {
-                            let columnRoom: any = {};
-                            columns.forEach(function (key: any) {
-                                let cols;
-                                if (query.TRANSFORMATIONS !== undefined) {
-                                    if (key.includes("_")) {
-                                        if (query.TRANSFORMATIONS.GROUP !== undefined) {
-                                            for (let b of query.TRANSFORMATIONS.GROUP) { // group has an array of keys
-                                                if (b === key) {
-                                                    // cols = key.split("_")[1]; // cols = title
-                                                    cols = key;
-                                                    break;
-                                                }
-                                            }
-                                            if (cols === undefined) {
-                                                throw  new InsightError("Columns didnt map to any GROUP key");
-                                            }
-                                        }
-                                    } else if (query.TRANSFORMATIONS.APPLY !== undefined) {
-                                        for (let a of query.TRANSFORMATIONS.APPLY) { // apply has an array of keys
-                                            if (Object.keys(a)[0] === key) {
-                                                cols = key;
-                                                break;
-                                            }
-                                        }
-                                        if (cols !== key) {
-                                            throw  new InsightError("Columns didnt map to any apply key");
-                                        }
-                                    } else {
-                                        throw new InsightError("Columns key not in apply");
-                                    }
+                            } else {
+                                if (key.includes("_")) {
+                                    cols = key.split("_")[1];
                                 } else {
-                                    if (key.includes("_")) {
-                                        // cols = key.split("_")[1];
-                                        cols = key;
-                                    } else {
-                                        throw new InsightError("Incorrect KEY format");
-                                    }
+                                    cols = key;
                                 }
-                                columnRoom[key] = room[cols];
-                            });
-                            columnResult.push(columnRoom);
+                            }
+                            columnSection[key] = section[cols];
                         });
-                        result = columnResult;
-                    }
+                        columnResult.push(columnSection);
+                    });
+                    result = columnResult;
                 }
 
                 if (order !== undefined && order !== null) {
-                    if (columns.includes(order)) {
-                        result = that.Sorter(result, order, columns);
+                    if (columns.includes(order) && !order.dir) {
+                        result = result.sort( function (a, b) {
+                            let x = a[order];
+                            let y = b[order];
+                            if (x === y) {
+                                return 0;
+                            } else if (x > y ) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        });
                     } else if (order.dir) {
                         if (order.keys !== undefined) {
                             for (let c of order.keys) {
@@ -1331,7 +1218,7 @@ export default class InsightFacade implements IInsightFacade {
             if (typeof Object.values(body)[0] !== "number") {
                 throw new InsightError("Invalid value");
             }
-            if (id === "courses") {
+            if (id === InsightDatasetKind.Courses) {
                 if (!this.validCourseKeyHelper(Object.keys(body)[0], id)) {
                     throw new InsightError("Invalid Course key");
                 }
@@ -1349,7 +1236,7 @@ export default class InsightFacade implements IInsightFacade {
                     default:
                         break;
                 }
-            } else if (id === "rooms") {
+            } else if (id === InsightDatasetKind.Rooms) {
                 if (!this.validRoomsKeyHelper(Object.keys(body)[0], id)) {
                     throw new InsightError("Invalid Rooms key");
                 }
@@ -1371,27 +1258,6 @@ export default class InsightFacade implements IInsightFacade {
                         throw new InsightError("Not valid key");
                     default:
                         break;
-                }
-                if (filter.hasOwnProperty("GT")) {
-                    if (section[Object.keys(filter.GT)[0]] > Object.values(filter.GT)[0]) { // section[rooms_lat]
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else if (filter.hasOwnProperty("LT")) {
-                    if (section[Object.keys(filter.LT)[0]] < Object.values(filter.LT)[0]) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-
-                    if (section[Object.keys(filter.EQ)[0]] === Object.values(filter.EQ)[0]) {
-
-                        return true;
-                    } else {
-                        return false;
-                    }
                 }
             }
 
@@ -1443,7 +1309,7 @@ export default class InsightFacade implements IInsightFacade {
             if (typeof value !== "string") {
                 throw new InsightError("Invalid type");
             }
-            if (id === "courses") {
+            if (id === InsightDatasetKind.Courses) {
                 if (!this.validCourseKeyHelper(key, id)) {
                     throw new InsightError("Invalid Course key");
                 }
@@ -1461,7 +1327,7 @@ export default class InsightFacade implements IInsightFacade {
                     default:
                         break;
                 }
-            } else if (id === "rooms") {
+            } else if (id === InsightDatasetKind.Rooms) {
                 if (!this.validRoomsKeyHelper(key, id)) {
                     throw new InsightError("Invalid Rooms key");
                 }
@@ -1475,41 +1341,6 @@ export default class InsightFacade implements IInsightFacade {
                     default:
                         break;
                 }
-                let actualRoom: string = section[key]; // section[rooms_lat]
-                // console.log(actualRoom);
-                // check each wildcard case
-                if (value.includes("*")) {
-                    let valueArray: string[] = value.split("*");
-                    if (valueArray.length === 2) {
-                        if (valueArray[0] === "") {
-                            if (valueArray.length > 2) {
-                                throw new InsightError("Asterisks cannot be in the middle");
-                            }
-                            if (value.startsWith("*")) {
-                                return actualRoom.endsWith(value.substring(1));
-                            }
-                        }
-                        if (valueArray[1] === "") {
-                            if (valueArray.length > 2) {
-                                throw new InsightError("Asterisks cannot be ");
-                            }
-                            if (value.endsWith("*")) {
-                                return actualRoom.startsWith(value.substring(0, value.length - 1));
-                            }
-                        } else {
-                            throw new InsightError ("Asterisk Error Occured");
-                        }
-                    }
-                    if (valueArray.length === 3 && valueArray[0] === "" && valueArray[2] === "") {
-                        if (value.startsWith("*") && value.endsWith("*")) {
-                            return actualRoom.includes(value.substring(1, value.length - 1));
-                        }
-                    } else {
-                        // h**lo or h*llo === error
-                        throw new InsightError("Asteriks cannot be in the middle");
-                    }
-                }
-                return value === actualRoom;
             }
 
             let actualRes: string = section[key.substring(key.indexOf("_") + 1)]; // section[id]
