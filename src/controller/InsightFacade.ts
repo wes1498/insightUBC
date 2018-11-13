@@ -837,15 +837,15 @@ export default class InsightFacade implements IInsightFacade {
                         // console.log(dataset);
                     }
                 }
-                for (let q of Object.keys(query)) {
-                    if (q !== "WHERE") {
-                        if (q !== "OPTIONS") {
-                            if (q !== "TRANSFORMATIONS") {
-                                throw new InsightError("Now this should work");
-                            }
-                        }
-                    }
-                }
+                // for (let q of Object.keys(query)) {
+                //     if (q !== "WHERE") {
+                //         if (q !== "OPTIONS") {
+                //             if (q !== "TRANSFORMATIONS") {
+                //                 throw new InsightError("Now this should work");
+                //             }
+                //         }
+                //     }
+                // }
 
                 if (transformations !== undefined && transformations !== null) {
                     let keys: any[] = Object.keys(query);
@@ -864,9 +864,16 @@ export default class InsightFacade implements IInsightFacade {
                     for (let values of dataset) {
                         let groupingVal: string = "";
                         for (let pair of transformations.GROUP) {
-                            if (!query.OPTIONS.COLUMNS.includes(pair) &&
-                                !InsightFacade.validCourseKeyHelper(pair, id)) {
-                                throw new InsightError("invalid key in GROUP");
+                            if (id === COURSES) {
+                                if (!query.OPTIONS.COLUMNS.includes(pair) &&
+                                    !InsightFacade.validCourseKeyHelper(pair, id)) {
+                                    throw new InsightError("invalid key in GROUP");
+                                }
+                            } else if (id === ROOMS) {
+                                if (!query.OPTIONS.COLUMNS.includes(pair) &&
+                                    !InsightFacade.validRoomsKeyHelper(pair, id)) {
+                                    throw new InsightError("invalid key in GROUP");
+                                }
                             }
                             let key = pair.split("_")[1]; // key = title
                             let value: string = values[key] as string; // grab value from values[title]
@@ -1214,7 +1221,7 @@ export default class InsightFacade implements IInsightFacade {
             if (typeof Object.values(body)[0] !== "number") {
                 throw new InsightError("Invalid value");
             }
-            if (id === InsightDatasetKind.Courses) {
+            if (id === COURSES) {
                 if (!this.validCourseKeyHelper(Object.keys(body)[0], id)) {
                     throw new InsightError("Invalid Course key");
                 }
@@ -1232,7 +1239,7 @@ export default class InsightFacade implements IInsightFacade {
                     default:
                         break;
                 }
-            } else if (id === InsightDatasetKind.Rooms) {
+            } else if (id === ROOMS) {
                 if (!this.validRoomsKeyHelper(Object.keys(body)[0], id)) {
                     throw new InsightError("Invalid Rooms key");
                 }
@@ -1305,7 +1312,7 @@ export default class InsightFacade implements IInsightFacade {
             if (typeof value !== "string") {
                 throw new InsightError("Invalid type");
             }
-            if (id === InsightDatasetKind.Courses) {
+            if (id === COURSES) {
                 if (!this.validCourseKeyHelper(key, id)) {
                     throw new InsightError("Invalid Course key");
                 }
@@ -1323,7 +1330,7 @@ export default class InsightFacade implements IInsightFacade {
                     default:
                         break;
                 }
-            } else if (id === InsightDatasetKind.Rooms) {
+            } else if (id === ROOMS) {
                 if (!this.validRoomsKeyHelper(key, id)) {
                     throw new InsightError("Invalid Rooms key");
                 }
