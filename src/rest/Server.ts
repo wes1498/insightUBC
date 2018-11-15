@@ -66,10 +66,10 @@ export default class Server {
                 that.rest.get("/echo/:msg", Server.echo);
                // that.rest.get("/yeet", Server.getShit);
 
-                that.rest.put("/addDataset/:id/:kind", Server.addDatasetFiles);
-                that.rest.del("/deleteDataset/:id", Server.deleteDatasets);
-                that.rest.post("/performQuery/", Server.postQuery);
-                that.rest.get("/numberOfDatasets", Server.getlistDataset);
+                that.rest.put("/dataset/:id/:kind", Server.addDatasetFiles);
+                that.rest.del("/dataset/:id", Server.deleteDatasets);
+                that.rest.post("/query", Server.postQuery);
+                that.rest.get("/datasets", Server.getlistDataset);
                 // Log.info("putted");
 
                 // NOTE: your endpoints should go here
@@ -171,11 +171,11 @@ export default class Server {
                // reject({code: 400, body: {error: "Error saving files"}});
             });
            // res.json(  successResponse.code + ": " + successResponse.body); // Formats json and res.sends
-            res.json({code: 200, body: {successResponse}});
+            res.json({code: 200, body: successResponse});
             return next();
         }).catch((failResponse: any) => {
             // res.json(failResonse.body);
-            res.json({code: 400, body: {failResponse}});
+            res.json({code: 400, body: failResponse});
             return next();
         });
     }
@@ -185,13 +185,13 @@ export default class Server {
         // let datasetKind = req.params.kind;
         const instancefacade = InsightFacade.getInstance();
         instancefacade.removeDataset(datasetId).then((successResponse: any) => {
-            res.json({code: 200, body: {successResponse}}); // Formats json and res.sends
+            res.json({code: 200, body: successResponse}); // Formats json and res.sends
             return next();
         }).catch((failResponse: any) => {
             // Log.error("Server::echo(..) - responding " + failResponse.code);
             // e.log(failResponse);
             let h = failResponse.message;
-            res.json({code: 400, body: {h}});
+            res.json({code: 400, body: h});
            // res.send(failResponse);
             return next();
         });
@@ -201,11 +201,11 @@ export default class Server {
         // let datasetKind = req.params.kind;
         const instancefacade = InsightFacade.getInstance();
         instancefacade.performQuery(query).then((successResponse: any) => {
-            res.json({code: 200, body: {successResponse}}); // Formats json and res.sends
+            res.json({code: 200, body: successResponse}); // Formats json and res.sends
             return next();
         }).catch((failResponse: any) => {
             let h = failResponse.message;
-            res.json({code: 400, body: {h}});
+            res.json({code: 400, body: h});
             return next();
         });
     }
