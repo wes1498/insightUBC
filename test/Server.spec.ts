@@ -4,6 +4,7 @@ import InsightFacade from "../src/controller/InsightFacade";
 import chai = require("chai");
 
 import chaiHttp = require("chai-http");
+import {expect} from "chai";
 import Log from "../src/Util";
 
 describe("Facade D3", function () {
@@ -64,6 +65,15 @@ describe("Facade D3", function () {
         }
     });
     */
+    it("list datasets", function () {
+        return chai.request("http://localhost:4321")
+            .get("/numberOfDatasets")
+            .then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch((err) => {
+                expect.fail();
+            });
+    });
 
     // The other endpoints work similarly. You should be able to find all instructions at the chai-http documentation
 });
