@@ -189,7 +189,7 @@ export default class Server {
             return next();
         }).catch((failResponse: any) => {
             // Log.error("Server::echo(..) - responding " + failResponse.code);
-            console.log(failResponse);
+            // e.log(failResponse);
             let h = failResponse.message;
             res.json({code: 400, body: {h}});
            // res.send(failResponse);

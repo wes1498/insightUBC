@@ -774,7 +774,7 @@ export default class InsightFacade implements IInsightFacade {
                             return reject(new NotFoundError("Dataset has not yet been loaded"));
                         } else {
                         that.roomsMap.delete(id);
-                        console.log("made it here");
+                        // console.log("made it here");
                         return resolve(id);
                     }
                 });
@@ -784,7 +784,7 @@ export default class InsightFacade implements IInsightFacade {
                         return reject(new NotFoundError("Dataset has not yet been loaded"));
                     } else {
                         that.coursesMap.delete(id);
-                        console.log("made it here");
+                        // console.log("made it here");
                         return resolve(id);
                     }
                 });
