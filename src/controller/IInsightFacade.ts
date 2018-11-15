@@ -23,10 +23,26 @@ export interface IGeoResponse {
     lon?: number;
     error?: string;
 }
+export interface InsightListResponse {
+    code: number;
+    body: InsightDataset[];
+}
 export interface InsightDataset {
     id: string;
     kind: InsightDatasetKind;
     numRows: number;
+}
+
+export interface InsightResponse {
+    code: 200 | 400;
+    body: InsightResolve | InsightReject;
+}
+export interface InsightResolve {
+    result: string | any[];
+}
+
+export interface InsightReject {
+    error: string;
 }
 
 export class InsightError extends Error {

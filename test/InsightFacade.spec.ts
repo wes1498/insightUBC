@@ -89,6 +89,17 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(response).to.deep.equal([id]);
         }
     });
+    it("Should remove rooms dataset", async () => {
+         const id: string = "rooms";
+         let response: string;
+         try {
+             response = await insightFacade.removeDataset(id);
+         } catch (err) {
+             response = err;
+         } finally {
+             expect(response).to.equal(id);
+         }
+    });
     // it("Should remove rooms dataset", async () => {
     //     const id: string = "rooms";
     //     let response: string;
@@ -112,7 +123,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     //         expect(response).to.deep.equal([id]);
     //     }
     // });
-    it("Should list 0 datasets before add uno", async () => {
+  /*  it("Should list 0 datasets before add uno", async () => {
         let response: InsightDataset[];
 
         try {
@@ -636,7 +647,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } finally {
             expect(response).to.be.instanceOf(InsightError);
         }
-    });
+    });*/
     // it("Should add a valid bool", async () => {
     //     const id: boolean = false;
     //     let response: string[];
@@ -661,7 +672,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     //         expect(response).to.be.instanceOf(InsightFacade);
     //     }
     // });
-    it("Should not add a valid broken", async () => {
+/*    it("Should not add a valid broken", async () => {
         const id: string = "coursesBroken";
         let response: string[];
 
@@ -683,7 +694,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         } finally {
             expect(response).to.be.instanceOf(InsightError);
         }
-    });
+    });*/
     // it("Trace Util", async () => {
     //     const id: string = "coursesBroken";
     //     let response: string;
@@ -754,8 +765,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     //         expect(response).to.be.instanceOf(InsightError);
     //     }
     // });
-
-    it("Should add test smaller sets ", async () => {
+/*    it("Should add test smaller sets ", async () => {
         const id: string = "coursesOne";
         let response: string[];
 
@@ -767,7 +777,11 @@ describe("InsightFacade Add/Remove Dataset", function () {
             // expect(response).to.deep.equal([id]);
             expect(response).to.contain("coursesOne");
         }
+<<<<<<< HEAD
     });
+=======
+    });*/
+>>>>>>> first d3
 
 });
 
@@ -852,7 +866,7 @@ describe("InsightFacade PerformQuery", () => {
     });
 
     // Dynamically create and run a test for each query in testQueries
-    it("Should run test queries", () => {
+/*    it("Should run test queries", () => {
         describe("Dynamic InsightFacade PerformQuery tests", () => {
             for (const test of testQueries) {
                 it(`[${test.filename}] ${test.title}`, async () => {
@@ -872,5 +886,5 @@ describe("InsightFacade PerformQuery", () => {
                 });
             }
         });
-    });
+    });*/
 });

@@ -1,5 +1,9 @@
 import Server from "./rest/Server";
 import Log from "./Util";
+import fs = require("fs");
+import restify = require("restify");
+// import {InsightResponse} from "./controller/IInsightFacade";
+// import InsightFacade from "./controller/InsightFacade";
 
 /**
  * Main app class that is run with the node command. Starts the server.
