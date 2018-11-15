@@ -791,54 +791,6 @@ export default class InsightFacade implements IInsightFacade {
             }
         });
     }
-    public removeDataset2(id: string): Promise<string> {
-        let that = this;
-        return new Promise<string>((resolve, reject ) => {
-            if (that.coursesMap.get(id)) {
-                that.coursesMap.delete(id);
-                that.removeFileOnDisk(id, COURSES).then((succ) => {
-                    return resolve("deleted courses");
-                }).catch((err) => {
-                    return reject(err);
-                });
-            } else if (that.roomsMap.get(id)) {
-                console.log("entered");
-                that.roomsMap.delete(id);
-                this.removeFileOnDisk(id, InsightDatasetKind.Rooms).then((succ) => {
-                    console.log("passe");
-                    return resolve("deleted rooms");
-                }).catch((err) => {
-                    return reject(err);
-                });
-            } else {
-                return reject("dataset " + id + " not added");
-            }
-        });
-    }
-    // Helper functions for removeDataset
-    private removeFileOnDisk(id: string, kind: InsightDatasetKind): Promise<boolean> {
-        return new Promise<boolean>((fulfill, reject) => {
-            fs.readdir(kind.toString(), (err, files) => {
-                if (err) {
-                    reject(false);
-                } else {
-                    if (files.includes(id)) {
-                        const path = Path.join(kind, id);
-                        fs.unlink(path, (errFile) => {
-                            if (errFile) {
-                                reject(false);
-                            } else {
-                                fulfill(true);
-                            }
-                        });
-                    } else {
-                        reject(false);
-                    }
-                }
-            });
-        });
-    }
-
     public performQuery(query: any): Promise<any[]> {
         let that = this;
         return new Promise<any[]>(function (resolve, reject) {
