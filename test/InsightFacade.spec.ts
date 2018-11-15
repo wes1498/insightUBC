@@ -781,8 +781,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 =======
     });*/
->>>>>>> first d3
-
 });
 
 // This test suite dynamically generates tests from the JSONe files in test/queries.
