@@ -98,7 +98,6 @@ CampusExplorer.buildQuery = function() {
 
     }
 
-
     return query;
 };
 

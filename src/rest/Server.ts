@@ -15,10 +15,12 @@ export default class Server {
 
     private port: number;
     private rest: restify.Server;
+    private static InsightFacade: InsightFacade;
 
     constructor(port: number) {
         Log.info("Server::<init>( " + port + " )");
         this.port = port;
+        Server.InsightFacade = new InsightFacade();
     }
 
     /**
@@ -158,33 +160,32 @@ export default class Server {
         let x = "./test/data/" + datasetId + ".zip";
         let bitmap = fs.readFileSync(x);
         let datasetStr = new Buffer(bitmap).toString("base64");
-        let instancefacade = InsightFacade.getInstance();
-        let dataKind: InsightDatasetKind = InsightDatasetKind.Rooms;
-        if (datasetKind === "Courses") {
-            dataKind = InsightDatasetKind.Courses;
-        } else {
-            dataKind = InsightDatasetKind.Rooms;
-        }
-        instancefacade.addDataset(datasetId, datasetStr, dataKind).then((successResponse: any) => {
-            fs.writeFile("data/" + datasetId + "tits" + ".json", JSON.stringify(successResponse), function (e) {
-                // return reject(new InsightError("Error Saving Files " + e));
-               // reject({code: 400, body: {error: "Error saving files"}});
-            });
-           // res.json(  successResponse.code + ": " + successResponse.body); // Formats json and res.sends
+        // let instancefacade = InsightFacade.getInstance();
+        // let dataKind: InsightDatasetKind = InsightDatasetKind.Rooms;
+        // if (datasetKind === "Courses") {
+        //     dataKind = InsightDatasetKind.Courses;
+        // } else {
+        //     dataKind = InsightDatasetKind.Rooms;
+        // }
+        Server.InsightFacade.addDataset(datasetId, datasetStr, datasetKind).then((successResponse: any) => {
+            // fs.writeFile("data/" + datasetId + "tits" + ".json", JSON.stringify(successResponse), function (e) {
+            //     // return reject(new InsightError("Error Saving Files " + e));
+            //    // reject({code: 400, body: {error: "Error saving files"}});
+            // });
+
             res.json({code: 200, body: successResponse});
-            return next();
         }).catch((failResponse: any) => {
-            // res.json(failResonse.body);
+
             res.json({code: 400, body: failResponse});
-            return next();
         });
+        return next();
     }
     private static deleteDatasets(req: restify.Request, res: restify.Response, next: restify.Next) {
         // console.log(process.cwd());
         let datasetId = req.params.id;
         // let datasetKind = req.params.kind;
-        const instancefacade = InsightFacade.getInstance();
-        instancefacade.removeDataset(datasetId).then((successResponse: any) => {
+        // const instancefacade = InsightFacade.getInstance();
+        Server.InsightFacade.removeDataset(datasetId).then((successResponse: any) => {
             res.json({code: 200, body: successResponse}); // Formats json and res.sends
             return next();
         }).catch((failResponse: any) => {
@@ -199,8 +200,8 @@ export default class Server {
     private static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
         let query = req.params.body;
         // let datasetKind = req.params.kind;
-        const instancefacade = InsightFacade.getInstance();
-        instancefacade.performQuery(query).then((successResponse: any) => {
+        // const instancefacade = InsightFacade.getInstance();
+        Server.InsightFacade.performQuery(query).then((successResponse: any) => {
             res.json({code: 200, body: successResponse}); // Formats json and res.sends
             return next();
         }).catch((failResponse: any) => {
@@ -211,8 +212,8 @@ export default class Server {
     }
     private static getlistDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
         // let datasetKind = req.params.kind;
-        const instancefacade = InsightFacade.getInstance();
-        instancefacade.listDatasets().then((successResponse: any) => {
+        // const instancefacade = InsightFacade.getInstance();
+        Server.InsightFacade.listDatasets().then((successResponse: any) => {
             res.send( successResponse); // Formats json and res.sends
             return next();
         });

@@ -7,15 +7,18 @@
 CampusExplorer.sendQuery = function(query) {
     return new Promise(function(fulfill, reject) {
          let request = new XMLHttpRequest();
+
         request.open("POST", "/query", true);
-        request.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200) {
-                fulfill(this.responseText);
-            } else if (this.readyState === 4 && this.status === 400) {
+        request.onload = function() {
+            if (this.status === 400) {
                 reject(this.responseText);
+
+            } else if (this.status === 200) {
+                fulfill(this.responseText);
             }
         };
-        request.send(query);
+        request.send(JSON.stringify(query));
+
 
         console.log("sent");
     });
