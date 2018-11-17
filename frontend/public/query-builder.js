@@ -44,6 +44,28 @@ CampusExplorer.buildQuery = function() {
         }
         where = whereOBJHelper(conditions, cond, id);
 
+        query["WHERE"] = where; // WHERE REQUIRED
+
+        let options = {};
+        options["COLUMNS"] = columnsOBJHelper(courseTab, id); // COLUMNS REQUIRED
+
+        if (Object.keys(orderOBJHelper(courseTab, id)).length > 0) {
+
+            options["ORDER"] = orderOBJHelper(courseTab, id); // ORDER NOT REQUIRED
+        }
+
+        query["OPTIONS"] = options; // OPTIONS REQUIRED
+
+        let transformations = {"GROUP": {}, "APPLY": {}};
+        if (Object.keys(groupOBJHelper(courseTab, id)).length > 0) {
+
+            transformations["GROUP"] = groupOBJHelper(courseTab, id);
+            transformations["APPLY"] = applyOBJHelper(courseTab, id);
+            query["TRANSFORMATIONS"] = transformations;
+
+        }
+
+
     } else if (id === "rooms") {
         roomsTab = document.getElementById("tab-rooms");
 
@@ -66,37 +88,36 @@ CampusExplorer.buildQuery = function() {
 
             cond = "NOT";
         }
-        where = whereOBJHelper(conditions, cond, id);
+
+        query["WHERE"] = whereOBJHelper(conditions, cond, id); // WHERE REQUIRED
+
+        let options = { "COLUMNS": {}};
+        options["COLUMNS"] = columnsOBJHelper(roomsTab, id); // COLUMNS REQUIRED
+
+        if (Object.keys(orderOBJHelper(roomsTab, id)).length > 0) {
+
+            options["ORDER"] = orderOBJHelper(roomsTab, id); // ORDER NOT REQUIRED
+        }
+
+        query["OPTIONS"] = options; // OPTIONS REQUIRED
+
+        let transformations = {"GROUP": {}, "APPLY": {}};
+        if (Object.keys(groupOBJHelper(roomsTab, id)).length > 0) {
+
+            transformations["GROUP"] = groupOBJHelper(roomsTab, id);
+            transformations["APPLY"] = applyOBJHelper(roomsTab, id);
+            query["TRANSFORMATIONS"] = transformations;
+
+        }
     }
     // bug
-    let tab = {};
-
-    if (courseTab === document.getElementById("tab-courses")) {
-        tab = courseTab;
-    } else {
-        tab = roomsTab;
-    }
-
-    query["WHERE"] = where; // WHERE REQUIRED
-
-    let options = {};
-    options["COLUMNS"] = columnsOBJHelper(tab, id); // COLUMNS REQUIRED
-
-    if (orderOBJHelper(tab, id).keys.length > 0) {
-
-        options["ORDER"] = orderOBJHelper(tab, id); // ORDER NOT REQUIRED
-    }
-
-    query["OPTIONS"] = options; // OPTIONS REQUIRED
-
-    let transformations = {"GROUP": {}, "APPLY": {}};
-    if (groupOBJHelper(tab, id).length > 0) {
-
-        transformations["GROUP"] = groupOBJHelper(tab, id);
-        transformations["APPLY"] = applyOBJHelper(tab, id);
-        query["TRANSFORMATIONS"] = transformations;
-
-    }
+    // let tab = {};
+    //
+    // if (courseTab === document.getElementById("tab-courses")) {
+    //     tab = courseTab;
+    // } else {
+    //     tab = roomsTab;
+    // }
 
     return query;
 };
@@ -226,7 +247,12 @@ function orderOBJHelper(tab, id) {
 
         if (option.getAttribute("selected") !== null) {
             let key;
-            if (option.getAttribute("class") !== "transformation") {
+            // if (option.getAttribute("class") !== "transformation") {
+            //     key = id + "_" + option.getAttribute("value");
+            // } else {
+            //     key = option.getAttribute("value");
+            // }
+            if (option.getAttribute("class") === null) {
                 key = id + "_" + option.getAttribute("value");
             } else {
                 key = option.getAttribute("value");

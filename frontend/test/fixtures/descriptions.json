@@ -1,5 +1,8 @@
 {
     "query1": "simple query IS comparison for department with two columns and old order syntax",
     "query2": "query with more query keys",
-    "query3": "query with descending maxSeats"
+    "query3": "query with descending maxSeats",
+    "query4": "query with no ORDER",
+    "query5": "query with asterisk",
+    "query6": "query with AND then NOT"
 }
