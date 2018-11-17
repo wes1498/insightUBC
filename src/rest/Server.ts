@@ -154,7 +154,7 @@ export default class Server {
             }
             try {
                 instancefacade.addDataset(datasetId, datasetStr, dataKind).then((successResponse: any) => {
-                    console.log(successResponse);
+                    // console.log(successResponse);
                     // res.json( 200, successResponse);
                     res.send(200, successResponse);
                     return next();
