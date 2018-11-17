@@ -67,7 +67,7 @@ describe("Facade D3", function () {
     */
     it("list datasets", function () {
         return chai.request("http://localhost:4321")
-            .get("/numberOfDatasets")
+            .get("/datasets")
             .then(function (res) {
                 expect(res.status).to.equal(200);
             }).catch((err) => {

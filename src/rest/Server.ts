@@ -15,12 +15,10 @@ export default class Server {
 
     private port: number;
     private rest: restify.Server;
-    private static InsightFacade: InsightFacade;
 
     constructor(port: number) {
         Log.info("Server::<init>( " + port + " )");
         this.port = port;
-        Server.InsightFacade = new InsightFacade();
     }
 
     /**
@@ -66,13 +64,11 @@ export default class Server {
                 // This is an example endpoint that you can invoke by accessing this URL in your browser:
                 // http://localhost:4321/echo/hello
                 that.rest.get("/echo/:msg", Server.echo);
-               // that.rest.get("/yeet", Server.getShit);
 
                 that.rest.put("/dataset/:id/:kind", Server.addDatasetFiles);
                 that.rest.del("/dataset/:id", Server.deleteDatasets);
                 that.rest.post("/query", Server.postQuery);
                 that.rest.get("/datasets", Server.getlistDataset);
-                // Log.info("putted");
 
                 // NOTE: your endpoints should go here
 
@@ -98,14 +94,6 @@ export default class Server {
         });
     }
 
-    private static getShit(req: restify.Request, res: restify.Response, next: restify.Next) {
-        let result = Server.performEcho(req.params.msg);
-        // console.log(result);
-        // return "yeeeeeet";
-        res.send("yeeeeeet");
-        // return next();
-    }
-
     // The next two methods handle the echo service.
     // These are almost certainly not the best place to put these, but are here for your reference.
     // By updating the Server.echo function pointer above, these methods can be easily moved.
@@ -113,10 +101,10 @@ export default class Server {
         Log.trace("Server::echo(..) - params: " + JSON.stringify(req.params));
         try {
             // const response = Server.performEcho(req.params.msg);
-            let response = "yeeeeeeeet mofocker";
+            let response = "herreee";
             // console.log("made it here responds");
             Log.info("Server::echo(..) - responding " + 200);
-            res.json(200, {result: "yeeeeeeet motherfucker"});
+            res.json(200, {result: "heree"});
         } catch (err) {
             // console.log("made it here dosent respond");
             Log.error("Server::echo(..) - responding 400");
@@ -153,55 +141,51 @@ export default class Server {
         });
     }
     private static addDatasetFiles(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("Server::addDataset(..) - id: " + req.params.id + ", kind: " + req.params.kind);
-        let datasetId = req.params.id;
-        let datasetKind = req.params.kind;
-        // console.log(datasetId);
-        let x = "./test/data/" + datasetId + ".zip";
-        let bitmap = fs.readFileSync(x);
-        let datasetStr = new Buffer(bitmap).toString("base64");
-        // let instancefacade = InsightFacade.getInstance();
-        // let dataKind: InsightDatasetKind = InsightDatasetKind.Rooms;
-        // if (datasetKind === "Courses") {
-        //     dataKind = InsightDatasetKind.Courses;
-        // } else {
-        //     dataKind = InsightDatasetKind.Rooms;
-        // }
-        Server.InsightFacade.addDataset(datasetId, datasetStr, datasetKind).then((successResponse: any) => {
-            // fs.writeFile("data/" + datasetId + "tits" + ".json", JSON.stringify(successResponse), function (e) {
-            //     // return reject(new InsightError("Error Saving Files " + e));
-            //    // reject({code: 400, body: {error: "Error saving files"}});
-            // });
-
-            res.json({code: 200, body: successResponse});
-        }).catch((failResponse: any) => {
-
-            res.json({code: 400, body: failResponse});
-        });
-        return next();
+            let datasetId = req.params.id;
+            let datasetKind = req.params.kind;
+            let buff = req.params.body;
+            let datasetStr = buff.toString("base64");
+            let instancefacade = InsightFacade.getInstance();
+            let dataKind: InsightDatasetKind = InsightDatasetKind.Rooms;
+            if (datasetKind === "courses") {
+                dataKind = InsightDatasetKind.Courses;
+            } else {
+                dataKind = InsightDatasetKind.Rooms;
+            }
+            try {
+                instancefacade.addDataset(datasetId, datasetStr, dataKind).then((successResponse: any) => {
+                    res.json({code: 200, body: successResponse});
+                    return next();
+                }).catch((failResponse: any) => {
+                    // res.json(failResonse.body);
+                    res.json({code: 400, body: failResponse});
+                    return next();
+                });
+            } catch (e) {
+                // console.log("caught");
+                res.json({code: 400, body: "caught"});
+            }
     }
     private static deleteDatasets(req: restify.Request, res: restify.Response, next: restify.Next) {
-        // console.log(process.cwd());
         let datasetId = req.params.id;
-        // let datasetKind = req.params.kind;
-        // const instancefacade = InsightFacade.getInstance();
-        Server.InsightFacade.removeDataset(datasetId).then((successResponse: any) => {
+        const instancefacade = InsightFacade.getInstance();
+        instancefacade.removeDataset(datasetId).then((successResponse: any) => {
             res.json({code: 200, body: successResponse}); // Formats json and res.sends
             return next();
         }).catch((failResponse: any) => {
-            // Log.error("Server::echo(..) - responding " + failResponse.code);
-            // e.log(failResponse);
             let h = failResponse.message;
             res.json({code: 400, body: h});
-           // res.send(failResponse);
             return next();
         });
     }
     private static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
         let query = req.params.body;
         // let datasetKind = req.params.kind;
-        // const instancefacade = InsightFacade.getInstance();
-        Server.InsightFacade.performQuery(query).then((successResponse: any) => {
+        if (typeof req.body === "string") {
+            query = JSON.parse(req.body);
+        }
+        let instancefacade = InsightFacade.getInstance();
+        instancefacade.performQuery(query).then((successResponse: any) => {
             res.json({code: 200, body: successResponse}); // Formats json and res.sends
             return next();
         }).catch((failResponse: any) => {
@@ -212,8 +196,8 @@ export default class Server {
     }
     private static getlistDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
         // let datasetKind = req.params.kind;
-        // const instancefacade = InsightFacade.getInstance();
-        Server.InsightFacade.listDatasets().then((successResponse: any) => {
+        let instancefacade = InsightFacade.getInstance();
+        instancefacade.listDatasets().then((successResponse: any) => {
             res.send( successResponse); // Formats json and res.sends
             return next();
         });

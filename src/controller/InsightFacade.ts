@@ -248,6 +248,8 @@ export default class InsightFacade implements IInsightFacade {
                     let roomsobj = JSON.parse(JSON.stringify(obj));
                     return resolve(roomsobj);
                 });
+                // console.log("caught it here");
+                // return reject("GEO ERROR: ");
             });
         });
     }
@@ -295,6 +297,8 @@ export default class InsightFacade implements IInsightFacade {
                 fxarray.push(j);
                 return resolve(fxarray);
                 // console.log(that.roomsMap);
+            }).catch((err) => {
+                console.log("caught it " +  err); // some coding error in handling happened
             });
             // return resolve("ee");
         });
@@ -625,6 +629,8 @@ export default class InsightFacade implements IInsightFacade {
                             result.push(value);
                         });
                         return resolve(result);
+                    }).catch((e) => {
+                        console.log("caught  " + e);
                     });
                     // }));
                 }).catch((e) => {
