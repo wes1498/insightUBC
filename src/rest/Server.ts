@@ -154,30 +154,36 @@ export default class Server {
             }
             try {
                 instancefacade.addDataset(datasetId, datasetStr, dataKind).then((successResponse: any) => {
-                    res.json( 200, successResponse);
+                    console.log(successResponse);
+                    // res.json( 200, successResponse);
+                    res.send(200, successResponse);
                     return next();
                 }).catch((failResponse: any) => {
                     // res.json(failResonse.body);
-                    res.json(400,  failResponse);
+                    // res.json(400,  failResponse);
+                    res.send(400, failResponse);
                     return next();
                 });
             } catch (e) {
                 // console.log("caught");
-                res.json( 400, e);
+                // res.json( 400, e);
+                res.send(400, e);
             }
         } catch (e) {
-            res.json(400, e);
+            res.send(400, e);
         }
     }
     private static deleteDatasets(req: restify.Request, res: restify.Response, next: restify.Next) {
         let datasetId = req.params.id;
         const instancefacade = InsightFacade.getInstance();
         instancefacade.removeDataset(datasetId).then((successResponse: any) => {
-            res.json( 200, successResponse); // Formats json and res.sends
+            // res.json( 200, successResponse); // Formats json and res.sends
+            res.send(200, successResponse);
             return next();
         }).catch((failResponse: any) => {
             let h = failResponse.message;
-            res.json( 404,  h);
+            // res.json( 404,  h);
+            res.send(404, h);
             return next();
         });
     }
@@ -189,18 +195,21 @@ export default class Server {
         }
         let instancefacade = InsightFacade.getInstance();
         instancefacade.performQuery(query).then((successResponse: any) => {
-            res.json( 200, successResponse); // Formats json and res.sends
+            // res.json( 200, successResponse); // Formats json and res.sends
+            res.send(200, successResponse);
             return next();
         }).catch((failResponse: any) => {
             let h = failResponse.message;
-            res.json( 400, h);
+            // res.json( 400, h);
+            res.send(400, h);
             return next();
         });
     }
     private static getlistDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
         let instancefacade = InsightFacade.getInstance();
         instancefacade.listDatasets().then((successResponse: any) => {
-            res.json( 200, successResponse);
+           // res.json( 200, successResponse);
+            res.send(200, successResponse);
             return next();
         });
     }
