@@ -27,7 +27,6 @@
             "ORDER": {
                 "dir": "DOWN",
                 "keys": ["rooms_lat"],
-
             }
         },
         "TRANSFORMATIONS": {

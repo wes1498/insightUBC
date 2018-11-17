@@ -324,7 +324,6 @@ function applyOBJHelper(tab, id) {
         }
 
         let key;
-
         // key = oneOf audit-avg-dept...
         // transformation.getElementsByClassName("control fields")[0]
         //     .getElementsByTagName("option").find(function (field) {
