@@ -298,7 +298,7 @@ export default class InsightFacade implements IInsightFacade {
                 return resolve(fxarray);
                 // console.log(that.roomsMap);
             }).catch((err) => {
-                console.log("caught it " +  err); // some coding error in handling happened
+                // console.log("caught it " +  err); // some coding error in handling happened
             });
             // return resolve("ee");
         });
@@ -630,7 +630,7 @@ export default class InsightFacade implements IInsightFacade {
                         });
                         return resolve(result);
                     }).catch((e) => {
-                        console.log("caught  " + e);
+                        // console.log("caught  " + e);
                     });
                     // }));
                 }).catch((e) => {
