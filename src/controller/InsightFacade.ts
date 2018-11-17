@@ -626,7 +626,7 @@ export default class InsightFacade implements IInsightFacade {
                         let result: any[] = [];
                         that.roomsMap.forEach(function (value, key) {
                             // console.log(key);
-                            result.push(value);
+                            result.push(key);
                         });
                         return resolve(result);
                     }).catch((e) => {
@@ -740,7 +740,7 @@ export default class InsightFacade implements IInsightFacade {
 
                         let result: string[] = [];
                         that.coursesMap.forEach(function (value, key) {
-                            result.push(value);
+                            result.push(key);
                         });
                         return resolve(result);
                         // }

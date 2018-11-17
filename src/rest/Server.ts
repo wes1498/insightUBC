@@ -181,8 +181,8 @@ export default class Server {
     private static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
         let query = req.params.body;
         // let datasetKind = req.params.kind;
-        if (typeof req.body === "string") {
-            query = JSON.parse(req.body);
+        if (typeof req.params.body === "string") {
+            query = JSON.parse(req.params.body);
         }
         let instancefacade = InsightFacade.getInstance();
         instancefacade.performQuery(query).then((successResponse: any) => {
