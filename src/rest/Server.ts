@@ -177,7 +177,7 @@ export default class Server {
             return next();
         }).catch((failResponse: any) => {
             let h = failResponse.message;
-            res.json( 400,  h);
+            res.json( 404,  h);
             return next();
         });
     }
