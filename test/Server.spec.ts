@@ -6,6 +6,7 @@ import chai = require("chai");
 import chaiHttp = require("chai-http");
 import {expect} from "chai";
 import Log from "../src/Util";
+import * as fs from "fs";
 
 describe("Facade D3", function () {
 
@@ -74,6 +75,78 @@ describe("Facade D3", function () {
                 expect.fail();
             });
     });
-
+    it("put datasets rooms", function () {
+        let files = process.cwd();
+        let file2 = files + "/test/data/rooms.zip";
+        return chai.request("http://localhost:4321")
+            .put("/dataset/rooms/rooms")
+            .attach("body", fs.readFileSync(file2), "rooms.zip")
+            .then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch((err) => {
+                expect.fail();
+            });
+    });
+    it("put datasets courses", function () {
+        let files = process.cwd();
+        let file2 = files + "/test/data/courses.zip";
+        return chai.request("http://localhost:4321")
+            .put("/dataset/courses/courses")
+            .attach("body", fs.readFileSync(file2), "courses.zip")
+            .then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch(() => {
+                expect.fail();
+            });
+    });
+    it("delete dataset courses", function () {
+        return chai.request("http://localhost:4321")
+            .del("/dataset/courses")
+            .then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch(() => {
+                expect.fail();
+            });
+    });
+    it("delete dataset courses with 404", function () {
+        return chai.request("http://localhost:4321")
+            .del("/dataset/courses")
+            .then(function () {
+                expect.fail();
+            }).catch((err) => {
+                expect(err.status).to.equal(404);
+            });
+    });
+    it("delete dataset courses with 400", function () {
+        return chai.request("http://localhost:4321")
+            .del("/dataset/").then(function () {
+                expect.fail();
+            }).catch((err) => {
+                expect(err.status).to.equal(400);
+            });
+    });
+    it("put datasets courses", function () {
+        let files = process.cwd();
+        let file2 = files + "/test/data/courses.zip";
+        return chai.request("http://localhost:4321")
+            .put("/dataset/courses/courses").attach("body", fs.readFileSync(file2), "courses.zip").then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch(() => {
+                expect.fail();
+            });
+    });
+    it("post 400", function () {
+        let files = process.cwd();
+        let file2 = files + "/test/queries/q2.json";
+        let query = fs.readFileSync(file2).toString();
+        // console.log(query);
+        return chai.request("http://localhost:4321").post("/query").send(query).then(function (res) {
+                // console.log(res);
+                expect.fail();
+            }).catch((err) => {
+                // console.log(err);
+            expect(err.status).to.equal(400);
+            });
+    });
     // The other endpoints work similarly. You should be able to find all instructions at the chai-http documentation
 });

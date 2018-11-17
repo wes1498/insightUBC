@@ -765,19 +765,19 @@ export default class InsightFacade implements IInsightFacade {
                 // reject({code: 400, body: {error: "Invalid ID"}});
             } else if (id === "rooms") {
                 if ((!that.roomsMap.has(id))) {
-                    return reject(new NotFoundError("Id not in Map"));
+                    return reject(new NotFoundError("NotFound: Id not in Map"));
                     // reject({code: 400, body: {error: "ID not in rooms Map"}});
                 }
             } else if (id === "courses") {
                 if (!that.coursesMap.has(id)) {
-                    return reject(new NotFoundError("Id not in Map"));
+                    return reject(new NotFoundError("NotFound: Id not in Map"));
                     // reject({code: 400, body: {error: "ID not in courses Map"}});
                 }
             }
             if (that.roomsMap.has(id)) {
                 fs.unlink(x, function (err) {
                     if (err) {
-                            return reject(new NotFoundError("Dataset has not yet been loaded"));
+                            return reject(new NotFoundError("NotFound: Dataset has not yet been loaded"));
                         } else {
                         that.roomsMap.delete(id);
                         // console.log("made it here");
@@ -787,7 +787,7 @@ export default class InsightFacade implements IInsightFacade {
             } else if (that.coursesMap.has(id)) {
                 fs.unlink(x, function (err) {
                     if (err) {
-                        return reject(new NotFoundError("Dataset has not yet been loaded"));
+                        return reject(new NotFoundError("NotFound: Dataset has not yet been loaded"));
                     } else {
                         that.coursesMap.delete(id);
                         // console.log("made it here");
