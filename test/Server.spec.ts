@@ -148,5 +148,24 @@ describe("Facade D3", function () {
             expect(err.status).to.equal(400);
             });
     });
+    it("echo with 400", function () {
+        return chai.request("http://localhost:4321")
+            .get("/echo")
+            .then(function () {
+                expect.fail();
+            }).catch((err) => {
+                console.log(err.status);
+                expect(err.status).to.equal(500);
+            });
+    });
+    it("echo with 200", function () {
+        return chai.request("http://localhost:4321")
+            .get("/echo/hello")
+            .then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch((err) => {
+                expect.fail();
+            });
+    });
     // The other endpoints work similarly. You should be able to find all instructions at the chai-http documentation
 });

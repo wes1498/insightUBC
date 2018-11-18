@@ -218,40 +218,40 @@ export default class InsightFacade implements IInsightFacade {
 
     private getGeo(url: string, fu2: any, st: any, r2: any, r3: any, a2: any, s2: any, te: any, fn: any, hf: any):
         Promise<IGeoResponse> {
-        return new Promise<IGeoResponse>((resolve, reject) => {
-            http.get(url, (result) => {
-                result.setEncoding("utf8");
-                let body = "";
-                result.on("data", (chunk) => {
-                    body += chunk;
-                }).on("error", (err) => {
-                    return reject("GEO ERROR: " + err);
+            return new Promise<IGeoResponse>((resolve, reject) => {
+                http.get(url, (result) => {
+                    result.setEncoding("utf8");
+                    let body = "";
+                    result.on("data", (chunk) => {
+                        body += chunk;
+                    }).on("error", (err) => {
+                        return reject("GEO ERROR: " + err);
+                    });
+                    result.on("end", () => {
+                        let resultVal: IGeoResponse = JSON.parse(body);
+                        let latlon = JSON.parse(JSON.stringify(resultVal));
+                        let lati = latlon.lat;
+                        let longi = latlon.lon;
+                        let obj = {
+                            rooms_fullname: fu2,
+                            rooms_shortname: st,
+                            rooms_number: r2,
+                            rooms_name: r3,
+                            rooms_address: a2,
+                            rooms_lat: lati,
+                            rooms_lon: longi,
+                            rooms_seats: s2,
+                            rooms_type: te,
+                            rooms_furniture: fn,
+                            rooms_href: "http:" + hf
+                        };
+                        let roomsobj = JSON.parse(JSON.stringify(obj));
+                        return resolve(roomsobj);
+                    });
+                    // console.log("caught it here");
+                    // return reject("GEO ERROR: ");
                 });
-                result.on("end", () => {
-                    let resultVal: IGeoResponse = JSON.parse(body);
-                    let latlon = JSON.parse(JSON.stringify(resultVal));
-                    let lati = latlon.lat;
-                    let longi = latlon.lon;
-                    let obj = {
-                        rooms_fullname: fu2,
-                        rooms_shortname: st,
-                        rooms_number: r2,
-                        rooms_name: r3,
-                        rooms_address: a2,
-                        rooms_lat: lati,
-                        rooms_lon: longi,
-                        rooms_seats: s2,
-                        rooms_type: te,
-                        rooms_furniture: fn,
-                        rooms_href: "http:" + hf
-                    };
-                    let roomsobj = JSON.parse(JSON.stringify(obj));
-                    return resolve(roomsobj);
-                });
-                // console.log("caught it here");
-                // return reject("GEO ERROR: ");
             });
-        });
     }
 
     private putData(mixarr3: any, chunks: any, id: any): any {
@@ -634,6 +634,7 @@ export default class InsightFacade implements IInsightFacade {
                     });
                     // }));
                 }).catch((e) => {
+                    that.roomsMap.delete(id);
                     return reject(new InsightError("Error decoding contents of rooms: Invalid Zip " + e));
                 });
             } else if (kind === InsightDatasetKind.Courses) {
@@ -726,6 +727,7 @@ export default class InsightFacade implements IInsightFacade {
                             }));
                         }));
                     } else {
+                        that.coursesMap.delete(id);
                         return reject(new InsightError("Desired folder for the dataset kind does not exist"));
                     }
                     Promise.all(filesPromise).then(function () {
@@ -746,6 +748,7 @@ export default class InsightFacade implements IInsightFacade {
                         // }
                     });
                 }).catch((e) => {
+                    that.coursesMap.delete(id);
                     return reject(new InsightError("Error decoding contents of courses: Invalid Zip " + e));
                 });
             }

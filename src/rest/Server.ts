@@ -161,7 +161,7 @@ export default class Server {
                 }).catch((failResponse: any) => {
                     // res.json(failResonse.body);
                     // res.json(400,  failResponse);
-                    res.send(400, {error: failResponse});
+                    res.send(400, {error: failResponse.message});
                     return next();
                 });
             } catch (e) {
