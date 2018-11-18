@@ -154,7 +154,7 @@ describe("Facade D3", function () {
             .then(function () {
                 expect.fail();
             }).catch((err) => {
-                console.log(err.status);
+                // console.log(err.status);
                 expect(err.status).to.equal(500);
             });
     });
