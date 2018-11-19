@@ -167,5 +167,37 @@ describe("Facade D3", function () {
                 expect.fail();
             });
     });
+    it("put datasets courses with 400", function () {
+        let files = process.cwd();
+        let file2 = files + "/test/data/courses.zip";
+        return chai.request("http://localhost:4321")
+            .put("/dataset/courses/rooms")
+            .attach("body", fs.readFileSync(file2), "rooms.zip")
+            .then(function () {
+                expect.fail();
+            }).catch((e) => {
+                expect(e.status).to.equal(400);
+            });
+    });
+    it("delete dataset rooms", function () {
+        return chai.request("http://localhost:4321")
+            .del("/dataset/rooms")
+            .then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch(() => {
+                expect.fail();
+            });
+    });
+    it("put post 200", function () {
+        let files = process.cwd();
+        let file2 = files + "/test/queries/q2.json";
+        return chai.request("http://localhost:4321").post("/query")
+            .attach("body", fs.readFileSync(file2), "q2.json")
+            .then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch((e) => {
+                expect.fail();
+            });
+    });
     // The other endpoints work similarly. You should be able to find all instructions at the chai-http documentation
 });

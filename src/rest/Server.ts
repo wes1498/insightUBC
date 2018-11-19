@@ -140,7 +140,6 @@ export default class Server {
         });
     }
     private static addDatasetFiles(req: restify.Request, res: restify.Response, next: restify.Next) {
-        try {
             let datasetId = req.params.id;
             let datasetKind = req.params.kind;
             let buff = req.params.body;
@@ -152,8 +151,7 @@ export default class Server {
             } else {
                 dataKind = InsightDatasetKind.Rooms;
             }
-            try {
-                instancefacade.addDataset(datasetId, datasetStr, dataKind).then((successResponse: any) => {
+            instancefacade.addDataset(datasetId, datasetStr, dataKind).then((successResponse: any) => {
                     // console.log(successResponse);
                     // res.json( 200, successResponse);
                     res.send(200, {result: successResponse});
@@ -164,14 +162,6 @@ export default class Server {
                     res.send(400, {error: failResponse.message});
                     return next();
                 });
-            } catch (e) {
-                // console.log("caught");
-                // res.json( 400, e);
-                res.send(400, {error: e});
-            }
-        } catch (e) {
-            res.send(400, {error: e});
-        }
     }
     private static deleteDatasets(req: restify.Request, res: restify.Response, next: restify.Next) {
         let datasetId = req.params.id;
