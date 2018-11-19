@@ -628,12 +628,12 @@ export default class InsightFacade implements IInsightFacade {
                         let result: any[] = [];
                         that.roomsMap.forEach(function (value, key) {
                             // console.log(key);
-                            // result.push(key);
+                            result.push(key);
                         });
                         let poth = process.cwd() + "/data";
                         let k = fs.readdirSync(poth);
                         k.forEach((rex) => {
-                            if (rex.match(/.*json/)) {
+                            if (rex.match(/.*json/) && !rex.match(id + ".json")) {
                                 let dat = rex.replace(/\.json/, "");
                                 result.push(dat);
                             }
@@ -752,12 +752,12 @@ export default class InsightFacade implements IInsightFacade {
 
                         let result: string[] = [];
                         that.coursesMap.forEach(function (value, key) {
-                            // result.push(key);
+                             result.push(key);
                         });
                         let poth = process.cwd() + "/data";
                         let x = fs.readdirSync(poth);
                         x.forEach((res) => {
-                            if (res.match(/.*json/)) {
+                            if (res.match(/.*json/) && !res.match(id + ".json")) {
                                 let dat = res.replace(/\.json/, "");
                                 result.push(dat);
                             }
