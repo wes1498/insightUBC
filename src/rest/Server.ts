@@ -99,13 +99,10 @@ export default class Server {
     private static echo(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("Server::echo(..) - params: " + JSON.stringify(req.params));
         try {
-            // const response = Server.performEcho(req.params.msg);
-            let response = "herreee";
-            // console.log("made it here responds");
+            const response = Server.performEcho(req.params.msg);
             Log.info("Server::echo(..) - responding " + 200);
-            res.json(200, {result: "heree"});
+            res.json(200, {result: response});
         } catch (err) {
-            // console.log("made it here dosent respond");
             Log.error("Server::echo(..) - responding 400");
             res.json(400, {error: err});
         }
