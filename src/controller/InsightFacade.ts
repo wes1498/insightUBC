@@ -38,6 +38,7 @@ export default class InsightFacade implements IInsightFacade {
     private hrefArray1: string[][] = [];
     private mixArray1: string[][] = [];
     private latlonArray1: string[][] = [];
+    private kepler: any[] = [];
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
@@ -54,6 +55,7 @@ export default class InsightFacade implements IInsightFacade {
         this.hrefArray1 = [];
         this.mixArray1 = [];
         this.latlonArray1 = [];
+        this.kepler = [];
     }
 
     public static getInstance() {
@@ -626,7 +628,15 @@ export default class InsightFacade implements IInsightFacade {
                         let result: any[] = [];
                         that.roomsMap.forEach(function (value, key) {
                             // console.log(key);
-                            result.push(key);
+                            // result.push(key);
+                        });
+                        let poth = process.cwd() + "/data";
+                        let k = fs.readdirSync(poth);
+                        k.forEach((rex) => {
+                            if (rex.match(/.*json/)) {
+                                let dat = rex.replace(/\.json/, "");
+                                result.push(dat);
+                            }
                         });
                         return resolve(result);
                     }).catch((e) => {
@@ -742,8 +752,17 @@ export default class InsightFacade implements IInsightFacade {
 
                         let result: string[] = [];
                         that.coursesMap.forEach(function (value, key) {
-                            result.push(key);
+                            // result.push(key);
                         });
+                        let poth = process.cwd() + "/data";
+                        let x = fs.readdirSync(poth);
+                        x.forEach((res) => {
+                            if (res.match(/.*json/)) {
+                                let dat = res.replace(/\.json/, "");
+                                result.push(dat);
+                            }
+                        });
+                        // console.log(result);
                         return resolve(result);
                         // }
                     });

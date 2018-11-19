@@ -94,6 +94,7 @@ describe("Facade D3", function () {
             .put("/dataset/courses/courses")
             .attach("body", fs.readFileSync(file2), "courses.zip")
             .then(function (res) {
+                // console.log(res);
                 expect(res.status).to.equal(200);
             }).catch(() => {
                 expect.fail();
@@ -182,6 +183,15 @@ describe("Facade D3", function () {
     it("delete dataset rooms", function () {
         return chai.request("http://localhost:4321")
             .del("/dataset/rooms")
+            .then(function (res) {
+                expect(res.status).to.equal(200);
+            }).catch(() => {
+                expect.fail();
+            });
+    });
+    it("delete dataset courses 2", function () {
+        return chai.request("http://localhost:4321")
+            .del("/dataset/courses")
             .then(function (res) {
                 expect(res.status).to.equal(200);
             }).catch(() => {

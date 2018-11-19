@@ -89,6 +89,18 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(response).to.deep.equal([id]);
         }
     });
+    it("Should add courses", async () => {
+        const id: string = "courses";
+        let response: string[];
+
+        try {
+            response = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.deep.equal([id, "rooms"]);
+        }
+    });
     it("Should remove rooms dataset", async () => {
          const id: string = "rooms";
          let response: string;
@@ -99,6 +111,17 @@ describe("InsightFacade Add/Remove Dataset", function () {
          } finally {
              expect(response).to.equal(id);
          }
+    });
+    it("Should remove course dataset", async () => {
+        const id: string = "courses";
+        let response: string;
+        try {
+            response = await insightFacade.removeDataset(id);
+        } catch (err) {
+            response = err;
+        } finally {
+            expect(response).to.equal(id);
+        }
     });
     // it("Should remove rooms dataset", async () => {
     //     const id: string = "rooms";
